@@ -31,7 +31,9 @@ def get_sleep_frame(path):
         data, time = raw[picks_eeg, start:stop]
         sleep_time_frame.append(data)
     tmp = np.array(sleep_time_frame)
-    sleep_time_frame = tmp.reshape((-1, fz * duration_time))
+    sleep_time_frame = tmp.reshape((-1, fz * duration_time))  # 数据标准化的处理
+    save_path = "../Data/output_data/sleep_frame_eeg.npy"
+    save_numpy_info(sleep_time_frame, save_path)
     return sleep_time_frame
 
 

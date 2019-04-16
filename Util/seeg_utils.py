@@ -13,3 +13,9 @@ def read_raw(path):
 def get_channels_names(raw):
     channel_names = raw.info['ch_names']
     return channel_names
+
+
+def save_numpy_info(data, path):  # 存储numpy的数据
+    np.save(path, data)
+    print("Successfully save!")
+    return True
