@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import numpy as np
+from main.pre_Processing import *
 
 
 def test_1():
@@ -15,7 +16,21 @@ def test_1():
 
 
 def test_2():
-    path = "../Data/output_data/sleep_frame_eeg.npy"
+    path = "../data/output_data/sleep_frame_eeg.npy"
     data = np.load(path)
     print(data.shape)
     print(data)
+
+
+def test_3():
+    path_data = "../data/output_data/sleep_frame_eeg.npy"
+    sleep_time_frame = read_sleep_date(path_data)
+    length = len(sleep_time_frame)
+    ratio = duration_time / length
+    x = [ratio * x for x in range(length)]
+    draw_plot(x, sleep_time_frame)
+
+
+# 模板
+def test_n():
+    print("test_n finished!")
