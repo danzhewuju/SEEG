@@ -1,9 +1,13 @@
 #!/usr/bin/python
+# ---------------------------------
+# 文件工具方法， 主要包含常见的文件处理方法
+#
+# ---------------------------------
 import glob
 import os
 
 
-def test_4(path="../data/data_path.txt"):
+def get_all_file_path(path="../data/data_path.txt"): # 主要是获取某文件夹下面所有的文件列表
     '''
     :param path: 存储对应文件的路径
     :return: 文件夹下面对应的文件路径
