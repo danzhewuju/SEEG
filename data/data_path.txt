@@ -1,0 +1,2 @@
+E:\数据集\表型数据集\SEEG_Data\LK处理数据
+E:\数据集\表型数据集\SEEG_Data\SGH处理数据
