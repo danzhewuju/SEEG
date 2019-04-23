@@ -68,4 +68,6 @@ def test_6():
 
 # 模板
 def test_n():
-    print(str(uuid.uuid1())+"-1")
+    path_normal = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/split/cases"
+    f = list(os.walk(path_normal))
+    print(len(f[0][2]))
