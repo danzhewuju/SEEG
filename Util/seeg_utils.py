@@ -57,7 +57,7 @@ def get_common_channels(ch_names1, ch_names2):  # 寻找两个数据的公共信
     return common_channels
 
 
-def data_connection(raw1, raw2):
+def data_connection(raw1, raw2):  # 数据的拼接
     '''
 
     :param raw1: raw data1
@@ -68,9 +68,21 @@ def data_connection(raw1, raw2):
     return raw1
 
 
-def select_channel_data(raw, ):  # 根据某些信道的名称进行数据选择
+def select_channel_data(raw, select_channel_names):  # 根据某些信道的名称进行数据选择,直接选择这个信道的数据
     '''
 
     :param raw:  raw data
     :return: channel data
     '''
+    ch_names = get_channels_names(raw)
+    pick_channel_No = mne.pick_channels(ch_names=ch_names, include=select_channel_names)
+    data, time = raw[pick_channel_No, :]
+    return data
+
+
+def select_channel_data_mne(raw, select_channel_name):
+    chan_name = select_channel_name
+    specific_chans = raw.copy().pick_channels(chan_name)
+    specific_chans.plot(block=True)
+    return specific_chans
+
