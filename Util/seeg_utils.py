@@ -44,3 +44,33 @@ def rewrite(raw, include_names, save_path):  # 对数据进行重写,主要是�
     raw.save(save_path, picks=picks, overwrite=True)
     # raw.save("SEEG.fif", picks=picks_seeg, overwrite=True)
     print("successfully written!")
+
+
+def get_common_channels(ch_names1, ch_names2):  # 寻找两个数据的公共信道
+    '''
+
+    :param ch_names1: raw1 ch_names list
+    :param ch_names2: raw2 ch_names list
+    :return: common ch_names list
+    '''
+    common_channels = [x for x in ch_names1 if x in ch_names2]
+    return common_channels
+
+
+def data_connection(raw1, raw2):
+    '''
+
+    :param raw1: raw data1
+    :param raw2: raw data2
+    :return:  data connection raw1:raw2
+    '''
+    raw1.append(raw2)
+    return raw1
+
+
+def select_channel_data(raw, ):  # 根据某些信道的名称进行数据选择
+    '''
+
+    :param raw:  raw data
+    :return: channel data
+    '''

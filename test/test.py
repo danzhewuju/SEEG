@@ -58,6 +58,15 @@ def test_4(path="../data/data_path.txt"):
     return file_map
 
 
+def test_6():
+    print("test_n finished!")
+    a = {"1": 12}
+    print(a)
+    a["2"] = 123
+    print(a)
+    return True
+
+
 # 模板
 def test_n():
     print("test_n finished!")
