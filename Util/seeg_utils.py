@@ -2,6 +2,8 @@
 
 import mne
 import numpy as np
+import os
+import uuid
 import matplotlib.pyplot as plt
 
 
@@ -83,6 +85,36 @@ def select_channel_data(raw, select_channel_names):  # 根据某些信道的名�
 def select_channel_data_mne(raw, select_channel_name):
     chan_name = select_channel_name
     specific_chans = raw.copy().pick_channels(chan_name)
-    specific_chans.plot(block=True)
+    # specific_chans.plot(block=True)
     return specific_chans
 
+
+def data_split(raw, time_step):  # 数据的切片处理
+    data_split = []
+    end = max(raw.times)
+    epoch = int(end // time_step)
+    fz = int(len(raw) / end)  # 采样频率
+    for index in range(epoch - 1):
+        start = index * fz * time_step
+        stop = (index + 1) * fz * time_step
+        data, time = raw[:, start:stop]
+        data_split.append(data)
+    return data_split
+
+
+def save_split_data(data_split, path, flag):  # 切片数据的保存
+    '''
+
+    :param data_split:  被切片的数据
+    :param path:   所存储的文件夹
+    :param flag:   对应数据的标识
+    :return:
+    '''
+    if not os.path.exists(path):
+        os.makedirs(path)
+    for d in data_split:
+        name = str(uuid.uuid1()) + "-" + str(flag)
+        path_all = os.path.join(path, name)
+        save_numpy_info(d, path_all)
+    print("File save successfully {}".format(path))
+    return True

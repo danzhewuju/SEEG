@@ -12,7 +12,7 @@ select_channel_name = ['EEG C3-Ref-1']  # 选择信道的名称
 '''
 
 
-def get_sleep_frame(path):           # 获得某一个信道的切片并对其进行处理
+def get_sleep_frame(path):  # 获得某一个信道的切片并对其进行处理
     raw = read_raw(path)
     raw.resample(100, npad="auto")  # resample 100hz
     raw.plot(duration=30)
@@ -46,3 +46,4 @@ def read_sleep_date(path):
     '''
     data = np.load(path)
     return data
+

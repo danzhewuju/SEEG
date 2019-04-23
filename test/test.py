@@ -3,6 +3,7 @@ import numpy as np
 from main.pre_Processing import *
 import glob
 import os
+import uuid
 
 
 def test_1():
@@ -59,14 +60,12 @@ def test_4(path="../data/data_path.txt"):
 
 
 def test_6():
-    print("test_n finished!")
-    a = {"1": 12}
-    print(a)
-    a["2"] = 123
-    print(a)
-    return True
+    path_lk0 = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/LK_label0_raw.fif'
+    raw = read_raw(path_lk0)
+    data = data_split(raw, 5)
+
 
 
 # 模板
 def test_n():
-    print("test_n finished!")
+    print(str(uuid.uuid1())+"-1")
