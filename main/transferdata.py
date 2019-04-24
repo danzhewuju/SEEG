@@ -3,7 +3,7 @@
 '''
 将数据按照标签进行转化，按照每一帧进行存储
 '''
-from Util import *
+from util import *
 
 path_lk0 = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/LK_label0_raw.fif'
 path_sgh0 = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/SGH_label0_raw.fif"

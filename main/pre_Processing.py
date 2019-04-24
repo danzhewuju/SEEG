@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from Util import *
+from util import *
 
 path = '../data/LK_eye_close_eeg_raw_new.fif'
 duration_time = 30  # 每一帧持续的时间是30s，这是一个参数，由你的神经网络来决定

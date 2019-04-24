@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from Util import *
+from util import *
 import argparse
 
 parser = argparse.ArgumentParser(description="CNN parameter setting!")
