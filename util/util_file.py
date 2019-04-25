@@ -13,7 +13,8 @@ import argparse
 # args = parser.parse_args()
 
 
-def get_all_file_path(path="/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/data processed"):  # 主要是获取某文件夹下面所有的文件列表
+def get_all_file_path(path="/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/data processed",
+                      suffix='fif'):  # 主要是获取某文件夹下面所有的文件列表
     '''
     :param path: 存储对应文件的路径
     :return: 文件夹下面对应的文件路径
@@ -27,6 +28,7 @@ def get_all_file_path(path="/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data
         path_dir.append(os.path.join(path, d))
 
     for index, p in enumerate(path_dir):
-        file_p = glob.glob(os.path.join(p, '*.fif'))
+        new_suffix = '*.' + suffix
+        file_p = glob.glob(os.path.join(p, new_suffix))
         file_map[names[index]] = file_p
     return file_map

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 '''
-将数据按照标签进行转化，按照每一帧进行存储
+将数据按照标签进行转化，按照每一帧进行存储 默认每一帧的时间长度是5秒
 '''
 from util import *
 
@@ -35,5 +35,5 @@ def save_file(path_lk, path_sgh, save_dir, flag):  # 将数据进行存储转化
 
 
 if __name__ == '__main__':
-    # save_file(path_lk0, path_sgh0, save_normal, flag=0)
+    save_file(path_lk0, path_sgh0, save_normal, flag=0)
     save_file(path_lk1, path_sgh1, save_cases, flag=1)

@@ -106,7 +106,7 @@ def save_split_data(data_split, path, flag):  # 切片数据的保存
     '''
 
     :param data_split:  被切片的数据
-    :param path:   所存储的文件夹
+    :param path:   所存储的文件夹,也就是存储文件的上一级文件夹
     :param flag:   对应数据的标识
     :return:
     '''
