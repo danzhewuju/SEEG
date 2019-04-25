@@ -80,39 +80,53 @@ def test_6():
     # print(len(f[0][2]))
 
 
-def test_8():   # 关于数据过零率的相关统计信息
-    path = '../data/seizure/split'
-    paths_filet_map = get_all_file_path(path, "npy")
-    path_cases = paths_filet_map['cases']
-    path_normal = paths_filet_map['normal']
-    data_normal = [np.load(x) for x in path_normal]
-    data_cases = [np.load(x) for x in path_cases]
-    channel_num = len(data_cases[0])
-
-    avg_counts_cases = []
-    for dd in data_cases:
+def test_8():  # 关于数据过零率的相关统计信息
+    path_cases = '../data/seizure/split/cases'
+    path_normal = '../data/seizure/split/normal'
+    map_cases = get_all_file_path(path_cases, 'npy')
+    map_normal = get_all_file_path(path_normal, 'npy')
+    # print(map_cases)
+    # print(map_normal)
+    data_map_cases = {}
+    for d_map in map_normal.items():
+        data = [np.load(x) for x in d_map[1]]
+        data_map_cases[d_map[0]] = data
+    data_lk = data_map_cases["LK"]
+    data_sgh = data_map_cases["SGH"]
+    channel_num = len(data_lk[0])
+    avg_counts_lk = []
+    for dd in data_lk:
         counts = []
         for d in dd:
             c = librosa.zero_crossings(d)
             counts.append(len([x for x in c if x == True]))
         avg_count = sum(counts) / channel_num
-        avg_counts_cases.append(avg_count)
-    plt.figure()
-    plt.title("zero_crossing cases")
-    plt.plot(range(len(avg_counts_cases)), avg_counts_cases)
-    print(np.mean(np.array(avg_counts_cases)))
-    plt.show()
+        avg_counts_lk.append(avg_count)
+    # plt.figure()
+    # plt.title("zero_crossing LK")
+    # plt.plot(range(len(avg_counts_cases)), avg_counts_cases)
+    print(np.mean(np.array(avg_counts_lk)))
+    # plt.show()
 
-    avg_counts_normal = []
-    for dd in data_normal:
+    avg_counts_sgh = []
+    for dd in data_sgh:
         counts = []
         for d in dd:
             c = librosa.zero_crossings(d)
             counts.append(len([x for x in c if x == True]))
         avg_count = sum(counts) / channel_num
-        avg_counts_normal.append(avg_count)
+        avg_counts_sgh.append(avg_count)
     plt.figure()
-    plt.title("zero_crossing normal")
-    plt.plot(range(len(avg_counts_normal)), avg_counts_normal)
-    print(sum(avg_counts_normal)/len(avg_counts_normal))
+    plt.title("zero_crossing")
+    plt.plot(range(len(avg_counts_lk)), avg_counts_lk)
+    end = len(avg_counts_lk)
+    plt.plot(avg_counts_sgh[:end])
+    print(sum(avg_counts_sgh) / len(avg_counts_sgh))
     plt.show()
+
+
+def test_9():
+    a = {"1": 12, "2": 23, "3": 321}
+    b = list(a.keys())
+    print(b)
+
