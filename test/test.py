@@ -6,6 +6,7 @@ import os
 import librosa
 import librosa.display
 import uuid
+import random
 
 
 def test_1():
@@ -131,3 +132,8 @@ def test_9():
     print("Test")
     print(b)
 
+
+def test_10():
+   a = [0, 1, 2]
+   b = random.sample(a, 3)    # 随机的CIA杨
+   print(b)
