@@ -6,11 +6,12 @@ from util import *
 
 
 class seegdata:
-    def __init__(self, path_normal='../data/seizure/split/normal', path_cases='../data/seizure/split/cases'):
+    def __init__(self, path_dir="../data/seizure/split"):
+        self.path_dir = path_dir
+
+    def get_split_npy_data(self, path_normal='../data/seizure/split/normal', path_cases='../data/seizure/split/cases'):
         self.path_cases = path_cases
         self.path_normal = path_normal
-
-    def get_split_npy_data(self):
         map_cases = get_all_file_path(self.path_cases, 'npy')
         map_normal = get_all_file_path(self.path_normal, 'npy')
         # print(map_cases)
@@ -25,12 +26,27 @@ class seegdata:
             data_map_normal[d_map[0]] = data
         # data_tmp = data_map_cases.items(0)
         channel_num = data_map_cases[list(data_map_cases.keys())[0]][0].shape[0]  # 获得信道的个数
+
         self.channel_number = channel_num
         self.data_map_normal = data_map_normal
         self.data_map_cases = data_map_cases
 
+    def get_all_path_by_keyword(self, keyword):
+        name_dir = os.listdir(self.path_dir)
+        path_all = []
+        if keyword in name_dir:
+            temp_path = os.path.join(self.path_dir, keyword)
+            path_all = get_all_file_path(temp_path, 'npy')
+            return path_all
+        else:
+            print("please check your keyword, keyword is not exist!")
+            return None
+
 
 if __name__ == '__main__':
     seeg = seegdata()
-    seeg.get_split_npy_data()
-    print(seeg.channel_number)
+    # seeg.get_split_npy_data()
+    # print(seeg.channel_number)
+    p = seeg.get_all_path_by_keyword('normal')
+    print(p)
+    print(len(p))

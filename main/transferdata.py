@@ -14,6 +14,8 @@ save_normal = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/spli
 save_cases = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/split/cases'
 time = 5  # 每一帧的持续时间
 resample = 100  # 重采样的频率
+high_pass = 0
+low_pass = 600
 
 
 def save_file(path_lk, path_sgh, save_dir, flag):  # 将数据进行存储转化为切片数据
@@ -78,13 +80,17 @@ if __name__ == '__main__':
     # 4. 数据保存
 
     raw_lk0 = read_raw(path_lk0)  # 数据的读取
+    raw_lk0 = filter_hz(raw_lk0, high_pass, low_pass)  # 进行滤波处理
     raw_lk0.resample(resample, npad="auto")  # resample 100hz
     raw_sgh0 = read_raw(path_sgh0)
+    raw_sgh0 = filter_hz(raw_sgh0, high_pass, low_pass)  # 进行滤波处理
     raw_sgh0.resample(resample, npad="auto")  # resample 100hz
 
     raw_lk1 = read_raw(path_lk1)  # 数据的读取
+    raw_lk1 = filter_hz(raw_lk1, high_pass, low_pass)
     raw_lk1.resample(resample, npad="auto")  # resample 100hz
     raw_sgh1 = read_raw(path_sgh1)
+    raw_sgh1 = filter_hz(raw_sgh1, low_pass, high_pass)  # 进行重采样
     raw_sgh1.resample(resample, npad="auto")  # resample 100hz
 
     raw_sgh_ch_names = get_channels_names(raw_sgh0)

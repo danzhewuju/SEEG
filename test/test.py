@@ -6,7 +6,6 @@ import os
 import librosa
 import librosa.display
 import uuid
-import random
 
 
 def test_1():
@@ -119,21 +118,17 @@ def test_8():  # 关于数据过零率的相关统计信息
         avg_counts_sgh.append(avg_count)
     plt.figure()
     plt.title("zero_crossing")
-    plt.plot(range(len(avg_counts_lk)), avg_counts_lk)
+    p_lk = plt.plot(range(len(avg_counts_lk)), avg_counts_lk, label='LK')
     end = len(avg_counts_lk)
-    plt.plot(avg_counts_sgh[:end])
+
+    p_sgh = plt.plot(avg_counts_sgh[:end], label='sgh')
+    plt.legend()
     print(sum(avg_counts_sgh) / len(avg_counts_sgh))
     plt.show()
 
 
-def test_9():
+def test_9():  # 其他功能的探索
     a = {"1": 12, "2": 23, "3": 321}
     b = list(a.keys())
     print("Test")
     print(b)
-
-
-def test_10():
-   a = [0, 1, 2]
-   b = random.sample(a, 3)    # 随机的CIA杨
-   print(b)
