@@ -23,8 +23,8 @@ parser.add_argument("-r", "--relation_dim", type=int, default=8)
 parser.add_argument("-w", "--class_num", type=int, default=2)
 parser.add_argument("-s", "--sample_num_per_class", type=int, default=2)
 parser.add_argument("-b", "--batch_num_per_class", type=int, default=5)
-parser.add_argument("-e", "--episode", type=int, default=5000)
-parser.add_argument("-t", "--test_episode", type=int, default=600)
+parser.add_argument("-e", "--episode", type=int, default=1000)
+parser.add_argument("-t", "--test_episode", type=int, default=10)
 parser.add_argument("-l", "--learning_rate", type=float, default=0.001)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-u", "--hidden_unit", type=int, default=10)
@@ -224,10 +224,10 @@ def main():
         feature_encoder_optim.step()
         relation_network_optim.step()
 
-        if (episode + 1) % 100 == 0:
+        if (episode + 1) % 10 == 0:
             print("episode:", episode + 1, "loss", loss.item())
 
-        if episode % 5000 == 0:
+        if episode % 100 == 0:
 
             # test
             print("Testing...")
@@ -237,7 +237,7 @@ def main():
                 task = tg.MiniDataTask(metatest_folders, CLASS_NUM, SAMPLE_NUM_PER_CLASS, 15)
                 sample_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=SAMPLE_NUM_PER_CLASS,
                                                                      split="train", shuffle=False)
-                num_per_class = BATCH_NUM_PER_CLASS
+                num_per_class = 5
                 test_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=num_per_class, split="test",
                                                                    shuffle=False)
 
