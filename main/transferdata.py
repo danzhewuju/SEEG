@@ -4,6 +4,7 @@
 将数据按照标签进行转化，按照每一帧进行存储 默认每一帧的时间长度是5秒
 '''
 from util import *
+import pandas as pd
 
 path_lk0 = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/LK_label0_raw.fif'
 path_sgh0 = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/SGH_label0_raw.fif"
@@ -50,7 +51,10 @@ def save_split_data_test(raw_data, name, flag, time=time):
     if flag == 0:
         dir = 'normal'
     else:
-        dir = "cases"
+        if flag == 1:
+            dir = "cases"
+        else:
+            dir = "sleep"
     path_dir = os.path.join(path_dir, dir)
     if os.path.exists(path_dir) is not True:
         os.makedirs(path_dir)
@@ -64,45 +68,21 @@ def save_split_data_test(raw_data, name, flag, time=time):
     return True
 
 
+def data_save(path_read, name, flag, common_channels):
+    raw = read_raw(path_read)
+    raw = filter_hz(raw, high_pass, low_pass)
+    raw.resample(resample, npad="auto")  # resample 100hz
+    raw = select_channel_data_mne(raw, common_channels)
+    save_split_data_test(raw, name, flag, time)
+
+
 if __name__ == '__main__':
-    # --------------------------------------------------
-    # 主要生成全部切片，所有正常人和病人的切片数据放在一个文件夹
-    # save_file(path_lk0, path_sgh0, save_normal, flag=0)
-    # save_file(path_lk1, path_sgh1, save_cases, flag=1)
-    # --------------------------------------------------
+    path_raw = "../data/data processed/SGH/SGH_Sleep_Aug_27th_1am_seeg_raw.fif"
+    name = "SGH"
+    flag = 2
 
-    # ---------------------------------------------------
-    # 操作流程
-    # 1. 读取数据
-    # 2. 重采样
-    # 3. 信道选择
-    # 3. 数据切片
-    # 4. 数据保存
-
-    raw_lk0 = read_raw(path_lk0)  # 数据的读取
-    raw_lk0 = filter_hz(raw_lk0, high_pass, low_pass)  # 进行滤波处理
-    raw_lk0.resample(resample, npad="auto")  # resample 100hz
-    raw_sgh0 = read_raw(path_sgh0)
-    raw_sgh0 = filter_hz(raw_sgh0, high_pass, low_pass)  # 进行滤波处理
-    raw_sgh0.resample(resample, npad="auto")  # resample 100hz
-
-    raw_lk1 = read_raw(path_lk1)  # 数据的读取
-    raw_lk1 = filter_hz(raw_lk1, high_pass, low_pass)
-    raw_lk1.resample(resample, npad="auto")  # resample 100hz
-    raw_sgh1 = read_raw(path_sgh1)
-    raw_sgh1 = filter_hz(raw_sgh1, low_pass, high_pass)  # 进行重采样
-    raw_sgh1.resample(resample, npad="auto")  # resample 100hz
-
-    raw_sgh_ch_names = get_channels_names(raw_sgh0)
-    raw_lk_ch_names = get_channels_names(raw_lk0)
-    common_channels = get_common_channels(raw_lk_ch_names, raw_sgh_ch_names)  # 公用信道的寻找
-
-    raw_lk0 = select_channel_data_mne(raw_lk0, common_channels)
-    raw_lk1 = select_channel_data_mne(raw_lk1, common_channels)
-    raw_sgh0 = select_channel_data_mne(raw_sgh0, common_channels)
-    raw_sgh1 = select_channel_data_mne(raw_sgh1, common_channels)
-
-    save_split_data_test(raw_lk0, "LK", flag=0)
-    save_split_data_test(raw_lk1, "LK", flag=1)
-    save_split_data_test(raw_sgh0, 'SGH', flag=0)
-    save_split_data_test(raw_sgh1, 'SGH', flag=1)
+    path = "../data/seizure/common_channels.csv"
+    data = pd.read_csv(path, sep=',')
+    d_list = data['channels']
+    common_channels = list(d_list)
+    data_save(path_raw, name, flag, common_channels)

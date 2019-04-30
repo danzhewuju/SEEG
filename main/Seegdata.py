@@ -33,7 +33,6 @@ class seegdata:
 
     def get_all_path_by_keyword(self, keyword):
         name_dir = os.listdir(self.path_dir)
-        path_all = []
         if keyword in name_dir:
             temp_path = os.path.join(self.path_dir, keyword)
             path_all = get_all_file_path(temp_path, 'npy')
@@ -47,6 +46,6 @@ if __name__ == '__main__':
     seeg = seegdata()
     # seeg.get_split_npy_data()
     # print(seeg.channel_number)
-    p = seeg.get_all_path_by_keyword('normal')
+    p = seeg.get_all_path_by_keyword('sleep')
     print(p)
     print(len(p))

@@ -5,6 +5,7 @@ import glob
 import os
 import librosa
 import librosa.display
+import pandas as pd
 import uuid
 
 
@@ -132,3 +133,10 @@ def test_9():  # 其他功能的探索
     b = list(a.keys())
     print("Test")
     print(b)
+
+
+def test_10():
+    path = "../data/seizure/common_channels.csv"
+
+    # print(d_list)
+    # print(data['channels'])
