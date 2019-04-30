@@ -82,12 +82,15 @@ class MiniImagenet(FewShotDataset):
     def __getitem__(self, idx):
         image_root = self.image_roots[idx]
         image = np.load(image_root)
+        image = image.astype('float32')
+        image = torch.from_numpy(image)
+        image = image[np.newaxis, :]
         # image = image.convert('RGB')
-        if self.transform is not None:
-            image = self.transform(image)
+        # if self.transform is not None:
+        #     image = self.transform(image)
         label = self.labels[idx]
-        if self.target_transform is not None:
-            label = self.target_transform(label)
+        # if self.target_transform is not None:
+        #     label = self.target_transform(label)
         return image, label
 
 

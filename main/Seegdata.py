@@ -31,7 +31,7 @@ class seegdata:
         self.data_map_normal = data_map_normal
         self.data_map_cases = data_map_cases
 
-    def get_all_path_by_keyword(self, keyword):
+    def get_all_path_by_keyword(self, keyword): # ./split/keyword
         name_dir = os.listdir(self.path_dir)
         if keyword in name_dir:
             temp_path = os.path.join(self.path_dir, keyword)

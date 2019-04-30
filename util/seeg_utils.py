@@ -23,9 +23,13 @@ def filter_hz(raw, high_pass, low_pass):  # 对数据进行滤波处理 对于�
 
 
 def save_numpy_info(data, path):  # 存储numpy的数据
-    np.save(path, data)
-    print("Successfully save!")
-    return True
+    if os.path.exists(path):
+        print("File is exist!!!")
+        return None
+    else:
+        np.save(path, data)
+        print("Successfully save!")
+        return True
 
 
 def rewrite(raw, include_names, save_path):  # 对数据进行重写,主要是包含某些特殊的信道分离重写

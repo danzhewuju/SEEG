@@ -10,7 +10,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 import numpy as np
-import task_generator_test as tg
+import task_generator as tg
 import os
 import math
 import argparse
@@ -21,9 +21,9 @@ parser = argparse.ArgumentParser(description="One Shot Visual Recognition")
 parser.add_argument("-f", "--feature_dim", type=int, default=64)
 parser.add_argument("-r", "--relation_dim", type=int, default=8)
 parser.add_argument("-w", "--class_num", type=int, default=2)
-parser.add_argument("-s", "--sample_num_per_class", type=int, default=50)
-parser.add_argument("-b", "--batch_num_per_class", type=int, default=32)
-parser.add_argument("-e", "--episode", type=int, default=500000)
+parser.add_argument("-s", "--sample_num_per_class", type=int, default=2)
+parser.add_argument("-b", "--batch_num_per_class", type=int, default=5)
+parser.add_argument("-e", "--episode", type=int, default=5000)
 parser.add_argument("-t", "--test_episode", type=int, default=600)
 parser.add_argument("-l", "--learning_rate", type=float, default=0.001)
 parser.add_argument("-g", "--gpu", type=int, default=0)
@@ -59,7 +59,7 @@ class CNNEncoder(nn.Module):
     def __init__(self):
         super(CNNEncoder, self).__init__()
         self.layer1 = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=3, padding=0),
+            nn.Conv2d(1, 64, kernel_size=3, padding=0),
             nn.BatchNorm2d(64, momentum=1, affine=True),
             nn.ReLU(),
             nn.MaxPool2d(2))
@@ -101,7 +101,7 @@ class RelationNetwork(nn.Module):
             nn.BatchNorm2d(64, momentum=1, affine=True),
             nn.ReLU(),
             nn.MaxPool2d(2))
-        self.fc1 = nn.Linear(input_size * 3 * 3, hidden_size)
+        self.fc1 = nn.Linear(input_size*145, hidden_size)
         self.fc2 = nn.Linear(hidden_size, 1)
 
     def forward(self, x):
@@ -136,7 +136,7 @@ def main():
     # Step 1: init data folders
     print("init data folders")
     # init character folders for dataset construction
-    metatrain_folders, metatest_folders = tg.mini_imagenet_folders()
+    metatrain_folders, metatest_folders = tg.mini_data_folders()
 
     # Step 2: init neural networks
     print("init neural networks")
@@ -181,7 +181,7 @@ def main():
         # init dataset
         # sample_dataloader is to obtain previous samples for compare
         # batch_dataloader is to batch samples for training
-        task = tg.MiniImagenetTask(metatrain_folders, CLASS_NUM, SAMPLE_NUM_PER_CLASS, BATCH_NUM_PER_CLASS)
+        task = tg.MiniDataTask(metatrain_folders, CLASS_NUM, SAMPLE_NUM_PER_CLASS, BATCH_NUM_PER_CLASS)
         sample_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=SAMPLE_NUM_PER_CLASS, split="train",
                                                              shuffle=False)
         batch_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=BATCH_NUM_PER_CLASS, split="test",
@@ -193,7 +193,7 @@ def main():
 
         # calculate features
         sample_features = feature_encoder(Variable(samples).cuda(GPU))  # 25*64*19*19
-        sample_features = sample_features.view(CLASS_NUM, SAMPLE_NUM_PER_CLASS, FEATURE_DIM, 19, 19)
+        sample_features = sample_features.view(CLASS_NUM, SAMPLE_NUM_PER_CLASS, FEATURE_DIM, 28, 123)
         sample_features = torch.sum(sample_features, 1).squeeze(1)
         batch_features = feature_encoder(Variable(batches).cuda(GPU))  # 20x64*5*5
 
@@ -203,7 +203,7 @@ def main():
         sample_features_ext = sample_features.unsqueeze(0).repeat(BATCH_NUM_PER_CLASS * CLASS_NUM, 1, 1, 1, 1)
         batch_features_ext = batch_features.unsqueeze(0).repeat(CLASS_NUM, 1, 1, 1, 1)
         batch_features_ext = torch.transpose(batch_features_ext, 0, 1)
-        relation_pairs = torch.cat((sample_features_ext, batch_features_ext), 2).view(-1, FEATURE_DIM * 2, 19, 19)
+        relation_pairs = torch.cat((sample_features_ext, batch_features_ext), 2).view(-1, FEATURE_DIM * 2, 28, 123)
         relations = relation_network(relation_pairs).view(-1, CLASS_NUM)
 
         mse = nn.MSELoss().cuda(GPU)
@@ -234,10 +234,10 @@ def main():
             accuracies = []
             for i in range(TEST_EPISODE):
                 total_rewards = 0
-                task = tg.MiniImagenetTask(metatest_folders, CLASS_NUM, SAMPLE_NUM_PER_CLASS, 15)
+                task = tg.MiniDataTask(metatest_folders, CLASS_NUM, SAMPLE_NUM_PER_CLASS, 15)
                 sample_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=SAMPLE_NUM_PER_CLASS,
                                                                      split="train", shuffle=False)
-                num_per_class = 5
+                num_per_class = BATCH_NUM_PER_CLASS
                 test_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=num_per_class, split="test",
                                                                    shuffle=False)
 
@@ -246,7 +246,7 @@ def main():
                     batch_size = test_labels.shape[0]
                     # calculate features
                     sample_features = feature_encoder(Variable(sample_images).cuda(GPU))  # 5x64
-                    sample_features = sample_features.view(CLASS_NUM, SAMPLE_NUM_PER_CLASS, FEATURE_DIM, 19, 19)
+                    sample_features = sample_features.view(CLASS_NUM, SAMPLE_NUM_PER_CLASS, FEATURE_DIM, 28, 123)
                     sample_features = torch.sum(sample_features, 1).squeeze(1)
                     test_features = feature_encoder(Variable(test_images).cuda(GPU))  # 20x64
 
@@ -258,7 +258,7 @@ def main():
                     test_features_ext = test_features.unsqueeze(0).repeat(1 * CLASS_NUM, 1, 1, 1, 1)
                     test_features_ext = torch.transpose(test_features_ext, 0, 1)
                     relation_pairs = torch.cat((sample_features_ext, test_features_ext), 2).view(-1, FEATURE_DIM * 2,
-                                                                                                 19, 19)
+                                                                                                 28, 123)
                     relations = relation_network(relation_pairs).view(-1, CLASS_NUM)
 
                     _, predict_labels = torch.max(relations.data, 1)

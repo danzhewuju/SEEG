@@ -5,6 +5,7 @@ import glob
 import os
 import librosa
 import librosa.display
+import random
 import pandas as pd
 import uuid
 
@@ -89,7 +90,7 @@ def test_8():  # 关于数据过零率的相关统计信息
     # print(map_cases)
     # print(map_normal)
     data_map_cases = {}
-    for d_map in map_normal.items():
+    for d_map in map_cases.items():
         data = [np.load(x) for x in d_map[1]]
         data_map_cases[d_map[0]] = data
     data_lk = data_map_cases["LK"]
@@ -119,6 +120,8 @@ def test_8():  # 关于数据过零率的相关统计信息
         avg_counts_sgh.append(avg_count)
     plt.figure()
     plt.title("zero_crossing")
+    plt.xlabel("t")
+    plt.ylabel('count')
     p_lk = plt.plot(range(len(avg_counts_lk)), avg_counts_lk, label='LK')
     end = len(avg_counts_lk)
 
@@ -136,7 +139,10 @@ def test_9():  # 其他功能的探索
 
 
 def test_10():
-    path = "../data/seizure/common_channels.csv"
+    path = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seeg/train/pre_zeizure/e01b382d-697b-11e9-bae7-e0d55ee63f3d-0.npy"
+    data = np.load(path)
+    print(data)
+    print(data.dtype)
 
     # print(d_list)
     # print(data['channels'])
