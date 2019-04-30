@@ -4,6 +4,7 @@ import mne
 import numpy as np
 import os
 import uuid
+import pyedflib
 import matplotlib.pyplot as plt
 
 
@@ -122,3 +123,104 @@ def save_split_data(data_split, path, flag):  # 切片数据的保存
         save_numpy_info(d, path_all)
     print("File save successfully {}".format(path))
     return True
+
+
+def pre_process(raw, seeg=True, eeg=False): # seeg及eeg预处理
+    '''
+
+    :param raw:  原数据
+    :param seeg:   是否为seeg数据
+    :param seeg:   是否为eeg数据
+    :return:
+    '''
+    sfreq = raw.info['sfreq']
+    nyq = sfreq / 2.
+    if seeg:
+        high_pass = 0.5
+    elif eeg:
+        high_pass = 1.
+    raw.notch_filter(np.arange(50, nyq, 50), filter_length='auto', phase='zero') # 滤去线路噪声
+    raw.filter(high_pass, None, fir_design='firwin') # 滤去slow drifts
+    return raw
+
+
+def split_edf(filename, NEpochs=1): # 把太大的edf文件分成NEpochs个小edf文件
+    '''
+
+    :param filename:  源文件名称
+    :param NEpochs:   要划分的数量
+    :return:
+    '''
+    dirname = os.path.dirname(filename)
+    basename = os.path.basename(filename)
+    oridir = os.getcwd()
+    if dirname != "": # pyedflib只能读取当前工作目录的文件
+        os.chdir(dirname)
+    f = pyedflib.EdfReader(basename)
+    os.chdir(oridir) # 路径换回去
+    NSamples = int(f.getNSamples()[0] / NEpochs)
+    NChannels = f.signals_in_file
+    fileOutPrefix = basename + '_'
+
+    channels_info = list()
+    for ch in range(NChannels):
+        ch_dict = dict()
+        ch_dict['label'] = f.getLabel(ch)
+        ch_dict['dimension'] = f.getPhysicalDimension(ch)
+        ch_dict['sample_rate'] = f.getSampleFrequency(ch)
+        ch_dict['physical_max'] = f.getPhysicalMaximum(ch)
+        ch_dict['physical_min'] = f.getPhysicalMinimum(ch)
+        ch_dict['digital_max'] = f.getDigitalMaximum(ch)
+        ch_dict['digital_min'] = f.getDigitalMinimum(ch)
+        ch_dict['transducer'] = f.getTransducer(ch)
+        ch_dict['prefilter'] = f.getPrefilter(ch)
+        channels_info.append(ch_dict)
+
+    for i in range(NEpochs):
+        print("File %d starts" % i)
+        fileOut = os.path.join('.', fileOutPrefix + str(i) + '.edf')
+        fout = pyedflib.EdfWriter(fileOut, NChannels, file_type=pyedflib.FILETYPE_EDFPLUS)
+        data_list = list()
+        for ch in range(NChannels):
+            data_list.append(f.readSignal(ch)[i * NSamples: (i + 1) * NSamples - 1])
+        fout.setSignalHeaders(channels_info)
+        fout.writeSamples(data_list)
+        fout.close()
+        del fout
+        del data_list
+        print("File %d done" % i)
+
+
+def save_raw_as_edf(raw, fout_name): # 把raw数据存为edf格式
+    '''
+
+    :param raw:  raw格式数据
+    :param fout_name:   输出的文件名
+    :return:
+    '''
+    NChannels = raw.info['nchan']
+    channels_info = list()
+    for i in range(NChannels):
+        '''默认参数来自edfwriter.py'''
+        ch_dict = dict()
+        ch_dict['label'] = raw.info['chs'][i]['ch_name']
+        ch_dict['dimension'] = 'mV'
+        ch_dict['sample_rate'] = raw.info['sfreq']
+        ch_dict['physical_max'] = 1.0
+        ch_dict['physical_min'] = -1.0
+        ch_dict['digital_max'] = 32767
+        ch_dict['digital_min'] = -32767
+        ch_dict['transducer'] = 'trans1'
+        ch_dict['prefilter'] = "pre1"
+        channels_info.append(ch_dict)
+
+    fileOut = os.path.join('.', fout_name + '.edf')
+    fout = pyedflib.EdfWriter(fileOut, NChannels, file_type=pyedflib.FILETYPE_EDFPLUS)
+    data_list, _ = raw[:, :]
+    print(data_list)
+    fout.setSignalHeaders(channels_info)
+    fout.writeSamples(data_list)
+    fout.close()
+    print("Done!")
+    del fout
+    del data_list
