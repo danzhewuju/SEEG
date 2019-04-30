@@ -77,8 +77,8 @@ def data_save(path_read, name, flag, common_channels):
 
 
 if __name__ == '__main__':
-    path_raw = "../data/data processed/SGH/SGH_Sleep_Aug_27th_1am_seeg_raw.fif"
-    name = "SGH"
+    path_raw = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/raw_data/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif"
+    name = "LK"
     flag = 2
 
     path = "../data/seizure/common_channels.csv"

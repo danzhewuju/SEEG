@@ -47,7 +47,7 @@ def data_process():
 
     seeg = seegdata()
     tmp_normal = seeg.get_all_path_by_keyword('sleep')
-    sleep_label0 = tmp_normal['SGH']  # 正常人的睡眠时间
+    sleep_label0 = tmp_normal['LK']  # 正常人的睡眠时间
     sleep_pre = seeg.get_all_path_by_keyword('normal')
     sleep_label1 = sleep_pre['LK']  # 发病前的一段时间
 
