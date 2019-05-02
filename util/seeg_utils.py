@@ -182,7 +182,10 @@ def split_edf(filename, NEpochs=1): # 把太大的edf文件分成NEpochs个小ed
         fout = pyedflib.EdfWriter(fileOut, NChannels, file_type=pyedflib.FILETYPE_EDFPLUS)
         data_list = list()
         for ch in range(NChannels):
-            data_list.append(f.readSignal(ch)[i * NSamples: (i + 1) * NSamples - 1])
+            if ch == NChannels - 1:
+                data_list.append(f.readSignal(ch)[i * NSamples:])
+            else:
+                data_list.append(f.readSignal(ch)[i * NSamples: (i + 1) * NSamples - 1])
         fout.setSignalHeaders(channels_info)
         fout.writeSamples(data_list)
         fout.close()
