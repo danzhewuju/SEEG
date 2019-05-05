@@ -6,6 +6,7 @@ import os
 import uuid
 import pyedflib
 import matplotlib.pyplot as plt
+from mne.time_frequency import *
 
 
 def read_raw(path):
@@ -227,3 +228,53 @@ def save_raw_as_edf(raw, fout_name): # 把raw数据存为edf格式
     print("Done!")
     del fout
     del data_list
+
+
+def make_whole_as_epoch(raw, e_id=666):
+    '''
+    将一整个raw作为一个epoch返回
+    :param raw:  raw类型对象
+    :param e_id:  整数类型，指定event的id，不能与已有id重复
+    :return:  Epochs对象
+    '''
+    data, _ = raw[:, :]
+    event_id = {'Added' : e_id} #人为增加一个event
+    event = [[0, 0, e_id]] #在第一个样本处标记event为id
+    epoch = mne.EpochsArray([data], raw.info, event, 0, event_id)
+    return epoch
+
+
+def tfr_analyze(epochs, freqs, resample=None, decim=1):
+    '''
+    freqs:type为ndarray，指定一个离散的频率数组
+    :param epochs:  待分析的Epochs对象
+    :param freqs:  ndarray类型，包含感兴趣的所有频率，例np.arange(80,100,0.5)
+    :param resample:  整数类型，指明重采样频率，通过对数据重采样减轻内存压力
+    :param decim:  整数类型，只抽取时频变换后的部分结果，减轻内存压力
+    :return:  AverageTFR对象，包含时频变换后的数据和信息
+    '''
+    if resample is not None:
+        epochs.resample(resample, npad='auto') #重采样，减少内存消耗
+    n_cycles = freqs / 2.
+    #使用小波变换进行时频变换
+    #decim参数指定对转换过的结果后再次重采样的频率，例如若指定为5，则频率变为原来的5分之一
+    power, itc = tfr_morlet(epochs, freqs=freqs, n_cycles=n_cycles, use_fft=True, return_itc=True, decim=decim)
+    power.info['sfreq'] /= decim
+    return power
+
+
+def tfr_extract(power, tmin=0, tmax=None):
+    '''
+    提取tfr_analyze返回的数据中感兴趣的时间段
+    :param power:  AverageTFR对象，时频变换的输出
+    :param tmin:  时间起点(包含在区间内)
+    :param tmax:  时间终点(不包含在区间内)
+    :return:  ndarray, shape(n_channels, n_freqs, n_times)
+    '''
+    sfreq = power.info['sfreq']
+    start = int(tmin * sfreq)
+    if tmax is None:
+        return np.ndarray([[[k for k in power.data[i][j][start:]] for j in range(len(power.data[i]))] for i in range(len(power.data))])
+    else:
+        end = int(tmax * sfreq)
+        return np.ndarray([[[k for k in power.data[i][j][start: end]] for j in range(len(power.data[i]))] for i in range(len(power.data))])
