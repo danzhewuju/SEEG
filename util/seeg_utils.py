@@ -126,7 +126,7 @@ def save_split_data(data_split, path, flag):  # 切片数据的保存
     return True
 
 
-def pre_process(raw, seeg=True, eeg=False): # seeg及eeg预处理
+def pre_process(raw, seeg=True, eeg=False):  # seeg及eeg预处理
     '''
 
     :param raw:  原数据
@@ -140,12 +140,12 @@ def pre_process(raw, seeg=True, eeg=False): # seeg及eeg预处理
         high_pass = 0.5
     elif eeg:
         high_pass = 1.
-    raw.notch_filter(np.arange(50, nyq, 50), filter_length='auto', phase='zero') # 滤去线路噪声
-    raw.filter(high_pass, None, fir_design='firwin') # 滤去slow drifts
+    raw.notch_filter(np.arange(50, nyq, 50), filter_length='auto', phase='zero')  # 滤去线路噪声
+    raw.filter(high_pass, None, fir_design='firwin')  # 滤去slow drifts
     return raw
 
 
-def split_edf(filename, NEpochs=1): # 把太大的edf文件分成NEpochs个小edf文件
+def split_edf(filename, NEpochs=1):  # 把太大的edf文件分成NEpochs个小edf文件
     '''
 
     :param filename:  源文件名称
@@ -155,10 +155,10 @@ def split_edf(filename, NEpochs=1): # 把太大的edf文件分成NEpochs个小ed
     dirname = os.path.dirname(filename)
     basename = os.path.basename(filename)
     oridir = os.getcwd()
-    if dirname != "": # pyedflib只能读取当前工作目录的文件
+    if dirname != "":  # pyedflib只能读取当前工作目录的文件
         os.chdir(dirname)
     f = pyedflib.EdfReader(basename)
-    os.chdir(oridir) # 路径换回去
+    os.chdir(oridir)  # 路径换回去
     NSamples = int(f.getNSamples()[0] / NEpochs)
     NChannels = f.signals_in_file
     fileOutPrefix = basename + '_'
@@ -195,7 +195,7 @@ def split_edf(filename, NEpochs=1): # 把太大的edf文件分成NEpochs个小ed
         print("File %d done" % i)
 
 
-def save_raw_as_edf(raw, fout_name): # 把raw数据存为edf格式
+def save_raw_as_edf(raw, fout_name):  # 把raw数据存为edf格式
     '''
 
     :param raw:  raw格式数据
@@ -238,8 +238,8 @@ def make_whole_as_epoch(raw, e_id=666):
     :return:  Epochs对象
     '''
     data, _ = raw[:, :]
-    event_id = {'Added' : e_id} #人为增加一个event
-    event = [[0, 0, e_id]] #在第一个样本处标记event为id
+    event_id = {'Added': e_id}  # 人为增加一个event
+    event = [[0, 0, e_id]]  # 在第一个样本处标记event为id
     epoch = mne.EpochsArray([data], raw.info, event, 0, event_id)
     return epoch
 
@@ -254,10 +254,10 @@ def tfr_analyze(epochs, freqs, resample=None, decim=1):
     :return:  AverageTFR对象，包含时频变换后的数据和信息
     '''
     if resample is not None:
-        epochs.resample(resample, npad='auto') #重采样，减少内存消耗
+        epochs.resample(resample, npad='auto')  # 重采样，减少内存消耗
     n_cycles = freqs / 2.
-    #使用小波变换进行时频变换
-    #decim参数指定对转换过的结果后再次重采样的频率，例如若指定为5，则频率变为原来的5分之一
+    # 使用小波变换进行时频变换
+    # decim参数指定对转换过的结果后再次重采样的频率，例如若指定为5，则频率变为原来的5分之一
     power, itc = tfr_morlet(epochs, freqs=freqs, n_cycles=n_cycles, use_fft=True, return_itc=True, decim=decim)
     power.info['sfreq'] /= decim
     return power
@@ -274,7 +274,9 @@ def tfr_extract(power, tmin=0, tmax=None):
     sfreq = power.info['sfreq']
     start = int(tmin * sfreq)
     if tmax is None:
-        return np.ndarray([[[k for k in power.data[i][j][start:]] for j in range(len(power.data[i]))] for i in range(len(power.data))])
+        return np.ndarray([[[k for k in power.data[i][j][start:]] for j in range(len(power.data[i]))] for i in
+                           range(len(power.data))])
     else:
         end = int(tmax * sfreq)
-        return np.ndarray([[[k for k in power.data[i][j][start: end]] for j in range(len(power.data[i]))] for i in range(len(power.data))])
+        return np.ndarray([[[k for k in power.data[i][j][start: end]] for j in range(len(power.data[i]))] for i in
+                           range(len(power.data))])

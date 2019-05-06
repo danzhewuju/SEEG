@@ -13,7 +13,7 @@ path_lk1 = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/LK_labe
 path_sgh1 = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/SGH_label1_raw.fif"
 save_normal = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/split/normal'
 save_cases = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/split/cases'
-time = 5  # 每一帧的持续时间
+time = 2  # 每一帧的持续时间
 resample = 100  # 重采样的频率
 high_pass = 0
 low_pass = 600
@@ -76,13 +76,29 @@ def data_save(path_read, name, flag, common_channels):
     save_split_data_test(raw, name, flag, time)
 
 
-if __name__ == '__main__':
-    path_raw = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/raw_data/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif"
-    name = "LK"
-    flag = 2
+def generate_data(path, flag, name, path_commom_channel):
+    '''
 
-    path = "../data/seizure/common_channels.csv"
-    data = pd.read_csv(path, sep=',')
+    :param path: 文件的路径
+    :param flag: 标志 0 ： 表示癫痫发作前的状态， 1：表示癫痫正在打坐 2:表示正常睡觉时的状态
+    :param name:病人的名称
+    :path_common_channel : 公共的信道名称
+    :return:
+    '''
+    data = pd.read_csv(path_commom_channel, sep=',')
     d_list = data['channels']
     common_channels = list(d_list)
-    data_save(path_raw, name, flag, common_channels)
+    data_save(path, name, flag, common_channels)
+
+
+if __name__ == '__main__':
+    # path_raw = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/raw_data/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif"
+    # name = "LK"
+    # flag = 2
+    path_commom_channel = "../data/seizure/common_channels.csv"
+    path_raw_pre_seizure = '../data/seizure/LK_label0_raw.fif'
+    name = "LK"
+    flag = 0  # normal
+
+    generate_data(path_raw_pre_seizure, flag, name, path_commom_channel)
+

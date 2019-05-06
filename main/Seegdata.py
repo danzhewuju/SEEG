@@ -46,6 +46,11 @@ if __name__ == '__main__':
     seeg = seegdata()
     # seeg.get_split_npy_data()
     # print(seeg.channel_number)
-    p = seeg.get_all_path_by_keyword('sleep')
-    print(p)
-    print(len(p))
+    p = seeg.get_all_path_by_keyword('normal')
+    # print(p)
+    # print(len(p))
+    p_LK = p['LK']
+    for p_1 in p_LK:
+        d_1 = np.load(p_1)
+        print(d_1.shape)
+

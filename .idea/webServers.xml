@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="bf70cef8-8ba9-47c0-a16e-81ab428b73b7" name="lab3" url="http://58.198.176.69">
+        <fileTransfer host="58.198.176.69" port="22" rootFolder="/home/cbd109-3/Users/data/yh/Program/Python" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
