@@ -21,12 +21,12 @@ parser = argparse.ArgumentParser(description="One Shot Visual Recognition")
 parser.add_argument("-f", "--feature_dim", type=int, default=64)
 parser.add_argument("-r", "--relation_dim", type=int, default=8)
 parser.add_argument("-w", "--class_num", type=int, default=2)
-parser.add_argument("-s", "--sample_num_per_class", type=int, default=5)
-parser.add_argument("-b", "--batch_num_per_class", type=int, default=10)
-parser.add_argument("-e", "--episode", type=int, default=10000)
-parser.add_argument("-t", "--test_episode", type=int, default=100)
+parser.add_argument("-s", "--sample_num_per_class", type=int, default=50)
+parser.add_argument("-b", "--batch_num_per_class", type=int, default=5)
+parser.add_argument("-e", "--episode", type=int, default=1000)
+parser.add_argument("-t", "--test_episode", type=int, default=10)
 parser.add_argument("-l", "--learning_rate", type=float, default=0.001)
-parser.add_argument("-g", "--gpu", type=int, default=1)
+parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-u", "--hidden_unit", type=int, default=10)
 args = parser.parse_args()
 
@@ -230,7 +230,7 @@ def main():
         if (episode + 1) % 10 == 0:
             print("episode:", episode + 1, "loss", loss.item())
 
-        if episode % 100 == 0:
+        if episode % 50 == 0:
 
             # test
             print("Testing...")
@@ -240,7 +240,7 @@ def main():
                 task = tg.MiniDataTask(metatest_folders, CLASS_NUM, SAMPLE_NUM_PER_CLASS, 15)
                 sample_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=SAMPLE_NUM_PER_CLASS,
                                                                      split="train", shuffle=False)
-                num_per_class = 5
+                num_per_class = 10
                 test_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=num_per_class, split="test",
                                                                    shuffle=False)
 

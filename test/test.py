@@ -139,7 +139,7 @@ def test_9():  # 其他功能的探索
 
 
 def test_10():
-    path = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seeg/train/pre_zeizure/e01b382d-697b-11e9-bae7-e0d55ee63f3d-0.npy"
+    path = "../data/seeg/train/pre_zeizure/e01b382d-697b-11e9-bae7-e0d55ee63f3d-0.npy"
     data = np.load(path)
     print(data)
     print(data.dtype)
