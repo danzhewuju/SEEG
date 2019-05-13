@@ -15,8 +15,8 @@ save_normal = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/spli
 save_cases = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/split/cases'
 time = 2  # 每一帧的持续时间
 resample = 100  # 重采样的频率
-high_pass = 0
-low_pass = 600
+high_pass = 8
+low_pass = 28
 
 
 def save_file(path_lk, path_sgh, save_dir, flag):  # 将数据进行存储转化为切片数据
@@ -92,13 +92,15 @@ def generate_data(path, flag, name, path_commom_channel):
 
 
 if __name__ == '__main__':
-    # path_raw = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/raw_data/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif"
-    # name = "LK"
-    # flag = 2
     path_commom_channel = "../data/seizure/common_channels.csv"
-    path_raw_pre_seizure = '../data/seizure/LK_label0_raw.fif'
-    name = "LK"
-    flag = 0  # normal
 
-    generate_data(path_raw_pre_seizure, flag, name, path_commom_channel)
+    path_raw = "../data/raw_data/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif"
+    name = "LK"
+    flag = 2
+
+    # path_raw = '../data/seizure/LK_label0_raw.fif'
+    # name = "LK"
+    # flag = 0  # normal
+
+    generate_data(path_raw, flag, name, path_commom_channel)
 

@@ -9,7 +9,7 @@ import random
 import numpy as np
 
 parser = argparse.ArgumentParser(description="data split")
-parser.add_argument('-r', '--ratio', type=float, default=0.8)  # 将数据集划分为测试集，以及验证集
+parser.add_argument('-r', '--ratio', type=float, default=0.5)  # 将数据集划分为测试集，以及验证集
 args = parser.parse_args()
 
 # Hyper Parameters
@@ -23,8 +23,12 @@ def data_process():
 
     if os.path.exists(train_folder) is not True:
         os.makedirs(train_folder)
+    else:
+        os.system("rm -r ./seeg/train/*")
     if os.path.exists(test_folder) is not True:
         os.makedirs(test_folder)
+    else:
+        os.system("rm -r ./seeg/test/*")
 
     path_normal = "sleep_normal"
     path_pre_seizure = "pre_zeizure"
@@ -54,6 +58,7 @@ def data_process():
     print("0:{} 1:{}".format(len(sleep_label0), len(sleep_label1)))
     random.seed(1)
     random.shuffle(sleep_label0)
+    random.seed(1)
     random.shuffle(sleep_label1)
     for (i, p) in enumerate(sleep_label0):
         name = p.split('/')[-1]
