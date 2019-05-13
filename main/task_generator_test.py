@@ -19,13 +19,13 @@ def imshow(img):
     plt.show()
 
 
-class Rotate(object):
-    def __init__(self, angle):
-        self.angle = angle
-
-    def __call__(self, x, mode="reflect"):
-        x = x.rotate(self.angle)
-        return x
+# class Rotate(object):
+#     def __init__(self, angle):
+#         self.angle = angle
+#
+#     def __call__(self, x, mode="reflect"):
+#         x = x.rotate(self.angle)
+#         return x
 
 
 def mini_imagenet_folders():
@@ -74,6 +74,12 @@ class MiniImagenetTask(object):
 
         self.train_labels = [labels[self.get_class(x)] for x in self.train_roots]
         self.test_labels = [labels[self.get_class(x)] for x in self.test_roots]
+
+        # random.seed(2)
+        # random.shuffle(self.test_labels)
+        # random.seed(2)
+        # random.shuffle(self.test_roots)
+
 
     def get_class(self, sample):
         return os.path.join(*sample.split('/')[:-1])
