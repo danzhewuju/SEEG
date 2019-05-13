@@ -22,7 +22,7 @@ import scipy.stats
 parser = argparse.ArgumentParser(description="One Shot Visual Recognition")
 parser.add_argument("-f", "--feature_dim", type=int, default=64)
 parser.add_argument("-r", "--relation_dim", type=int, default=8)
-parser.add_argument("-w", "--class_num", type=int, default=5)
+parser.add_argument("-w", "--class_num", type=int, default=2)
 parser.add_argument("-s", "--sample_num_per_class", type=int, default=5)
 parser.add_argument("-b", "--batch_num_per_class", type=int, default=10)
 parser.add_argument("-e", "--episode", type=int, default=10)
@@ -62,7 +62,7 @@ class CNNEncoder(nn.Module):
     def __init__(self):
         super(CNNEncoder, self).__init__()
         self.layer1 = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=3, padding=0),
+            nn.Conv2d(1, 64, kernel_size=3, padding=0),
             nn.BatchNorm2d(64, momentum=1, affine=True),
             nn.ReLU(),
             nn.MaxPool2d(2))

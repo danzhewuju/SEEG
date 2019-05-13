@@ -60,20 +60,21 @@ def data_process():
     random.shuffle(sleep_label0)
     random.seed(1)
     random.shuffle(sleep_label1)
-    for (i, p) in enumerate(sleep_label0):
+    min_data = min(len(sleep_label0), len(sleep_label1)) # 让两个数据集的个数相差不多
+    for (i, p) in enumerate(sleep_label0[:min_data]):
         name = p.split('/')[-1]
         d = np.load(p)
-        if i <= int(RATIO * len(sleep_label0)):
+        if i <= int(RATIO * len(sleep_label0[:min_data])):
             save_path = os.path.join(train_folder_dir_normal, name)
         else:
             save_path = os.path.join(test_folder_dir_normal, name)
         np.save(save_path, d)
 
     print("Successfully write for normal data!!!")
-    for (i, p) in enumerate(sleep_label1):
+    for (i, p) in enumerate(sleep_label1[:min_data]):
         name = p.split('/')[-1]
         d = np.load(p)
-        if i <= int(RATIO * len(sleep_label1)):
+        if i <= int(RATIO * len(sleep_label1[:min_data])):
             save_path = os.path.join(train_folder_dir_pre, name)
         else:
             save_path = os.path.join(test_folder_dir_pre, name)
