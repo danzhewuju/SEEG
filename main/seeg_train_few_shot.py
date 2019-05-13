@@ -21,9 +21,9 @@ parser = argparse.ArgumentParser(description="One Shot Visual Recognition")
 parser.add_argument("-f", "--feature_dim", type=int, default=64)
 parser.add_argument("-r", "--relation_dim", type=int, default=8)
 parser.add_argument("-w", "--class_num", type=int, default=2)
-parser.add_argument("-s", "--sample_num_per_class", type=int, default=50)
+parser.add_argument("-s", "--sample_num_per_class", type=int, default=10)
 parser.add_argument("-b", "--batch_num_per_class", type=int, default=5)
-parser.add_argument("-e", "--episode", type=int, default=1000)
+parser.add_argument("-e", "--episode", type=int, default=10000)
 parser.add_argument("-t", "--test_episode", type=int, default=10)
 parser.add_argument("-l", "--learning_rate", type=float, default=0.001)
 parser.add_argument("-g", "--gpu", type=int, default=0)
@@ -104,7 +104,7 @@ class RelationNetwork(nn.Module):
             nn.BatchNorm2d(64, momentum=1, affine=True),
             nn.ReLU(),
             nn.MaxPool2d(2))
-        self.fc1 = nn.Linear(input_size*50, hidden_size)
+        self.fc1 = nn.Linear(input_size * 50, hidden_size)
         self.fc2 = nn.Linear(hidden_size, 1)
 
     def forward(self, x):
@@ -116,7 +116,7 @@ class RelationNetwork(nn.Module):
         return out
 
 
-def weights_init(m):   # init weights
+def weights_init(m):  # init weights
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
         n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
@@ -227,10 +227,10 @@ def main():
         feature_encoder_optim.step()
         relation_network_optim.step()
 
-        if (episode + 1) % 10 == 0:
+        if (episode + 1) % 50 == 0:
             print("episode:", episode + 1, "loss", loss.item())
 
-        if episode % 50 == 0:
+        if episode % 100 == 0:
 
             # test
             print("Testing...")
@@ -245,6 +245,7 @@ def main():
                                                                    shuffle=False)
 
                 sample_images, sample_labels = sample_dataloader.__iter__().next()
+                test_num = 0
                 for test_images, test_labels in test_dataloader:
                     batch_size = test_labels.shape[0]
                     # calculate features
@@ -272,7 +273,8 @@ def main():
 
                     total_rewards += np.sum(rewards)
 
-                accuracy = total_rewards / 1.0 / CLASS_NUM / 15
+                    test_num += batch_size
+                accuracy = total_rewards / 1.0 / test_num
                 accuracies.append(accuracy)
 
             test_accuracy, h = mean_confidence_interval(accuracies)

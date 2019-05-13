@@ -52,6 +52,15 @@ class MiniDataTask(object):
 
         self.train_labels = [labels[self.get_class(x)] for x in self.train_roots]
         self.test_labels = [labels[self.get_class(x)] for x in self.test_roots]
+        # random shuffle
+        # random.seed(1)
+        # random.shuffle(self.train_labels)
+        # random.seed(1)
+        # random.shuffle(self.train_roots)
+        random.seed(2)
+        random.shuffle(self.test_labels)
+        random.seed(2)
+        random.shuffle(self.test_roots)
 
     def get_class(self, sample):
         return os.path.join(*sample.split('/')[:-1])
@@ -123,7 +132,7 @@ class ClassBalancedSampler(Sampler):
 
 
 def get_mini_imagenet_data_loader(task, num_per_class=1, split='train', shuffle=False):
-    normalize = transforms.Normalize(mean=[0.92206, 0.92206, 0.92206], std=[0.08426, 0.08426, 0.08426])
+    normalize = transforms.Normalize(mean=[0.92206], std=[0.08426])
 
     dataset = MiniImagenet(task, split=split, transform=transforms.Compose([transforms.ToTensor(), normalize]))
 

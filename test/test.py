@@ -144,5 +144,17 @@ def test_10():
     print(data)
     print(data.dtype)
 
+
+def test_11():
+    a = np.random.randint(0, 10, 10)
+    b = a.copy()
+
+    random.seed(1)
+    random.shuffle(a)
+    print(a)
+    random.seed(1)
+    random.shuffle(b)
+    print(b)
+
     # print(d_list)
     # print(data['channels'])
