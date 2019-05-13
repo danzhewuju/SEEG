@@ -43,6 +43,7 @@ def mini_imagenet_folders():
 
     random.seed(1)
     random.shuffle(metatrain_folders)
+    random.seed(1)
     random.shuffle(metatest_folders)
 
     return metatrain_folders, metatest_folders
@@ -173,7 +174,7 @@ class ClassBalancedSamplerOld(Sampler):
 
 
 def get_mini_imagenet_data_loader(task, num_per_class=1, split='train', shuffle=False):
-    normalize = transforms.Normalize(mean=[0.92206, 0.92206, 0.92206], std=[0.08426, 0.08426, 0.08426])
+    normalize = transforms.Normalize(mean=[0.92206], std=[0.08426])
 
     dataset = MiniImagenet(task, split=split, transform=transforms.Compose([transforms.ToTensor(), normalize]))
     if split == 'train':
