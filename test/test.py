@@ -146,10 +146,8 @@ def test_10():
 
 
 def test_11():
-    raw_path = "../data/raw_data/Pre_seizure/LK_SZ1_pre_seizureraw.fif"
-    data = read_raw(raw_path)
-    data.plot()
-    print(data.times)
+    path_dir = '../data/raw_data/Pre_seizure'
+    print(os.listdir(path_dir))
 
 
     # print(d_list)

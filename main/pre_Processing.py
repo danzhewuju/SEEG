@@ -21,7 +21,7 @@ def get_duration_data(raw_path, name, save_dir, start, end_times, gap_time=30):
         if os.path.exists(save_dir) is not True:
             os.makedirs(save_dir)
         save_path = os.path.join(save_dir, name)
-        save_path += 'raw.fif'
+        save_path += '_raw.fif'
 
         rewrite(duration_data, channel_names, save_path)
         return duration_data
@@ -51,12 +51,12 @@ if __name__ == '__main__':
     # name = "LK_SZ4_pre_seizure"
     # end_time = 995
 
-    # raw_path = "../data/raw_data/LK_SZ/LK_SZ5_seeg_raw.fif"
-    # name = "LK_SZ5_pre_seizure"
-    # end_time = 1535
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ5_seeg_raw.fif"
+    name = "LK_SZ5_pre_seizure"
+    end_time = 1535
 
-    raw_path = "../data/raw_data/LK_SZ/LK_SZ6_seeg_raw.fif"
-    name = "LK_SZ6_pre_seizure"
-    end_time = 702
+    # raw_path = "../data/raw_data/LK_SZ/LK_SZ6_seeg_raw.fif"
+    # name = "LK_SZ6_pre_seizure"
+    # end_time = 702
 
     get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
