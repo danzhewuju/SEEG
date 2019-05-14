@@ -10,6 +10,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 from torch.utils.data.sampler import Sampler
+import time
 
 
 def imshow(img):
@@ -30,7 +31,7 @@ def imshow(img):
 
 def mini_imagenet_folders():
     train_folder = '../data/seeg/train'
-    test_folder = '../data/seeg/test'
+    test_folder = '../data/seeg/val'
 
     metatrain_folders = [os.path.join(train_folder, label) \
                          for label in os.listdir(train_folder) \
@@ -40,11 +41,11 @@ def mini_imagenet_folders():
                         for label in os.listdir(test_folder) \
                         if os.path.isdir(os.path.join(test_folder, label)) \
                         ]
-
-    random.seed(1)
-    random.shuffle(metatrain_folders)
-    random.seed(1)
-    random.shuffle(metatest_folders)
+    # t = time.time()
+    # random.seed(t)
+    # random.shuffle(metatrain_folders)
+    # random.seed(t)
+    # random.shuffle(metatest_folders)
 
     return metatrain_folders, metatest_folders
 
@@ -180,9 +181,9 @@ class ClassBalancedSamplerOld(Sampler):
 
 
 def get_mini_imagenet_data_loader(task, num_per_class=1, split='train', shuffle=False):
-    normalize = transforms.Normalize(mean=[0.92206], std=[0.08426])
-
-    dataset = MiniImagenet(task, split=split, transform=transforms.Compose([transforms.ToTensor(), normalize]))
+    # normalize = transforms.Normalize(mean=[0.92206], std=[0.08426])
+    dataset = MiniImagenet(task, split=split)
+    # dataset = MiniImagenet(task, split=split, transform=transforms.Compose([transforms.ToTensor(), normalize]))
     if split == 'train':
         sampler = ClassBalancedSamplerOld(num_per_class, task.num_classes, task.train_num, shuffle=shuffle)
 
