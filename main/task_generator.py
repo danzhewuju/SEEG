@@ -53,10 +53,10 @@ class MiniDataTask(object):
 
         self.train_labels = [labels[self.get_class(x)] for x in self.train_roots]
         self.test_labels = [labels[self.get_class(x)] for x in self.test_roots]
-        # random shuffle
-        # random.seed(1)
+        # t = time.time()
+        # random.seed(t)
         # random.shuffle(self.train_labels)
-        # random.seed(1)
+        # random.seed(t)
         # random.shuffle(self.train_roots)
         t = time.time()
         random.seed(t)

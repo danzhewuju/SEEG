@@ -41,11 +41,11 @@ def mini_imagenet_folders():
                         for label in os.listdir(test_folder) \
                         if os.path.isdir(os.path.join(test_folder, label)) \
                         ]
-    # t = time.time()
-    # random.seed(t)
-    # random.shuffle(metatrain_folders)
-    # random.seed(t)
-    # random.shuffle(metatest_folders)
+    t = time.time()
+    random.seed(t)
+    random.shuffle(metatrain_folders)
+    random.seed(t)
+    random.shuffle(metatest_folders)
 
     return metatrain_folders, metatest_folders
 
@@ -76,11 +76,11 @@ class MiniImagenetTask(object):
         self.train_labels = [labels[self.get_class(x)] for x in self.train_roots]
         self.test_labels = [labels[self.get_class(x)] for x in self.test_roots]
 
-        # random.seed(2)
-        # random.shuffle(self.test_labels)
-        # random.seed(2)
-        # random.shuffle(self.test_roots)
-
+        t = time.time()
+        random.seed(t)
+        random.shuffle(self.test_labels)
+        random.seed(t)
+        random.shuffle(self.test_roots)
 
     def get_class(self, sample):
         return os.path.join(*sample.split('/')[:-1])
