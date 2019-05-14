@@ -274,9 +274,9 @@ def tfr_extract(power, tmin=0, tmax=None):
     sfreq = power.info['sfreq']
     start = int(tmin * sfreq)
     if tmax is None:
-        return np.ndarray([[[k for k in power.data[i][j][start:]] for j in range(len(power.data[i]))] for i in
+        return np.array([[[k for k in power.data[i][j][start:]] for j in range(len(power.data[i]))] for i in
                            range(len(power.data))])
     else:
         end = int(tmax * sfreq)
-        return np.ndarray([[[k for k in power.data[i][j][start: end]] for j in range(len(power.data[i]))] for i in
+        return np.array([[[k for k in power.data[i][j][start: end]] for j in range(len(power.data[i]))] for i in
                            range(len(power.data))])
