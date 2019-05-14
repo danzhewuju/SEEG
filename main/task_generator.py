@@ -9,6 +9,7 @@ import random
 import os
 import numpy as np
 from torch.utils.data.sampler import Sampler
+import time
 
 
 def mini_data_folders():
@@ -57,9 +58,10 @@ class MiniDataTask(object):
         # random.shuffle(self.train_labels)
         # random.seed(1)
         # random.shuffle(self.train_roots)
-        random.seed(2)
+        t = time.time()
+        random.seed(t)
         random.shuffle(self.test_labels)
-        random.seed(2)
+        random.seed(t)
         random.shuffle(self.test_roots)
 
     def get_class(self, sample):

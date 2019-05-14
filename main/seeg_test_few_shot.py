@@ -44,8 +44,14 @@ LEARNING_RATE = args.learning_rate
 GPU = args.gpu
 HIDDEN_UNIT = args.hidden_unit
 
-x_ = 28
+# 118
+# x_ = 28
+# y_ = 48
+# f1_line = 50
+
+x_ = 31
 y_ = 48
+f1_line = 60
 
 
 def mean_confidence_interval(data, confidence=0.95):
@@ -104,7 +110,7 @@ class RelationNetwork(nn.Module):
             nn.BatchNorm2d(64, momentum=1, affine=True),
             nn.ReLU(),
             nn.MaxPool2d(2))
-        self.fc1 = nn.Linear(input_size * 50, hidden_size)
+        self.fc1 = nn.Linear(input_size * f1_line, hidden_size)
         self.fc2 = nn.Linear(hidden_size, 1)
 
     def forward(self, x):

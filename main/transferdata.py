@@ -73,6 +73,7 @@ def data_save(path_read, name, flag, common_channels):
     raw = filter_hz(raw, high_pass, low_pass)
     raw.resample(resample, npad="auto")  # resample 100hz
     raw = select_channel_data_mne(raw, common_channels)
+    raw.reorder_channels(common_channels)   # 更改信道的顺序
     save_split_data_test(raw, name, flag, time)
 
 
@@ -96,19 +97,19 @@ if __name__ == '__main__':
 
     # path_raw = "../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif"
     # path_raw = '../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-1.fif'
-    # path_raw = '../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif'
-    # name = "LK"
-    # flag = 2  # 正常睡眠时间
+    path_raw = '../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif'
+    name = "LK"
+    flag = 2  # 正常睡眠时间
 
     # path_raw = '../data/seizure/LK_label0_raw.fif'
     # name = "LK"
     # flag = 0  # 癫痫发作前的睡眠时间
 
-    # generate_data(path_raw, flag, name, path_commom_channel)
+    generate_data(path_raw, flag, name, path_commom_channel)
 
-    path_dir = "../data/raw_data/LK_Pre_seizure"
-    flag = 0
-    for p in os.listdir(path_dir):
-        path_raw = os.path.join(path_dir, p)
-        name = "LK"
-        generate_data(path_raw, flag, name, path_commom_channel)
+    # path_dir = "../data/raw_data/LK_Pre_seizure"
+    # flag = 0
+    # for p in os.listdir(path_dir):
+    #     path_raw = os.path.join(path_dir, p)
+    #     name = "LK"
+    #     generate_data(path_raw, flag, name, path_commom_channel)

@@ -29,20 +29,6 @@ def test_2():
     print(data)
 
 
-def test_3():
-    '''
-
-    :return: 图像的展示
-    '''
-    path_data = "../data/output_data/sleep_frame_eeg.npy"
-    sleep_time_frame = read_sleep_date(path_data)
-    length = len(sleep_time_frame[0])
-    ratio = duration_time / length
-    print("length:{} ratio:{}".format(length, ratio))
-    x = [ratio * x for x in range(length)]
-    draw_plot(x, sleep_time_frame[0])
-
-
 def test_4(path="../data/data_path.txt"):
     '''
 
@@ -149,6 +135,20 @@ def test_11():
     path_dir = '../data/raw_data/Pre_seizure'
     print(os.listdir(path_dir))
 
+
+def test_12():
+    path_channel = '../data/seizure/common_channels.csv'
+    path = '../data/raw_data/LK_Pre_seizure/LK_SZ1_pre_seizure_raw.fif'
+    raw_data = read_raw(path)
+    raw_data.plot()
+    print(raw_data.info['ch_names'])
+    data = pd.read_csv(path_channel, sep=',')
+    d_list = data['channels']
+    common_channels = list(d_list)
+    new_raw_data = select_channel_data_mne(raw_data, common_channels)
+    new_raw_data.reorder_channels(common_channels)
+    new_raw_data.plot()
+    print(new_raw_data.info['ch_names'])
 
     # print(d_list)
     # print(data['channels'])
