@@ -16,6 +16,7 @@ import math
 import argparse
 import scipy as sp
 import scipy.stats
+import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(description="One Shot Visual Recognition")
 parser.add_argument("-f", "--feature_dim", type=int, default=64)
@@ -23,7 +24,7 @@ parser.add_argument("-r", "--relation_dim", type=int, default=8)
 parser.add_argument("-w", "--class_num", type=int, default=2)
 parser.add_argument("-s", "--sample_num_per_class", type=int, default=10)
 parser.add_argument("-b", "--batch_num_per_class", type=int, default=5)
-parser.add_argument("-e", "--episode", type=int, default=500 )
+parser.add_argument("-e", "--episode", type=int, default=500)
 parser.add_argument("-t", "--test_episode", type=int, default=10)
 parser.add_argument("-l", "--learning_rate", type=float, default=0.001)
 parser.add_argument("-g", "--gpu", type=int, default=0)
@@ -182,7 +183,7 @@ def main():
 
     last_accuracy = 0.0
 
-    for episode in range(EPISODE):   # default=1000
+    for episode in range(EPISODE):  # default=1000
 
         feature_encoder_scheduler.step(episode)
         relation_network_scheduler.step(episode)
@@ -233,10 +234,13 @@ def main():
         feature_encoder_optim.step()
         relation_network_optim.step()
 
+        plt_acc = []
+        plt_loss = []
+
         if (episode + 1) % 10 == 0:
             print("episode:", episode + 1, "loss", loss.item())
 
-        if episode % 100 == 0:
+        if episode % 1 == 0:
 
             # test
             print("Testing...")
@@ -284,8 +288,17 @@ def main():
                 accuracies.append(accuracy)
 
             test_accuracy, h = mean_confidence_interval(accuracies)
+            plt_acc.append(test_accuracy)
+            plt_loss.append(loss.item())
 
             print("test accuracy:", test_accuracy, "h:", h)
+            plt.figure()
+            plt.xlabel("epoch")
+            plt.ylabel("Acc/loss")
+            plt.plot(plt_acc, label='Acc')
+            plt.plot(plt_loss, label='Loss')
+            plt.legend(loc='upper right')
+            plt.show()
 
             if test_accuracy > last_accuracy:
                 # save networks
