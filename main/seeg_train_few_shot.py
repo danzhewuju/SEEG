@@ -182,6 +182,10 @@ def main():
     print("Training...")
 
     last_accuracy = 0.0
+    plt_test_acc = []
+    plt_test_loss = []
+    plt_train_acc = []
+    plt_train_loss = []
 
     for episode in range(EPISODE):  # default=1000
 
@@ -234,13 +238,19 @@ def main():
         feature_encoder_optim.step()
         relation_network_optim.step()
 
-        plt_acc = []
-        plt_loss = []
+        _, predict_labels = torch.max(relations.data, 1)
+
+        batch_labels = batch_labels.cuda(GPU)
+
+        rewards = [1 if predict_labels[j] == batch_labels[j] else 0 for j in range(BATCH_NUM_PER_CLASS * CLASS_NUM)]
+        train_acc = sum(rewards) / (BATCH_NUM_PER_CLASS * CLASS_NUM)
+        plt_train_acc.append(train_acc)
+        plt_train_loss.append(loss.item())
 
         if (episode + 1) % 10 == 0:
             print("episode:", episode + 1, "loss", loss.item())
 
-        if episode % 1 == 0:
+        if episode % 10 == 0:
 
             # test
             print("Testing...")
@@ -250,7 +260,7 @@ def main():
                 task = tg.MiniDataTask(metatest_folders, CLASS_NUM, SAMPLE_NUM_PER_CLASS, 15)
                 sample_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=SAMPLE_NUM_PER_CLASS,
                                                                      split="train", shuffle=False)
-                num_per_class = 30
+                num_per_class = 20
                 test_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=num_per_class, split="test",
                                                                    shuffle=False)
 
@@ -288,17 +298,10 @@ def main():
                 accuracies.append(accuracy)
 
             test_accuracy, h = mean_confidence_interval(accuracies)
-            plt_acc.append(test_accuracy)
-            plt_loss.append(loss.item())
+            plt_test_acc.append(test_accuracy)
+            plt_test_loss.append(loss.item())
 
             print("test accuracy:", test_accuracy, "h:", h)
-            plt.figure()
-            plt.xlabel("epoch")
-            plt.ylabel("Acc/loss")
-            plt.plot(plt_acc, label='Acc')
-            plt.plot(plt_loss, label='Loss')
-            plt.legend(loc='upper right')
-            plt.show()
 
             if test_accuracy > last_accuracy:
                 # save networks
@@ -312,6 +315,26 @@ def main():
                 print("save networks for episode:", episode)
 
                 last_accuracy = test_accuracy
+
+    plt.figure()
+    plt.title("testing info")
+    plt.xlabel("epoch")
+    plt.ylabel("Acc/loss")
+    plt.plot(plt_test_loss, label='Loss')
+    plt.plot(plt_test_acc, label='Acc')
+    plt.legend(loc='upper right')
+    plt.savefig('./drawing/test.png')
+    plt.show()
+
+    plt.figure()
+    plt.title("training info")
+    plt.xlabel("epoch")
+    plt.ylabel("Acc/loss")
+    plt.plot(plt_train_loss, label='Loss')
+    plt.plot(plt_train_acc, label='Acc')
+    plt.legend(loc='upper right')
+    plt.savefig('./drawing/train.png')
+    plt.show()
 
 
 if __name__ == '__main__':
