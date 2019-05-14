@@ -1,49 +1,62 @@
-#!/usr/bin/python
+# /usr/bin/Python
+
 from util import *
 
-path = '../data/LK_eye_close_eeg_raw_new.fif'
-duration_time = 30  # 每一帧持续的时间是30s，这是一个参数，由你的神经网络来决定
-select_channel_name = ['EEG C3-Ref-1']  # 选择信道的名称
 
-'''
-1.对数据进行重采样到100hz
-2.选择select_channel_name 信道的数据
-3.按照duration的信息进行分段
-'''
-
-
-def get_sleep_frame(path):  # 获得某一个信道的切片并对其进行处理
-    raw = read_raw(path)
-    raw.resample(100, npad="auto")  # resample 100hz
-    raw.plot(duration=30)
-    plt.show()
-    ch_names = get_channels_names(raw)
-    print(ch_names)
-    picks_eeg = mne.pick_channels(ch_names=ch_names, include=select_channel_name)
-    s = 0  # 开始时间
-    end = max(raw.times)  # 持续的记录时间
-    epoch = int(end // duration_time)  # 划分为多少切片
-
-    fz = int(len(raw) / end)  # 采样频率
-    print("end:{},  epoch:{}times,  fz:{}hz".format(end, epoch, fz))
-    sleep_time_frame = []
-    for index in range(epoch - 1):
-        start = index * fz * duration_time
-        stop = (index + 1) * fz * duration_time
-        data, time = raw[picks_eeg, start:stop]
-        sleep_time_frame.append(data)
-    tmp = np.array(sleep_time_frame)
-    sleep_time_frame = tmp.reshape((-1, fz * duration_time))  # 数据标准化的处理
-    save_path = "../data/output_data/sleep_frame_eeg.npy"
-    save_numpy_info(sleep_time_frame, save_path)
-    return sleep_time_frame
-
-
-def read_sleep_date(path):
+def get_duration_data(raw_path, name, save_dir, start, end_times, gap_time=30):
     '''
-    :param path: 读取文件的路径
-    :return: 返回读取的数据
-    '''
-    data = np.load(path)
-    return data
 
+    :param raw_path: 原始数据的路径
+    :param name: 保存的名称
+    :param save_dir:
+    :param start:
+    :param end_times:
+    :param gap_time:
+    :return:
+    '''
+    if end_time - gap_time > start:
+        raw_data = read_raw(raw_path)
+        channel_names = get_channels_names(raw_data)
+        duration_data = get_duration_raw_data(raw_data, start, end_times - gap_time)
+        if os.path.exists(save_dir) is not True:
+            os.makedirs(save_dir)
+        save_path = os.path.join(save_dir, name)
+        save_path += 'raw.fif'
+
+        rewrite(duration_data, channel_names, save_path)
+        return duration_data
+    else:
+        print("时间区间不合理！！！")
+        return None
+
+
+if __name__ == '__main__':
+    start = 0
+    save_dir = "../data/raw_data/Pre_seizure"
+
+    # 对应相关数据的目录
+    # raw_path = "../data/raw_data/LK_SZ/LK_SZ1_seeg_raw.fif"
+    # name = "LK_SZ1_pre_seizure"
+    # end_time = 546
+
+    # raw_path = "../data/raw_data/LK_SZ/LK_SZ2_seeg_raw.fif"
+    # name = "LK_SZ2_pre_seizure"
+    # end_time = 564
+
+    # raw_path = "../data/raw_data/LK_SZ/LK_SZ3_seeg_raw.fif"
+    # name = "LK_SZ3_pre_seizure"
+    # end_time = 733
+
+    # raw_path = "../data/raw_data/LK_SZ/LK_SZ4_seeg_raw.fif"
+    # name = "LK_SZ4_pre_seizure"
+    # end_time = 995
+
+    # raw_path = "../data/raw_data/LK_SZ/LK_SZ5_seeg_raw.fif"
+    # name = "LK_SZ5_pre_seizure"
+    # end_time = 1535
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ6_seeg_raw.fif"
+    name = "LK_SZ6_pre_seizure"
+    end_time = 702
+
+    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)

@@ -146,15 +146,11 @@ def test_10():
 
 
 def test_11():
-    a = np.random.randint(0, 10, 10)
-    b = a.copy()
+    raw_path = "../data/raw_data/Pre_seizure/LK_SZ1_pre_seizureraw.fif"
+    data = read_raw(raw_path)
+    data.plot()
+    print(data.times)
 
-    random.seed(1)
-    random.shuffle(a)
-    print(a)
-    random.seed(1)
-    random.shuffle(b)
-    print(b)
 
     # print(d_list)
     # print(data['channels'])

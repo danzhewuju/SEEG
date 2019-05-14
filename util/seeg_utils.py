@@ -52,6 +52,7 @@ def rewrite(raw, include_names, save_path):  # 对数据进行重写,主要是�
     raw.save(save_path, picks=picks, overwrite=True)
     # raw.save("SEEG.fif", picks=picks_seeg, overwrite=True)
     print("successfully written!")
+    return True
 
 
 def get_common_channels(ch_names1, ch_names2):  # 寻找两个数据的公共信道
@@ -106,6 +107,16 @@ def data_split(raw, time_step):  # 数据的切片处理
         data, time = raw[:, start:stop]
         data_split.append(data)
     return data_split
+
+
+def get_duration_raw_data(raw, start, stop):
+    end = max(raw.times)
+    if stop > end:
+        print("over range!!!")
+        return None
+    else:
+        duration_data = raw.crop(start, stop)
+        return duration_data
 
 
 def save_split_data(data_split, path, flag):  # 切片数据的保存
