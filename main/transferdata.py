@@ -1,18 +1,11 @@
 #!/usr/bin/python
 
 '''
-将数据按照标签进行转化，按照每一帧进行存储 默认每一帧的时间长度是5秒
+将数据按照标签进行转化，按照每一帧进行存储 默认每一帧的时间长度是2秒
 '''
 from util import *
 import pandas as pd
 
-path_lk0 = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/LK_label0_raw.fif'
-path_sgh0 = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/SGH_label0_raw.fif"
-
-path_lk1 = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/LK_label1_raw.fif'
-path_sgh1 = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/SGH_label1_raw.fif"
-save_normal = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/split/normal'
-save_cases = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/split/cases'
 time = 2  # 每一帧的持续时间
 resample = 100  # 重采样的频率
 high_pass = 0
@@ -73,7 +66,7 @@ def data_save(path_read, name, flag, common_channels):
     raw = filter_hz(raw, high_pass, low_pass)
     raw.resample(resample, npad="auto")  # resample 100hz
     raw = select_channel_data_mne(raw, common_channels)
-    raw.reorder_channels(common_channels)   # 更改信道的顺序
+    raw.reorder_channels(common_channels)  # 更改信道的顺序
     save_split_data_test(raw, name, flag, time)
 
 

@@ -3,7 +3,7 @@
 from util import *
 
 
-def get_duration_data(raw_path, name, save_dir, start, end_times, gap_time=30):
+def get_duration_data(raw_path, name, save_dir, start, end_times, gap_time=30):  # 用来获取癫痫发作前的睡眠数据
     '''
 
     :param raw_path: 原始数据的路径
