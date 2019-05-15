@@ -96,17 +96,15 @@ class CNN(nn.Module):
         self.fc3 = nn.Linear(8, NUM_CLASS)  # 取决于最后的个数种类
 
     def forward(self, x):
-            out = self.layer1(x)
-            out = self.layer2(out)
-            out = self.layer3(out)
-            out = self.layer4(out)
-            out = out.reshape(out.size(0), -1)  # 这里面的-1代表的是自适应的意思。
-            out = self.fc1(out)
-            out = self.fc2(out)
-            out = self.fc3(out)
-            return out
-
-
+        out = self.layer1(x)
+        out = self.layer2(out)
+        out = self.layer3(out)
+        out = self.layer4(out)
+        out = out.reshape(out.size(0), -1)  # 这里面的-1代表的是自适应的意思。
+        out = self.fc1(out)
+        out = self.fc2(out)
+        out = self.fc3(out)
+        return out
 
 
 class Data_info():
