@@ -35,6 +35,7 @@ BATCH_SIZE = args.batch_size
 LEARNING_RATE = args.learning_rate
 NUM_EPOCH = args.epoch
 
+# input = 130*200
 x_ = 9
 y_ = 12
 
