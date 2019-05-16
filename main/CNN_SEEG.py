@@ -2,6 +2,7 @@
 import argparse
 import os
 import time
+import random
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,9 +21,9 @@ parser.add_argument('-train_p', '--train_path', default='../data/seeg/train')
 parser.add_argument('-test_p', '--test_path', default='../data/seeg/test')
 parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
-parser.add_argument('-b', '--batch_size', type=int, default=64)
+parser.add_argument('-b', '--batch_size', type=int, default=16)
 parser.add_argument('-l', '--learning_rate', type=float, default=0.001)
-parser.add_argument('-e', '--epoch', type=int, default=5)
+parser.add_argument('-e', '--epoch', type=int, default=3)
 args = parser.parse_args()
 
 # hyper parameter setting
@@ -41,7 +42,7 @@ y_ = 12
 
 
 def show_plt(accuracy, loss):  # 画出accuracy,loss的趋势图
-    path = './drawing'
+    path = './drawing/'
     time_stamp = time.time()
     time_struct = time.localtime(time_stamp)
     time_stamp = "Accuracy-Loss%d-%d-%d %d:%d:%d" % (time_struct[0], time_struct[1], time_struct[2],
@@ -127,6 +128,13 @@ class Data_info():
                 full_path = os.path.join(path, n)
                 data_test.append((full_path, index))
 
+        # t = time.time()
+        # random.seed(t)
+        # random.shuffle(data_train)
+        # t = time.time()
+        # random.seed(t)
+        # random.shuffle(data_test)
+
         self.data_train = data_train
         self.data_test = data_test
         self.train_length = len(data_train)
@@ -205,7 +213,6 @@ def run():
     show_plt(Acc_h, Loss_h)
 
     # Test the model
-    Acc = 0.0
     model.eval()  # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
     with torch.no_grad():
         correct = 0
@@ -215,14 +222,16 @@ def run():
             labels = labels.cuda(GPU)
             # images = images
             # labels = labels
-            outputs = model(images)  # 直接获得模型的结果
+            outputs = model(images).cuda(GPU)  # 直接获得模型的结果
+            loss = criterion(outputs, labels).cuda(GPU)
             _, predicted = torch.max(outputs.data, 1)
+
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
         print('Test Accuracy of the model on the {} test images: {} %'.format(datas.test_length,
                                                                               100 * correct / total))
-        Acc = BATCH_SIZE * correct / total
+        Acc = correct / total
 
     # Save the model checkpoint
     timestamp = str(int(time.time()))
