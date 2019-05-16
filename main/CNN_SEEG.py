@@ -36,7 +36,7 @@ LEARNING_RATE = args.learning_rate
 NUM_EPOCH = args.epoch
 
 # input = 130*200
-x_ = 9
+x_ = 8
 y_ = 12
 
 
@@ -142,6 +142,8 @@ class MyDataset(Dataset):  # 重写dateset的相关类
     def __getitem__(self, index):
         fn, label = self.imgs[index]
         data = np.load(fn)
+        data = data.astype('float32')
+        data = data[np.newaxis, :]
         return data, label
 
     def __len__(self):
@@ -179,8 +181,8 @@ def run():
             # labels = labels
 
             # Forward pass
-            outputs = model(images)
-            loss = criterion(outputs, labels)
+            outputs = model(images).cuda(GPU)
+            loss = criterion(outputs, labels).cuda(GPU)
             _, prediction = torch.max(outputs.data, 1)
 
             # Backward and optimize
