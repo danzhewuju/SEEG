@@ -21,9 +21,9 @@ parser.add_argument('-train_p', '--train_path', default='../data/seeg/train')
 parser.add_argument('-test_p', '--test_path', default='../data/seeg/test')
 parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
-parser.add_argument('-b', '--batch_size', type=int, default=16)
+parser.add_argument('-b', '--batch_size', type=int, default=32)
 parser.add_argument('-l', '--learning_rate', type=float, default=0.001)
-parser.add_argument('-e', '--epoch', type=int, default=3)
+parser.add_argument('-e', '--epoch', type=int, default=10)
 args = parser.parse_args()
 
 # hyper parameter setting
@@ -201,7 +201,7 @@ def run():
             correct = (prediction == labels).sum().item()
             correct_rate = correct / BATCH_SIZE
 
-            if (i + 1) % 10 == 0:
+            if (i + 1) % 50 == 0:
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.4f}'
                       .format(epoch + 1, NUM_EPOCH, i + 1, total_step, loss.item(), correct_rate))
             correct_h.append(correct_rate)
@@ -213,30 +213,27 @@ def run():
     show_plt(Acc_h, Loss_h)
 
     # Test the model
-    model.eval()  # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
-    with torch.no_grad():
-        correct = 0
-        total = 0
-        for images, labels in test_loader:
-            images = images.cuda(GPU)
-            labels = labels.cuda(GPU)
-            # images = images
-            # labels = labels
-            outputs = model(images).cuda(GPU)  # 直接获得模型的结果
-            loss = criterion(outputs, labels).cuda(GPU)
-            _, predicted = torch.max(outputs.data, 1)
+    correct = 0
+    total = 0
+    for images, labels in test_loader:
+        images = images.cuda(GPU)
+        labels = labels.cuda(GPU)
+        # images = images
+        # labels = labels
+        outputs = model(images)  # 直接获得模型的结果
+        _, predicted = torch.max(outputs.data, 1)
 
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
 
-        print('Test Accuracy of the model on the {} test images: {} %'.format(datas.test_length,
-                                                                              100 * correct / total))
-        Acc = correct / total
+    print('Test Accuracy of the model on the {} test images: {} %'.format(datas.test_length,
+                                                                          100 * correct / total))
+    Acc = correct / total
 
     # Save the model checkpoint
     timestamp = str(int(time.time()))
     name = str("./models/model-{}-{}-{:.4f}.ckpt".format(LEARNING_RATE, timestamp, Acc))
-    torch.save(model.state_dict(), name)
+    # torch.save(model.state_dict(), name)
     end_time = time.time()
     run_time = end_time - start_time
     print("Running Time {:.2f}".format(run_time))
