@@ -20,9 +20,9 @@ parser.add_argument('-train_p', '--train_path', default='../data/seeg/train')
 parser.add_argument('-test_p', '--test_path', default='../data/seeg/test')
 parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
-parser.add_argument('-b', '--batch_size', type=int, default=16)
+parser.add_argument('-b', '--batch_size', type=int, default=64)
 parser.add_argument('-l', '--learning_rate', type=float, default=0.001)
-parser.add_argument('-e', '--epoch', type=int, default=20)
+parser.add_argument('-e', '--epoch', type=int, default=5)
 args = parser.parse_args()
 
 # hyper parameter setting
@@ -191,11 +191,12 @@ def run():
             optimizer.step()
 
             correct = (prediction == labels).sum().item()
+            correct_rate = correct / BATCH_SIZE
 
-            if (i + 1) % 100 == 0:
+            if (i + 1) % 10 == 0:
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.4f}'
-                      .format(epoch + 1, NUM_EPOCH, i + 1, total_step, loss.item(), correct / BATCH_SIZE))
-            correct_h.append(correct / BATCH_SIZE)
+                      .format(epoch + 1, NUM_EPOCH, i + 1, total_step, loss.item(), correct_rate))
+            correct_h.append(correct_rate)
             loss_h.append(loss.item())
         Acc_h.append(np.mean(np.asarray(correct_h)))
         Loss_h.append(np.mean(np.asarray(loss_h)))
@@ -210,7 +211,7 @@ def run():
         correct = 0
         total = 0
         for images, labels in test_loader:
-            images = images.cudo(GPU)
+            images = images.cuda(GPU)
             labels = labels.cuda(GPU)
             # images = images
             # labels = labels
@@ -219,13 +220,13 @@ def run():
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
-        print('Test Accuracy of the model on the {} test images: {} %'.format(datas.test_imgs_length,
+        print('Test Accuracy of the model on the {} test images: {} %'.format(datas.test_length,
                                                                               100 * correct / total))
         Acc = BATCH_SIZE * correct / total
 
     # Save the model checkpoint
     timestamp = str(int(time.time()))
-    name = str("./model/model-{}-{}-{:.4f}.ckpt".format(LEARNING_RATE, timestamp, Acc))
+    name = str("./models/model-{}-{}-{:.4f}.ckpt".format(LEARNING_RATE, timestamp, Acc))
     torch.save(model.state_dict(), name)
     end_time = time.time()
     run_time = end_time - start_time
