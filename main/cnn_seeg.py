@@ -2,7 +2,6 @@
 import argparse
 import os
 import time
-import random
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,6 +18,7 @@ parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
 parser.add_argument('-s', '--sample', default=100)  # 对其进行重采样
 parser.add_argument('-train_p', '--train_path', default='../data/seeg/train')
 parser.add_argument('-test_p', '--test_path', default='../data/seeg/test')
+parser.add_argument('-val_p', '--val_path', default='../data/seeg/val')
 parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
 parser.add_argument('-b', '--batch_size', type=int, default=32)
@@ -30,6 +30,7 @@ args = parser.parse_args()
 
 TEST_PATH = args.test_path
 TRAIN_PATH = args.train_path
+VAL_PATH = args.val_path
 GPU = args.GPU  # 使用哪个GPU
 NUM_CLASS = args.class_number  # 分类的个数
 BATCH_SIZE = args.batch_size
@@ -232,8 +233,8 @@ def run():
 
     # Save the model checkpoint
     timestamp = str(int(time.time()))
-    name = str("./models/model-{}-{}-{:.4f}.ckpt".format(LEARNING_RATE, timestamp, Acc))
-    # torch.save(model.state_dict(), name)
+    name = str("./models/model-cnn.ckpt")
+    torch.save(model.state_dict(), name)
     end_time = time.time()
     run_time = end_time - start_time
     print("Running Time {:.2f}".format(run_time))
