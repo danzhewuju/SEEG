@@ -9,9 +9,9 @@ class seegdata:
     def __init__(self, path_dir="../data/seizure/split"):
         self.path_dir = path_dir
 
-    def get_split_npy_data(self, path_normal='../data/seizure/split/normal', path_cases='../data/seizure/split/cases'):
+    def get_split_npy_data(self, path_normal='../data/seizure/split/preseizure', path_cases='../data/seizure/split/cases'):
         self.path_cases = path_cases
-        self.path_normal = path_normal
+        self.path_normal = path_normal # 癫痫发作的前段时间
         map_cases = get_all_file_path(self.path_cases, 'npy')
         map_normal = get_all_file_path(self.path_normal, 'npy')
         # print(map_cases)

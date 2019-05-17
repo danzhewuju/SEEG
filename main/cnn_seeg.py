@@ -227,7 +227,7 @@ def run():
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
-    print('Test Accuracy of the model on the {} test images: {} %'.format(datas.test_length,
+    print('Test Accuracy of the model on the {} test seegs: {} %'.format(datas.test_length,
                                                                           100 * correct / total))
     Acc = correct / total
 
@@ -237,7 +237,7 @@ def run():
     torch.save(model.state_dict(), name)
     end_time = time.time()
     run_time = end_time - start_time
-    print("Running Time {:.2f}".format(run_time))
+    print("Running Time {:.4f}".format(run_time))
 
 
 if __name__ == '__main__':

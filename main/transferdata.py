@@ -42,7 +42,7 @@ def save_split_data_test(raw_data, name, flag, time=time):
     '''
     path_dir = "../data/seizure/split"
     if flag == 0:
-        dir = 'normal'  # 癫痫发作前的状态
+        dir = 'preseizure'  # 癫痫发作前的状态
     else:
         if flag == 1:
             dir = "cases"  # 癫痫正在发作
@@ -51,9 +51,11 @@ def save_split_data_test(raw_data, name, flag, time=time):
     path_dir = os.path.join(path_dir, dir)
     if os.path.exists(path_dir) is not True:
         os.makedirs(path_dir)
+        print("create dir:{}".format(path_dir))
     path_person = os.path.join(path_dir, name)
     if os.path.exists(path_person) is not True:
         os.makedirs(path_person)
+        print("create dir:{}".format(path_person))
 
     raw_split_data = data_split(raw_data, time)  # 进行五秒的切片
     print("split time {}".format(len(raw_split_data)))
@@ -90,19 +92,19 @@ if __name__ == '__main__':
 
     # path_raw = "../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif"
     # path_raw = '../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-1.fif'
-    path_raw = '../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif'
-    name = "LK"
-    flag = 2  # 正常睡眠时间
+    # path_raw = '../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif'
+    # name = "LK"
+    # flag = 2  # 正常睡眠时间
 
     # path_raw = '../data/seizure/LK_label0_raw.fif'
     # name = "LK"
     # flag = 0  # 癫痫发作前的睡眠时间
 
-    generate_data(path_raw, flag, name, path_commom_channel)
+    # generate_data(path_raw, flag, name, path_commom_channel)
 
-    # path_dir = "../data/raw_data/LK_Pre_seizure"
-    # flag = 0
-    # for p in os.listdir(path_dir):
-    #     path_raw = os.path.join(path_dir, p)
-    #     name = "LK"
-    #     generate_data(path_raw, flag, name, path_commom_channel)
+    path_dir = "../data/raw_data/LK_Pre_seizure"
+    flag = 0
+    for p in os.listdir(path_dir):
+        path_raw = os.path.join(path_dir, p)
+        name = "LK"
+        generate_data(path_raw, flag, name, path_commom_channel)

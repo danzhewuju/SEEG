@@ -142,11 +142,11 @@ def run():
             outputs = model(data)  # 直接获得模型的结果
             _, predicted = torch.max(outputs.data, 1)
             correct += (predicted == labels).sum().item()
-    print('Test Accuracy of the model on the {} test images: {} %'.format(total,
+    print('Test Accuracy of the model on the {} test seegs: {} %'.format(total,
                                                                           100 * correct / total))
     end_time = time.time()
     run_time = end_time - start_time
-    print("Running Time {:.2f}".format(run_time))
+    print("Running Time {:.4f}".format(run_time))
 
 
 if __name__ == '__main__':
