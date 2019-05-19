@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-import matplotlib.pyplot as plt
-import numpy as np
 from util import *
 
 
@@ -9,9 +7,10 @@ class seegdata:
     def __init__(self, path_dir="../data/seizure/split"):
         self.path_dir = path_dir
 
-    def get_split_npy_data(self, path_normal='../data/seizure/split/preseizure', path_cases='../data/seizure/split/cases'):
+    def get_split_npy_data(self, path_normal='../data/seizure/split/preseizure',
+                           path_cases='../data/seizure/split/cases'):
         self.path_cases = path_cases
-        self.path_normal = path_normal # 癫痫发作的前段时间
+        self.path_normal = path_normal  # 癫痫发作的前段时间
         map_cases = get_all_file_path(self.path_cases, 'npy')
         map_normal = get_all_file_path(self.path_normal, 'npy')
         # print(map_cases)
@@ -31,7 +30,7 @@ class seegdata:
         self.data_map_normal = data_map_normal
         self.data_map_cases = data_map_cases
 
-    def get_all_path_by_keyword(self, keyword): # ./split/keyword
+    def get_all_path_by_keyword(self, keyword):  # ./split/keyword
         name_dir = os.listdir(self.path_dir)
         if keyword in name_dir:
             temp_path = os.path.join(self.path_dir, keyword)
@@ -53,4 +52,3 @@ if __name__ == '__main__':
     for p_1 in p_LK:
         d_1 = np.load(p_1)
         print(d_1.shape)
-

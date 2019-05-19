@@ -1,13 +1,13 @@
 #!/usr/bin/python
-import numpy as np
-from main.pre_Processing import *
 import glob
 import os
+
 import librosa
 import librosa.display
-import random
 import pandas as pd
-import uuid
+import random
+
+from main.pre_Processing import *
 
 
 def test_1():
@@ -152,3 +152,12 @@ def test_12():
 
     # print(d_list)
     # print(data['channels'])
+
+
+def test_13():
+    a = np.random.randint(0, 100, 20)
+    b = a.copy()
+    c = a.copy()
+    random.shuffle(b)
+    random.shuffle(c)
+    print(a, b, c)

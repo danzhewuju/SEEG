@@ -3,8 +3,9 @@
 '''
 将数据按照标签进行转化，按照每一帧进行存储 默认每一帧的时间长度是2秒
 '''
-from util import *
 import pandas as pd
+
+from util import *
 
 time = 2  # 每一帧的持续时间
 resample = 100  # 重采样的频率
@@ -47,7 +48,11 @@ def save_split_data_test(raw_data, name, flag, time=time):
         if flag == 1:
             dir = "cases"  # 癫痫正在发作
         else:
-            dir = "sleep"  # 正常睡眠状态
+            if flag == 2:
+                dir = "sleep"  # 正常睡眠状态
+            else:
+                dir = "awake"  # 代表的是清醒的状态
+
     path_dir = os.path.join(path_dir, dir)
     if os.path.exists(path_dir) is not True:
         os.makedirs(path_dir)
@@ -102,9 +107,17 @@ if __name__ == '__main__':
 
     # generate_data(path_raw, flag, name, path_commom_channel)
 
-    path_dir = "../data/raw_data/LK_Pre_seizure"
-    flag = 0
+    # path_dir = "../data/raw_data/LK_Pre_seizure"
+    # flag = 0
+    # for p in os.listdir(path_dir):
+    #     path_raw = os.path.join(path_dir, p)
+    #     name = "LK"
+    #     generate_data(path_raw, flag, name, path_commom_channel)
+
+    path_dir = "../data/raw_data/LK_Awake"
+    flag = 3
     for p in os.listdir(path_dir):
         path_raw = os.path.join(path_dir, p)
         name = "LK"
         generate_data(path_raw, flag, name, path_commom_channel)
+
