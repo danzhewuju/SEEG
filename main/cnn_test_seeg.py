@@ -21,7 +21,7 @@ parser.add_argument('-test_p', '--test_path', default='../data/seeg/test')
 parser.add_argument('-val_p', '--val_path', default='../data/seeg/val')
 parser.add_argument('-m_p', '--model_path', default='./models/model-cnn.ckpt')
 parser.add_argument('-g', '--GPU', type=int, default=0)
-parser.add_argument('-n', '--class_number', type=int, default=3)
+parser.add_argument('-n', '--class_number', type=int, default=2)
 parser.add_argument('-b', '--batch_size', type=int, default=16)
 parser.add_argument('-l', '--learning_rate', type=float, default=0.001)
 parser.add_argument('-e', '--epoch', type=int, default=10)
@@ -133,7 +133,7 @@ def run():
     correct = 0
 
     # Test the model
-    model.eval()  # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
+    model.eval()  # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance) 对于单个图片的测试
     with torch.no_grad():
         for (data, labels) in val_loader:
             data = data.cuda(GPU)

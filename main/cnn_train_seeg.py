@@ -20,7 +20,7 @@ parser.add_argument('-train_p', '--train_path', default='../data/seeg/train')
 parser.add_argument('-test_p', '--test_path', default='../data/seeg/test')
 parser.add_argument('-val_p', '--val_path', default='../data/seeg/val')
 parser.add_argument('-g', '--GPU', type=int, default=0)
-parser.add_argument('-n', '--class_number', type=int, default=3)
+parser.add_argument('-n', '--class_number', type=int, default=2)
 parser.add_argument('-b', '--batch_size', type=int, default=32)
 parser.add_argument('-l', '--learning_rate', type=float, default=0.001)
 parser.add_argument('-e', '--epoch', type=int, default=10)
@@ -228,7 +228,7 @@ def run():
         correct += (predicted == labels).sum().item()
 
     print('Test Accuracy of the model on the {} test seegs: {} %'.format(datas.test_length,
-                                                                          100 * correct / total))
+                                                                         100 * correct / total))
     Acc = correct / total
 
     # Save the model checkpoint
