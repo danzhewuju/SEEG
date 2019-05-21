@@ -1,13 +1,14 @@
 #!/usr/bin/Python
 '''
 author: Alex
-function: test cnn model
+function: CNN feature visualization
 '''
-
 import argparse
+import math
 import os
 import time
 
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
@@ -121,6 +122,28 @@ class MyDataset(Dataset):
         return len(self.datas)
 
 
+def get_features(pretrained_model, x, layers=[3, 4, 9]):  ## get_features 其实很简单
+    '''
+    1.首先import model
+    2.将weights load 进model
+    3.熟悉model的每一层的位置，提前知道要输出feature map的网络层是处于网络的那一层
+    4.直接将test_x输入网络，*list(model.chidren())是用来提取网络的每一层的结构的。net1 = nn.Sequential(*list(pretrained_model.children())[:layers[0]]) ,就是第三层前的所有层。
+
+    '''
+    net1 = nn.Sequential(*list(pretrained_model.children())[:layers[0]])
+    #   print net1
+    out1 = net1(x)
+
+    net2 = nn.Sequential(*list(pretrained_model.children())[layers[0]:layers[1]])
+    #   print net2
+    out2 = net2(out1)
+
+    # net3 = nn.Sequential(*list(pretrained_model.children())[layers[1]:layers[2]])
+    # out3 = net3(out2)
+
+    return out1, out2
+
+
 def run():
     start_time = time.time()  # 图像风格图像
     data_info = Data_info(VAL_PATH)
@@ -141,14 +164,35 @@ def run():
             data = data.cuda(GPU)
             labels = labels.cuda(GPU)
 
-            outputs = model(data)  # 直接获得模型的结果
-            _, predicted = torch.max(outputs.data, 1)
-            correct += (predicted == labels).sum().item()
-    print('Test Accuracy of the model on the {} test seegs: {} %'.format(total,
-                                                                         100 * correct / total))
-    end_time = time.time()
-    run_time = end_time - start_time
-    print("Running Time {:.4f}".format(run_time))
+            # outputs = model(data)  # 直接获得模型的结果
+            # _, predicted = torch.max(outputs.data, 1)
+            # correct += (predicted == labels).sum().item()
+            out1, out2 = get_features(model, data)
+            out1 = out1.cpu()
+            out2 = out2.cpu()
+
+            num = out2.shape[0]
+            t = int(math.sqrt(num))
+            plt.figure(1)
+            for i in range(num):
+                plt.subplot(t, t, (i + 1))
+                plt.imshow(out1[i][0])
+                plt.axis('off')
+            plt.show()
+
+            plt.figure(2)
+            for i in range(num):
+                plt.subplot(t, t, (i + 1))
+                plt.imshow(out2[i][0])
+                plt.axis('off')
+            plt.show()
+            break
+
+    # print('Test Accuracy of the model on the {} test seegs: {} %'.format(total,
+    #                                                                      100 * correct / total))
+    # end_time = time.time()
+    # run_time = end_time - start_time
+    # print("Running Time {:.4f}".format(run_time))
 
 
 if __name__ == '__main__':
