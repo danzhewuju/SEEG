@@ -24,7 +24,7 @@ def seeg_plot(path):
     data_raw.plot(duration=30)
 
 
-def get_all_visualization_feature(key='LK', status='preseizure'):
+def get_all_visualization_feature(key='LK', status='preseizure', top_k=10):
     seeg = seegdata()
     path_dict = seeg.get_all_path_by_keyword(status)
     data = path_dict[key]
@@ -34,6 +34,7 @@ def get_all_visualization_feature(key='LK', status='preseizure'):
     sum = np.load(p)
     for p in data:
         d = np.load(p)
+        d = np.abs(d)
         sum += d
     avg_p = sum / count
     print(avg_p)
@@ -43,8 +44,16 @@ def get_all_visualization_feature(key='LK', status='preseizure'):
     print(t_axis)
     t_axis = np.abs(t_axis)
     t_dict = dict(zip(t_axis, range(len(t_axis))))
-    t_dict = sorted(t_dict.items(), key=lambda x: -x[0])
+    t_dict = sorted(t_dict.items(), key=lambda x: -x[0])  # 将能量从高到低排序
     print(t_dict)
+    top = min(top_k, len(t_dict))
+    top_data = []
+    for i in range(top):
+        top_data.append(t_dict[i][-1])
+    print("top channels:{}".format(top_data))
+    top_data = sorted(top_data)
+    print("top channels:{}".format(top_data))
+
 
 
 # def test():
