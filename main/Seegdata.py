@@ -45,7 +45,7 @@ if __name__ == '__main__':
     seeg = seegdata()
     # seeg.get_split_npy_data()
     # print(seeg.channel_number)
-    p = seeg.get_all_path_by_keyword('normal')
+    p = seeg.get_all_path_by_keyword('preseizure')
     # print(p)
     # print(len(p))
     p_LK = p['LK']

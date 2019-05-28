@@ -1,11 +1,10 @@
 #!/usr/bin/python
-import glob
-import os
+
+import random
 
 import librosa
 import librosa.display
 import pandas as pd
-import random
 
 from main.pre_Processing import *
 
@@ -90,7 +89,7 @@ def test_8():  # 关于数据过零率的相关统计信息
             counts.append(len([x for x in c if x == True]))
         avg_count = sum(counts) / channel_num
         avg_counts_lk.append(avg_count)
-    # plt.figure()
+    # plt.visualization_feature()
     # plt.title("zero_crossing LK")
     # plt.plot(range(len(avg_counts_cases)), avg_counts_cases)
     print(np.mean(np.array(avg_counts_lk)))
@@ -161,3 +160,16 @@ def test_13():
     random.shuffle(b)
     random.shuffle(c)
     print(a, b, c)
+
+
+def test_14():
+    a = np.random.randint(0, 10, (3, 3))
+    b = np.random.randint(0, 10, (3, 3))
+    c = a + b
+    d = c / 2
+    print(a)
+    print(b)
+    print(c)
+    print(d)
+    e = np.zeros((10,10))
+    print(e)
