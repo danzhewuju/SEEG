@@ -32,7 +32,7 @@ def save_file(path_lk, path_sgh, save_dir, flag):  # 将数据进行存储转化
     save_split_data(raw_sgh_split, save_dir, flag)
 
 
-def save_split_data_test(raw_data, name, flag, time=time):
+def save_split_data_test(raw_data, name, flag, time=time, flag_duration=0):
     '''
 
     :param raw_data:  原始的raw数据，保证mne可读格式
@@ -42,8 +42,14 @@ def save_split_data_test(raw_data, name, flag, time=time):
     :return:
     '''
     path_dir = "../data/seizure/split"
-    if flag == 0:
-        dir = 'preseizure'  # 癫痫发作前的状态
+    if flag == 0:  # 癫痫发作前的状态, 这个状态可以进一步的细分，主要表现为发作前设置的预警时间
+        if flag_duration == 0:  # 默认是不进行细分
+            dir = 'preseizure'
+        else:
+            if flag_duration == 1:
+                dir = 'preseizure/within_warning_time'  # 在预警的时间线之内
+            else:
+                dir = 'preseizure/before_warning_time'  # 在预警的时间线之前
     else:
         if flag == 1:
             dir = "cases"  # 癫痫正在发作
@@ -62,22 +68,22 @@ def save_split_data_test(raw_data, name, flag, time=time):
         os.makedirs(path_person)
         print("create dir:{}".format(path_person))
 
-    raw_split_data = data_split(raw_data, time)  # 进行五秒的切片
+    raw_split_data = data_split(raw_data, time)  # 进行2秒的切片
     print("split time {}".format(len(raw_split_data)))
     save_split_data(raw_split_data, path_person, flag)
     return True
 
 
-def data_save(path_read, name, flag, common_channels):
+def data_save(path_read, name, flag, common_channels, flag_duration=0):
     raw = read_raw(path_read)
     raw = filter_hz(raw, high_pass, low_pass)
     raw.resample(resample, npad="auto")  # resample 100hz
     raw = select_channel_data_mne(raw, common_channels)
     raw.reorder_channels(common_channels)  # 更改信道的顺序
-    save_split_data_test(raw, name, flag, time)
+    save_split_data_test(raw, name, flag, time, flag_duration=flag_duration)
 
 
-def generate_data(path, flag, name, path_commom_channel):
+def generate_data(path, flag, name, path_commom_channel, flag_duration=0):
     '''
 
     :param path: 文件的路径
@@ -89,7 +95,7 @@ def generate_data(path, flag, name, path_commom_channel):
     data = pd.read_csv(path_commom_channel, sep=',')
     d_list = data['channels']
     common_channels = list(d_list)
-    data_save(path, name, flag, common_channels)
+    data_save(path, name, flag, common_channels, flag_duration=flag_duration)
 
 
 if __name__ == '__main__':
@@ -114,10 +120,28 @@ if __name__ == '__main__':
     #     name = "LK"
     #     generate_data(path_raw, flag, name, path_commom_channel)
 
-    path_dir = "../data/raw_data/LK_Awake"
-    flag = 3
+    # path_dir = "../data/raw_data/LK_Awake"
+    # flag = 3
+    # for p in os.listdir(path_dir):
+    #     path_raw = os.path.join(path_dir, p)
+    #     name = "LK"
+    #     generate_data(path_raw, flag, name, path_commom_channel)
+
+    # ----------------------------------------------------------------------------
+    # 增加了一个模块， 这个模块进一步的细分了癫痫发作之前的时间划分
+
+    # path_dir = "../data/raw_data/Pre_seizure/before_warning_time"
+    # flag = 0
+    # flag_duration = 2
+    # for p in os.listdir(path_dir):
+    #     path_raw = os.path.join(path_dir, p)
+    #     name = "LK"
+    #     generate_data(path_raw, flag, name, path_commom_channel, flag_duration)
+
+    path_dir = "../data/raw_data/Pre_seizure/within_warning_time"
+    flag = 0
+    flag_duration = 1
     for p in os.listdir(path_dir):
         path_raw = os.path.join(path_dir, p)
         name = "LK"
-        generate_data(path_raw, flag, name, path_commom_channel)
-
+        generate_data(path_raw, flag, name, path_commom_channel, flag_duration)

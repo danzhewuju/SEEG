@@ -1,5 +1,5 @@
 '''
-数据预处理，主要是讲数据进行划分，训练集和测试集以及验证集，划分的数据集用于few-shot learning, cnn 的训练效果
+数据预处理，主要是讲数据进行划分，训练集和测试集以及验证集，划分的数据集用于few-shot learning, cnn 的训练效果, 这个处理方法是根据持续时间来做出选择
 '''
 
 import random
@@ -36,8 +36,8 @@ def data_process():
         os.system("rm -r ./seeg/val/*")
 
     path_normal = "sleep_normal"
-    path_pre_seizure = "pre_zeizure"
-    path_awake = "awake"
+    path_pre_seizure = "pre_zeizure_wwt"
+    path_awake = "pre_zeizure_bwt"
 
     train_folder_dir_normal = os.path.join(train_folder, path_normal)
     train_folder_dir_pre = os.path.join(train_folder, path_pre_seizure)
