@@ -7,6 +7,9 @@ class seegdata:
     def __init__(self, path_dir="../data/seizure/split"):
         self.path_dir = path_dir
 
+    def set_path_dir(self, new_path):
+        self.path_dir = new_path
+
     def get_split_npy_data(self, path_normal='../data/seizure/split/preseizure',
                            path_cases='../data/seizure/split/cases'):
         self.path_cases = path_cases
@@ -41,14 +44,15 @@ class seegdata:
             return None
 
 
-if __name__ == '__main__':
-    seeg = seegdata()
-    # seeg.get_split_npy_data()
-    # print(seeg.channel_number)
-    p = seeg.get_all_path_by_keyword('preseizure')
-    # print(p)
-    # print(len(p))
-    p_LK = p['LK']
-    for p_1 in p_LK:
-        d_1 = np.load(p_1)
-        print(d_1.shape)
+# if __name__ == '__main__':
+#     path_dir = "../data/seizure/split/preseizure"
+#     seeg = seegdata(path_dir=path_dir)
+#     # seeg.get_split_npy_data()
+#     # print(seeg.channel_number)
+#     p = seeg.get_all_path_by_keyword('before_warning_time')
+#     print(p)
+#     # print(len(p))
+#     # p_LK = p['LK']
+#     # for p_1 in p_LK:
+#     #     d_1 = np.load(p_1)
+#     #     print(d_1.shape)

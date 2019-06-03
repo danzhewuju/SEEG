@@ -7,6 +7,7 @@ import librosa.display
 import pandas as pd
 
 from main.pre_processing import *
+from main.Seegdata import *
 
 
 def test_1():
@@ -163,13 +164,11 @@ def test_13():
 
 
 def test_14():
-    a = np.random.randint(0, 10, (3, 3))
-    b = np.random.randint(0, 10, (3, 3))
-    c = a + b
-    d = c / 2
-    print(a)
-    print(b)
-    print(c)
-    print(d)
-    e = np.zeros((10,10))
-    print(e)
+    seeg = seegdata()
+    path_dir_seizure = "../data/seizure/split/preseizure"
+    seeg.set_path_dir(path_dir_seizure)
+    sleep_bwt = seeg.get_all_path_by_keyword('within_warning_time')
+    sleep_bwt_label1 = sleep_bwt['LK']  # 发病前的一段时间,警戒线之外
+    for p in sleep_bwt_label1:
+        d = np.load(p)
+        print(d.shape)

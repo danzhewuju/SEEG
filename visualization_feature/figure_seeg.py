@@ -24,7 +24,7 @@ def seeg_plot(path):
     data_raw.plot(duration=30)
 
 
-def get_all_visualization_feature(key='LK', status='preseizure', top_k=10):
+def get_all_visualization_feature(key='LK', status='preseizure', top_k=20):
     seeg = seegdata()
     path_dict = seeg.get_all_path_by_keyword(status)
     data = path_dict[key]
