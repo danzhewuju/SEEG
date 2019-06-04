@@ -130,15 +130,23 @@ if __name__ == '__main__':
     # ----------------------------------------------------------------------------
     # 增加了一个模块， 这个模块进一步的细分了癫痫发作之前的时间划分
 
-    # path_dir = "../data/raw_data/Pre_seizure/before_warning_time"
-    # flag = 0
-    # flag_duration = 2
-    # for p in os.listdir(path_dir):
-    #     path_raw = os.path.join(path_dir, p)
-    #     name = "LK"
-    #     generate_data(path_raw, flag, name, path_commom_channel, flag_duration)
+    path_dir = "../data/raw_data/Pre_seizure/before_warning_time"
+    if os.path.exists(path_dir) is True:
+        rm_dir = os.path.join('../data/seizure/split/preseizure/before_warning_time', '*')
+        os.system('rm -r {}'.format(rm_dir))
+        print("all files are removed!")
+    flag = 0
+    flag_duration = 2
+    for p in os.listdir(path_dir):
+        path_raw = os.path.join(path_dir, p)
+        name = "LK"
+        generate_data(path_raw, flag, name, path_commom_channel, flag_duration)
 
     path_dir = "../data/raw_data/Pre_seizure/within_warning_time"
+    if os.path.exists(path_dir) is True:
+        rm_dir = os.path.join('../data/seizure/split/preseizure/within_warning_time', '*')
+        os.system('rm -r {}'.format(rm_dir))
+        print("all files are removed!")
     flag = 0
     flag_duration = 1
     for p in os.listdir(path_dir):

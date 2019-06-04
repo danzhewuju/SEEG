@@ -318,7 +318,7 @@ def main():
 
     plt.figure()
     plt.title("testing info")
-    plt.xlabel("epoch")
+    plt.xlabel("episode")
     plt.ylabel("Acc/loss")
     plt.plot(plt_test_loss, label='Loss')
     plt.plot(plt_test_acc, label='Acc')
@@ -328,7 +328,7 @@ def main():
 
     plt.figure()
     plt.title("training info")
-    plt.xlabel("epoch")
+    plt.xlabel("episode*10")
     plt.ylabel("Acc/loss")
     plt.plot(plt_train_loss, label='Loss')
     plt.plot(plt_train_acc, label='Acc')

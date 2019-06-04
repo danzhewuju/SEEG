@@ -57,35 +57,50 @@ if __name__ == '__main__':
 
     # 对应相关数据的目录
 
-    # raw_path = "../data/raw_data/LK_SZ/LK_SZ1_seeg_raw.fif"
-    # within_warning_name = "LK_SZ1_pre_seizure_within_warning_time"
-    # end_time = 546
-    # before_warning_name = "LK_SZ1_pre_seizure_before_warning_time"
-    # before_warning_end_time = end_time - warning_time
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ1_seeg_raw.fif"
+    within_warning_name = "LK_SZ1_pre_seizure_within_warning_time"
+    end_time = 546
+    before_warning_name = "LK_SZ1_pre_seizure_before_warning_time"
+    before_warning_end_time = end_time - warning_time
 
-    # raw_path = "../data/raw_data/LK_SZ/LK_SZ2_seeg_raw.fif"
-    # within_warning_name = "LK_SZ2_pre_seizure_within_warning_time"
-    # end_time = 564
-    # before_warning_name = "LK_SZ2_pre_seizure_before_warning_time"
-    # before_warning_end_time = end_time - warning_time
+    get_duration_data(raw_path, before_warning_name, save_dir_bwt, start, before_warning_end_time, gap_time=60)
+    get_duration_data(raw_path, within_warning_name, save_dir_wwt, before_warning_end_time, end_time, gap_time=30)
 
-    # raw_path = "../data/raw_data/LK_SZ/LK_SZ3_seeg_raw.fif"
-    # within_warning_name = "LK_SZ3_pre_seizure_within_warning_time"
-    # end_time = 733
-    # before_warning_name = "LK_SZ3_pre_seizure_before_warning_time"
-    # before_warning_end_time = end_time - warning_time
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ2_seeg_raw.fif"
+    within_warning_name = "LK_SZ2_pre_seizure_within_warning_time"
+    end_time = 564
+    before_warning_name = "LK_SZ2_pre_seizure_before_warning_time"
+    before_warning_end_time = end_time - warning_time
 
-    # raw_path = "../data/raw_data/LK_SZ/LK_SZ4_seeg_raw.fif"
-    # within_warning_name = "LK_SZ4_pre_seizure_within_warning_time"
-    # end_time = 995
-    # before_warning_name = "LK_SZ4_pre_seizure_before_warning_time"
-    # before_warning_end_time = end_time - warning_time
+    get_duration_data(raw_path, before_warning_name, save_dir_bwt, start, before_warning_end_time, gap_time=60)
+    get_duration_data(raw_path, within_warning_name, save_dir_wwt, before_warning_end_time, end_time, gap_time=30)
 
-    # raw_path = "../data/raw_data/LK_SZ/LK_SZ5_seeg_raw.fif"
-    # within_warning_name = "LK_SZ5_pre_seizure_within_warning_time"
-    # end_time = 1535
-    # before_warning_name = "LK_SZ5_pre_seizure_before_warning_time"
-    # before_warning_end_time = end_time - warning_time
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ3_seeg_raw.fif"
+    within_warning_name = "LK_SZ3_pre_seizure_within_warning_time"
+    end_time = 733
+    before_warning_name = "LK_SZ3_pre_seizure_before_warning_time"
+    before_warning_end_time = end_time - warning_time
+
+    get_duration_data(raw_path, before_warning_name, save_dir_bwt, start, before_warning_end_time, gap_time=60)
+    get_duration_data(raw_path, within_warning_name, save_dir_wwt, before_warning_end_time, end_time, gap_time=30)
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ4_seeg_raw.fif"
+    within_warning_name = "LK_SZ4_pre_seizure_within_warning_time"
+    end_time = 995
+    before_warning_name = "LK_SZ4_pre_seizure_before_warning_time"
+    before_warning_end_time = end_time - warning_time
+
+    get_duration_data(raw_path, before_warning_name, save_dir_bwt, start, before_warning_end_time, gap_time=60)
+    get_duration_data(raw_path, within_warning_name, save_dir_wwt, before_warning_end_time, end_time, gap_time=30)
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ5_seeg_raw.fif"
+    within_warning_name = "LK_SZ5_pre_seizure_within_warning_time"
+    end_time = 1535
+    before_warning_name = "LK_SZ5_pre_seizure_before_warning_time"
+    before_warning_end_time = end_time - warning_time
+
+    get_duration_data(raw_path, before_warning_name, save_dir_bwt, start, before_warning_end_time, gap_time=60)
+    get_duration_data(raw_path, within_warning_name, save_dir_wwt, before_warning_end_time, end_time, gap_time=30)
 
     raw_path = "../data/raw_data/LK_SZ/LK_SZ6_seeg_raw.fif"
     within_warning_name = "LK_SZ6_pre_seizure_within_warning_time"
