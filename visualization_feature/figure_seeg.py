@@ -34,7 +34,7 @@ def get_all_visualization_feature(key='LK', status='preseizure', top_k=20):
     sum = np.load(p)
     for p in data:
         d = np.load(p)
-        # d = np.abs(d)
+        d = np.abs(d)
         sum += d
     avg_p = sum / count
     print(avg_p)
@@ -44,7 +44,7 @@ def get_all_visualization_feature(key='LK', status='preseizure', top_k=20):
     print(t_axis)
     t_axis = np.abs(t_axis)
     t_dict = dict(zip(t_axis, range(len(t_axis))))
-    t_dict = sorted(t_dict.items(), key=lambda x: -x[0])  # 将能量从高到低排序
+    t_dict = sorted(t_dict.items(), key=lambda x: x[0])  # 将能量从高到低排序
     print(t_dict)
     top = min(top_k, len(t_dict))
     top_data = []
@@ -78,9 +78,9 @@ if __name__ == '__main__':
     t_axis = np.sum(dd, axis=1)
     t_axis = np.abs(t_axis)
     t_dict = dict(zip(t_axis, range(len(t_axis))))
-    t_dict = sorted(t_dict.items(), key=lambda x: -x[0])  # 将能量从高到低排序
+    t_dict = sorted(t_dict.items(), key=lambda x: x[0])  # 将能量从高到低排序
     print(t_dict)
-    top = min(10, len(t_dict))
+    top = min(20, len(t_dict))
     top_data = []
     for i in range(top):
         top_data.append(t_dict[i][-1])
