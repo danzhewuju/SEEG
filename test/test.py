@@ -6,7 +6,6 @@ import librosa
 import librosa.display
 import pandas as pd
 
-from main.pre_processing import *
 from main.Seegdata import *
 
 
@@ -172,3 +171,20 @@ def test_14():
     for p in sleep_bwt_label1:
         d = np.load(p)
         print(d.shape)
+
+
+def test_15():
+    path = './path.csv'
+    paths = pd.read_csv(path, sep=',')
+    print(paths)
+    raw_data_path = paths['path']
+    raw_name = paths['name']
+    f = open('./channel.txt', 'w', encoding='UTF-8')
+    f.writelines('name, channels\n')
+    for n, p in zip(raw_name, raw_data_path):
+        data = read_edf_raw(p)
+        channels = get_channels_names(data)
+        print(channels)
+        dd = n + ',' + str(channels)+'\n'
+        f.writelines(dd)
+    f.close()

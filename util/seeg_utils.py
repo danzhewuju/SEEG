@@ -1,16 +1,21 @@
 #!/usr/bin/python3
 
-import mne
-import numpy as np
 import os
 import uuid
+
+import mne
+import numpy as np
 import pyedflib
-import matplotlib.pyplot as plt
 from mne.time_frequency import *
 
 
 def read_raw(path):
     raw = mne.io.read_raw_fif(path, preload=True)
+    return raw
+
+
+def read_edf_raw(path):
+    raw = mne.io.read_raw_edf(path, preload=True)
     return raw
 
 
