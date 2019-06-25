@@ -98,37 +98,58 @@ def generate_data(path, flag, name, path_commom_channel, flag_duration=0):
     data_save(path, name, flag, common_channels, flag_duration=flag_duration)
 
 
-if __name__ == '__main__':
-    path_commom_channel = "../data/seizure/common_channels.csv"
+def sleep_normal_handle(path_commom_channel):
+    '''
 
-    # path_raw = "../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif"
-    # path_raw = '../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-1.fif'
-    # path_raw = '../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif'
-    # name = "LK"
-    # flag = 2  # 正常睡眠时间
+    :return:
+    流程操作， 将正常的睡眠进行切片划分
+    '''
+    path_raw_normal_sleep = ["../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif",
+                             '../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-1.fif',
+                             '../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif'
+                             ]  # 数据太多，因此只是选取部分的数据进行处理
+    name = "LK"
+    flag = 2  # 正常睡眠时间
 
-    # path_raw = '../data/seizure/LK_label0_raw.fif'
-    # name = "LK"
-    # flag = 0  # 癫痫发作前的睡眠时间
+    for path_raw in path_raw_normal_sleep:
+        generate_data(path_raw, flag, name, path_commom_channel)
 
-    # generate_data(path_raw, flag, name, path_commom_channel)
+    print("正常睡眠的数据处理完成！")
+    return True
 
-    # path_dir = "../data/raw_data/LK_Pre_seizure"
-    # flag = 0
-    # for p in os.listdir(path_dir):
-    #     path_raw = os.path.join(path_dir, p)
-    #     name = "LK"
-    #     generate_data(path_raw, flag, name, path_commom_channel)
 
-    # path_dir = "../data/raw_data/LK_Awake"
-    # flag = 3
-    # for p in os.listdir(path_dir):
-    #     path_raw = os.path.join(path_dir, p)
-    #     name = "LK"
-    #     generate_data(path_raw, flag, name, path_commom_channel)
+def pre_seizure_biclass_handle(path_commom_channel):
+    '''
 
-    # ----------------------------------------------------------------------------
-    # 增加了一个模块， 这个模块进一步的细分了癫痫发作之前的时间划分
+    :return:
+    处理流程过的函数，主要是处理癫痫发作前的是睡眠状态
+
+    '''
+
+    path_dir = "../data/raw_data/LK_Pre_seizure"
+    flag = 0
+    for p in os.listdir(path_dir):
+        path_raw = os.path.join(path_dir, p)
+        name = "LK"
+        generate_data(path_raw, flag, name, path_commom_channel)
+    print("癫痫发作前的睡眠处理完成！！！")
+    return True
+
+
+def awake_handle(path_commom_channel):
+    path_dir = "../data/raw_data/LK_Awake"
+    flag = 3
+    for p in os.listdir(path_dir):
+        path_raw = os.path.join(path_dir, p)
+        name = "LK"
+        generate_data(path_raw, flag, name, path_commom_channel)
+
+
+def pre_seizure_multiclass_handle(path_commom_channel):
+    '''
+     增加了一个模块， 这个模块进一步的细分了癫痫发作之前的睡眠阶段，在睡眠阶段设置了预警时间
+    :return:
+    '''
 
     path_dir = "../data/raw_data/Pre_seizure/before_warning_time"
     if os.path.exists(path_dir) is True:
@@ -153,3 +174,9 @@ if __name__ == '__main__':
         path_raw = os.path.join(path_dir, p)
         name = "LK"
         generate_data(path_raw, flag, name, path_commom_channel, flag_duration)
+
+
+if __name__ == '__main__':
+    path_commom_channel = "../data/seizure/common_channels.csv"
+    pre_seizure_biclass_handle(path_commom_channel)
+    sleep_normal_handle(path_commom_channel)

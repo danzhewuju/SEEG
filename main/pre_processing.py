@@ -1,4 +1,8 @@
 # /usr/bin/Python
+'''
+主要是数据的划分问题，将数据划分为癫痫发作前和正常睡眠
+
+'''
 
 from util import *
 
@@ -16,7 +20,7 @@ def get_duration_data(raw_path, name, save_dir, start, end_times, gap_time=30): 
     :param gap_time:
     :return:
     '''
-    if end_time - gap_time > start:
+    if end_times - gap_time > start:
         raw_data = read_raw(raw_path)
         channel_names = get_channels_names(raw_data)
         duration_data = get_duration_raw_data(raw_data, start, end_times - gap_time)
@@ -41,9 +45,11 @@ def os_mkdir(save_dir, dir):  # mkdir some dir
         print("{} dir is existed!".format(new_path))
 
 
-if __name__ == '__main__':
+def multi_class_handle():
     '''
-    数据的预处理过程，主要是包含选所要选择的片段，0-546s 估计的时间段
+
+        将癫痫的发作前的睡眠状态进行了细分
+        对于多分类的数据进行预处理， 主要是将癫痫发作前的睡眠状态进行细分
     '''
     start = 0
     save_dir = "../data/raw_data/Pre_seizure"
@@ -110,3 +116,49 @@ if __name__ == '__main__':
 
     get_duration_data(raw_path, before_warning_name, save_dir_bwt, start, before_warning_end_time, gap_time=30)
     get_duration_data(raw_path, within_warning_name, save_dir_wwt, before_warning_end_time, end_time, gap_time=30)
+
+    return True
+
+
+def bi_class_handle():
+    '''
+        对于二分类的数据进行预处理
+    '''
+    start = 0
+    save_dir = "../data/raw_data/LK_Pre_seizure"
+
+    # 对应相关数据的目录
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ1_seeg_raw.fif"
+    end_time = 546
+    name = "LK_SZ1_pre_seizure"
+    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ2_seeg_raw.fif"
+    end_time = 564
+    name = "LK_SZ2_pre_seizure"
+    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ3_seeg_raw.fif"
+    end_time = 733
+    name = "LK_SZ3_pre_seizure"
+    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ4_seeg_raw.fif"
+    end_time = 995
+    name = "LK_SZ4_pre_seizure"
+    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ5_seeg_raw.fif"
+    end_time = 1535
+    name = "LK_SZ5_pre_seizure"
+    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ6_seeg_raw.fif"
+    end_time = 702
+    name = "LK_SZ6_pre_seizure"
+    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+
+
+if __name__ == '__main__':
+    bi_class_handle()

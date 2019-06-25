@@ -184,7 +184,8 @@ def test_15():
     for n, p in zip(raw_name, raw_data_path):
         data = read_edf_raw(p)
         channels = get_channels_names(data)
-        print(channels)
+        # print(channels)
+        print("name:{}, channels: {}".format(n, len(channels)))
         dd = n + ',' + str(channels)+'\n'
         f.writelines(dd)
     f.close()
