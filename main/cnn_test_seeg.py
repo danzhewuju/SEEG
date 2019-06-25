@@ -114,7 +114,7 @@ class MyDataset(Dataset):
     def __getitem__(self, item):
         d_p, label = self.datas[item]
         data = np.load(d_p)
-        data = matrix_normalization(data, (131, 200))
+        data = matrix_normalization(data, (130, 200))
         data = data.astype('float32')
         data = data[np.newaxis, :]
         return data, label
