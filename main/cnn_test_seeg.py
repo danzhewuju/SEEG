@@ -122,7 +122,7 @@ class MyDataset(Dataset):
 
 
 def run():
-    start_time = time.time()  # 图像风格图像
+    start_time = time.time()  # 开始时间
     data_info = Data_info(VAL_PATH)
     val_data = MyDataset(data_info.val)  # 标准数据集的构造?
     val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True)

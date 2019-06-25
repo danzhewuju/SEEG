@@ -5,7 +5,10 @@
 # ---------------------------------
 import glob
 import os
-import argparse
+
+import numpy as np
+import torchvision.transforms as transforms
+from PIL import Image
 
 
 # parser = argparse.ArgumentParser(description="File path function")
@@ -32,3 +35,20 @@ def get_all_file_path(path="/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data
         file_p = glob.glob(os.path.join(p, new_suffix))
         file_map[names[index]] = file_p
     return file_map
+
+
+def matrix_normalization(data, resize_shape=(131, 200)):
+    '''
+    矩阵的归一化，主要是讲不通形状的矩阵变换为特定形状的矩阵
+    eg:(188, 200)->(131, 200)   归一化的表示
+    :param data:
+    :param resize_shape:
+    :return:
+    '''
+    data_t = Image.fromarray(data.astype(np.uint8))
+    transforms_data = transforms.Compose(
+        [transforms.Resize(resize_shape)]
+    )
+    result = transforms_data(data_t)
+    result = np.array(result)
+    return result
