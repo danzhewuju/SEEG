@@ -12,6 +12,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
+from util.util_file import *
 
 parser = argparse.ArgumentParser(description="CNN parameter setting!")
 parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
@@ -113,6 +114,7 @@ class MyDataset(Dataset):
     def __getitem__(self, item):
         d_p, label = self.datas[item]
         data = np.load(d_p)
+        data = matrix_normalization(data, (131, 200))
         data = data.astype('float32')
         data = data[np.newaxis, :]
         return data, label

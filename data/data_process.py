@@ -5,6 +5,7 @@
 import random
 
 from main import *
+import argparse
 
 parser = argparse.ArgumentParser(description="data split")
 parser.add_argument('-r', '--ratio', type=float, default=0.6)  # 将数据集划分为测试集，以及验证集
@@ -77,8 +78,12 @@ def data_process():
     sleep_label0 = tmp_normal['LK']  # 正常人的睡眠时间
     sleep_pre = seeg.get_all_path_by_keyword('preseizure')
     sleep_label1 = sleep_pre['LK']  # 发病前的一段时间
+    tmp_a = sleep_pre['ZK']
+    sleep_label1 = sleep_label1+ tmp_a
+
     awake_label2 = seeg.get_all_path_by_keyword('awake')
     awake_label2 = awake_label2['LK']
+
 
     # print("normal sleep:{} pre seizure:{} awake:{} ".format(len(sleep_label0), len(sleep_label1), len(awake_label2))) # 三分类
     print("normal sleep:{} pre seizure:{}".format(len(sleep_label0), len(sleep_label1)))

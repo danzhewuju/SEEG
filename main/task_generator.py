@@ -9,6 +9,7 @@ import random
 import os
 import numpy as np
 from torch.utils.data.sampler import Sampler
+from util.util_file import *
 import time
 
 
@@ -93,6 +94,7 @@ class MiniImagenet(FewShotDataset):
     def __getitem__(self, idx):
         image_root = self.image_roots[idx]
         image = np.load(image_root)
+        image = matrix_normalization(image, (130, 200)) # 矩阵的归一化
         image = image.astype('float32')
         image = torch.from_numpy(image)
         image = image[np.newaxis, :]

@@ -124,39 +124,69 @@ def bi_class_handle():
     '''
         对于二分类的数据进行预处理
     '''
+    # start = 0
+    # save_dir = "../data/raw_data/LK/LK_Pre_seizure"
+    #
+    # # 对应相关数据的目录
+    #
+    # raw_path = "../data/raw_data/LK_SZ/LK_SZ1_seeg_raw.fif"
+    # end_time = 546
+    # name = "LK_SZ1_pre_seizure"
+    # get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+    #
+    # raw_path = "../data/raw_data/LK_SZ/LK_SZ2_seeg_raw.fif"
+    # end_time = 564
+    # name = "LK_SZ2_pre_seizure"
+    # get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+    #
+    # raw_path = "../data/raw_data/LK_SZ/LK_SZ3_seeg_raw.fif"
+    # end_time = 733
+    # name = "LK_SZ3_pre_seizure"
+    # get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+    #
+    # raw_path = "../data/raw_data/LK_SZ/LK_SZ4_seeg_raw.fif"
+    # end_time = 995
+    # name = "LK_SZ4_pre_seizure"
+    # get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+    #
+    # raw_path = "../data/raw_data/LK_SZ/LK_SZ5_seeg_raw.fif"
+    # end_time = 1535
+    # name = "LK_SZ5_pre_seizure"
+    # get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+    #
+    # raw_path = "../data/raw_data/LK_SZ/LK_SZ6_seeg_raw.fif"
+    # end_time = 702
+    # name = "LK_SZ6_pre_seizure"
+    # get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+
+    # -------------------------------------------------------------------------
+    # 扩展了数据集
     start = 0
-    save_dir = "../data/raw_data/LK_Pre_seizure"
-
-    # 对应相关数据的目录
-
-    raw_path = "../data/raw_data/LK_SZ/LK_SZ1_seeg_raw.fif"
-    end_time = 546
-    name = "LK_SZ1_pre_seizure"
+    save_dir = "../data/raw_data/ZK/ZK_Pre_seizure"
+    raw_path = '../data/raw_data/ZK/ZK_SZ/ZK_SZ1_raw.fif'
+    end_time = 729
+    name = "ZK_SZ1_pre_seizure"
     get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
 
-    raw_path = "../data/raw_data/LK_SZ/LK_SZ2_seeg_raw.fif"
-    end_time = 564
-    name = "LK_SZ2_pre_seizure"
+    start = 0
+    save_dir = "../data/raw_data/WSH/WSH_Pre_seizure"
+    raw_path = '../data/raw_data/WSH/WSH_SZ/WSH_SZ1_raw.fif'
+    end_time = 1446
+    name = "WSH_SZ1_pre_seizure"
     get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
 
-    raw_path = "../data/raw_data/LK_SZ/LK_SZ3_seeg_raw.fif"
-    end_time = 733
-    name = "LK_SZ3_pre_seizure"
+    start = 0
+    save_dir = "../data/raw_data/SJ/SJ_Pre_seizure"
+    raw_path = '../data/raw_data/SJ/SJ_SZ/SJ_SZ1_raw.fif'
+    end_time = 1020
+    name = "SJ_SZ1_pre_seizure"
     get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
 
-    raw_path = "../data/raw_data/LK_SZ/LK_SZ4_seeg_raw.fif"
-    end_time = 995
-    name = "LK_SZ4_pre_seizure"
-    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
-
-    raw_path = "../data/raw_data/LK_SZ/LK_SZ5_seeg_raw.fif"
-    end_time = 1535
-    name = "LK_SZ5_pre_seizure"
-    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
-
-    raw_path = "../data/raw_data/LK_SZ/LK_SZ6_seeg_raw.fif"
-    end_time = 702
-    name = "LK_SZ6_pre_seizure"
+    start = 0
+    save_dir = "../data/raw_data/JWJ/JWJ_Pre_seizure"
+    raw_path = '../data/raw_data/JWJ/JWJ_SZ/JWJ_SZ1_raw.fif'
+    end_time = 349
+    name = "JWJ_SZ1_pre_seizure"
     get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
 
 

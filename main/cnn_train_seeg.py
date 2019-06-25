@@ -8,6 +8,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
+from util.util_file import *
 
 '''
 一般CNN模型的训练
@@ -151,6 +152,7 @@ class MyDataset(Dataset):  # 重写dateset的相关类
     def __getitem__(self, index):
         fn, label = self.imgs[index]
         data = np.load(fn)
+        data = matrix_normalization(data, (131, 200))
         data = data.astype('float32')
         data = data[np.newaxis, :]
         return data, label

@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from torch.utils.data.sampler import Sampler
 import time
+from util.util_file import *
 
 
 def imshow(img):
@@ -111,6 +112,7 @@ class MiniImagenet(FewShotDataset):
     def __getitem__(self, idx):
         image_root = self.image_roots[idx]
         image = np.load(image_root)
+        image = matrix_normalization(image, (130, 200))
         image = image.astype('float32')
         image = torch.from_numpy(image)
         image = image[np.newaxis, :]

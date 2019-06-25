@@ -118,21 +118,55 @@ def sleep_normal_handle(path_commom_channel):
     return True
 
 
-def pre_seizure_biclass_handle(path_commom_channel):
+def pre_seizure_biclass_handle():
     '''
 
     :return:
     处理流程过的函数，主要是处理癫痫发作前的是睡眠状态
 
     '''
+    # path_commom_channel = "../data/seizure/channels_info/LK_common_channels.csv"
+    #
+    # path_dir = "../data/raw_data/LK/LK_Pre_seizure"
+    # flag = 0
+    # for p in os.listdir(path_dir):
+    #     path_raw = os.path.join(path_dir, p)
+    #     name = "LK"
+    #     generate_data(path_raw, flag, name, path_commom_channel)
+    # print("癫痫发作前的睡眠处理完成！！！")
 
-    path_dir = "../data/raw_data/LK/LK_Pre_seizure"
+    path_commom_channel = "../data/seizure/channels_info/ZK_seq.csv"
+    path_dir = "../data/raw_data/ZK/ZK_Pre_seizure"
     flag = 0
     for p in os.listdir(path_dir):
         path_raw = os.path.join(path_dir, p)
-        name = "LK"
+        name = "ZK"
         generate_data(path_raw, flag, name, path_commom_channel)
-    print("癫痫发作前的睡眠处理完成！！！")
+
+    # path_commom_channel = "../data/seizure/channels_info/WSH_seq.csv"
+    # path_dir = "../data/raw_data/WSH/WSH_Pre_seizure"
+    # flag = 0
+    # for p in os.listdir(path_dir):
+    #     path_raw = os.path.join(path_dir, p)
+    #     name = "WSH"
+    #     generate_data(path_raw, flag, name, path_commom_channel)
+    #
+    # path_commom_channel = "../data/seizure/channels_info/SJ_seq.csv"
+    # path_dir = "../data/raw_data/SJ/SJ_Pre_seizure"
+    # flag = 0
+    # for p in os.listdir(path_dir):
+    #     path_raw = os.path.join(path_dir, p)
+    #     name = "SJ"
+    #     generate_data(path_raw, flag, name, path_commom_channel)
+    #
+    # path_commom_channel = "../data/seizure/channels_info/JWJ_seq.csv"
+    # path_dir = "../data/raw_data/JWJ/JWJ_Pre_seizure"
+    # flag = 0
+    # for p in os.listdir(path_dir):
+    #     path_raw = os.path.join(path_dir, p)
+    #     name = "JWJ"
+    #     generate_data(path_raw, flag, name, path_commom_channel)
+
     return True
 
 
@@ -177,6 +211,5 @@ def pre_seizure_multiclass_handle(path_commom_channel):
 
 
 if __name__ == '__main__':
-    path_commom_channel = "../data/seizure/channels_info/LK_common_channels.csv"
-    pre_seizure_biclass_handle(path_commom_channel)
-    sleep_normal_handle(path_commom_channel)
+    pre_seizure_biclass_handle()
+    # sleep_normal_handle()

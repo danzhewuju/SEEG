@@ -211,9 +211,17 @@ def test_16():
 
 
 def test_17():
-    a = np.random.randint(0, 10, (10, 10))
-    print(a)
-    b = matrix_normalization(a, (9, 10))
-    print(b.shape)
-    print(b)
+  a = [1, 2, 3]
+  b = [4, 5]
+  c = a + b
+  print(c)
 
+
+def test_channels_matching():
+    path = '../data/raw_data/ZK/ZK_Pre_seizure/ZK_SZ1_pre_seizure_raw.fif'
+    data = read_raw(path)
+    channels_name = get_channels_names(data)
+    f = open('./ZK_channels.txt', 'w')
+    f.write(str(channels_name))
+    f.close()
+    print(channels_name)
