@@ -104,9 +104,9 @@ def sleep_normal_handle(path_commom_channel):
     :return:
     流程操作， 将正常的睡眠进行切片划分
     '''
-    path_raw_normal_sleep = ["../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif",
-                             '../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-1.fif',
-                             '../data/raw_data/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif'
+    path_raw_normal_sleep = ["../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif",
+                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-1.fif',
+                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif'
                              ]  # 数据太多，因此只是选取部分的数据进行处理
     name = "LK"
     flag = 2  # 正常睡眠时间
@@ -126,7 +126,7 @@ def pre_seizure_biclass_handle(path_commom_channel):
 
     '''
 
-    path_dir = "../data/raw_data/LK_Pre_seizure"
+    path_dir = "../data/raw_data/LK/LK_Pre_seizure"
     flag = 0
     for p in os.listdir(path_dir):
         path_raw = os.path.join(path_dir, p)
@@ -137,7 +137,7 @@ def pre_seizure_biclass_handle(path_commom_channel):
 
 
 def awake_handle(path_commom_channel):
-    path_dir = "../data/raw_data/LK_Awake"
+    path_dir = "../data/raw_data/LK/LK_Awake"
     flag = 3
     for p in os.listdir(path_dir):
         path_raw = os.path.join(path_dir, p)
@@ -151,7 +151,7 @@ def pre_seizure_multiclass_handle(path_commom_channel):
     :return:
     '''
 
-    path_dir = "../data/raw_data/Pre_seizure/before_warning_time"
+    path_dir = "../data/raw_data/LK/multiPre_seizure/before_warning_time"
     if os.path.exists(path_dir) is True:
         rm_dir = os.path.join('../data/seizure/split/preseizure/before_warning_time', '*')
         os.system('rm -r {}'.format(rm_dir))
@@ -163,7 +163,7 @@ def pre_seizure_multiclass_handle(path_commom_channel):
         name = "LK"
         generate_data(path_raw, flag, name, path_commom_channel, flag_duration)
 
-    path_dir = "../data/raw_data/Pre_seizure/within_warning_time"
+    path_dir = "../data/raw_data/LK/multiPre_seizure/within_warning_time"
     if os.path.exists(path_dir) is True:
         rm_dir = os.path.join('../data/seizure/split/preseizure/within_warning_time', '*')
         os.system('rm -r {}'.format(rm_dir))
@@ -177,6 +177,6 @@ def pre_seizure_multiclass_handle(path_commom_channel):
 
 
 if __name__ == '__main__':
-    path_commom_channel = "../data/seizure/common_channels.csv"
+    path_commom_channel = "../data/seizure/channels_info/LK_common_channels.csv"
     pre_seizure_biclass_handle(path_commom_channel)
     sleep_normal_handle(path_commom_channel)

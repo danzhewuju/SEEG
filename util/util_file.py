@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # ---------------------------------
 # 文件工具方法， 主要包含常见的文件处理方法
-#
+#  以及常见的文件存储的方法
 # ---------------------------------
 import glob
 import os
@@ -11,13 +11,7 @@ import torchvision.transforms as transforms
 from PIL import Image
 
 
-# parser = argparse.ArgumentParser(description="File path function")
-# parser.add_argument("-p", "--path", type=str, default="/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/data processed")
-# args = parser.parse_args()
-
-
-def get_all_file_path(path="/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/data processed",
-                      suffix='fif'):  # 主要是获取某文件夹下面所有的文件列表
+def get_all_file_path(path, suffix='fif'):  # 主要是获取某文件夹下面所有的文件列表
     '''
     :param path: 存储对应文件的路径
     :return: 文件夹下面对应的文件路径
