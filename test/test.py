@@ -5,8 +5,6 @@ import random
 import librosa
 import librosa.display
 import pandas as pd
-import torchvision.transforms as transforms
-from PIL import Image
 
 from main.Seegdata import *
 from util.util_file import *
@@ -194,27 +192,12 @@ def test_15():
     f.close()
 
 
-def test_16():
-    a = 188
-    b = 200
-    data_1 = np.random.randn(a * b).reshape(a, b)
-    print("shape:{}".format(data_1.shape))
-    transforms_data = transforms.Compose(
-        [transforms.Resize((131, 200))]
-    )
-    data_1 = Image.fromarray(data_1)
-    data_2 = transforms_data(data_1)
-    data_2 = np.array(data_2)
-    print(data_2)
-    print(data_2.shape)
-    # print("shape:{}".format(d.shape))
-
-
 def test_17():
-  a = [1, 2, 3]
-  b = [4, 5]
-  c = a + b
-  print(c)
+    a = np.random.randint(-100, 100, (102, 200))
+    print(a)
+    b = matrix_normalization(a, (130, 200))
+    print(b)
+    print(b.shape)
 
 
 def test_channels_matching():
