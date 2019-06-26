@@ -208,3 +208,19 @@ def test_channels_matching():
     f.write(str(channels_name))
     f.close()
     print(channels_name)
+
+
+def test_18():
+    path = '../data/seeg/val/pre_zeizure'
+    paths = [os.path.join(path, x) for x in os.listdir(path)]
+    # print(paths)
+    path_a = []
+    for p in paths:
+        d = np.load(p)
+        if d.shape != (130, 200):
+            path_a.append(p)
+    # print(path_a)
+    dd = np.load(path_a[0])
+    print(dd.shape)
+    dd = matrix_normalization(dd, (200, 200))
+    print(dd.shape)

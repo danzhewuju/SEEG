@@ -2,15 +2,14 @@
 # 数据的预处理的一些方法
 # ---------------------
 
-import torch
-import torchvision.transforms as transforms
-from torch.utils.data import DataLoader, Dataset
 import random
-import os
-import numpy as np
-from torch.utils.data.sampler import Sampler
-from util.util_file import *
 import time
+
+import torch
+from torch.utils.data import DataLoader, Dataset
+from torch.utils.data.sampler import Sampler
+
+from util.util_file import *
 
 
 def mini_data_folders():

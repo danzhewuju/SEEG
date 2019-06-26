@@ -44,15 +44,15 @@ class seegdata:
             return None
 
 
-if __name__ == '__main__':
-    path_dir = "../data/seizure/split"
-    seeg = seegdata(path_dir=path_dir)
-    # seeg.get_split_npy_data()
-    # print(seeg.channel_number)
-    p = seeg.get_all_path_by_keyword('preseizure')
-    # print(p)
-    print(len(p))
-    p_LK = p['ZK']
-    for p_1 in p_LK:
-        d_1 = np.load(p_1)
-        print(d_1.shape)
+# if __name__ == '__main__':
+#     path_dir = "../data/seizure/split"
+#     seeg = seegdata(path_dir=path_dir)
+#     # seeg.get_split_npy_data()
+#     # print(seeg.channel_number)
+#     p = seeg.get_all_path_by_keyword('preseizure')
+#     # print(p)
+#     print(len(p))
+#     p_LK = p['ZK']
+#     for p_1 in p_LK:
+#         d_1 = np.load(p_1)
+#         print(d_1.shape)

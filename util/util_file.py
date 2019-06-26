@@ -7,6 +7,7 @@ import glob
 import os
 
 import numpy as np
+import random
 
 
 def get_all_file_path(path, suffix='fif'):  # 主要是获取某文件夹下面所有的文件列表
@@ -44,7 +45,7 @@ def matrix_normalization(data, resize_shape=(130, 200)):
         扩大原来的矩阵
         '''
         d = resize_shape[0] - data_shape[0]
-        channels_add = np.random.randint(1, data_shape[0] - 1, d)  # 随机的添加的信道列表
+        channels_add = random.sample(range(1, data_shape[0]-1), d)
         fake_channel = []  # 添加信道列表的值
         for c in channels_add:
             tmp = (data[c - 1] + data[c]) * 1.0 / 2
@@ -56,6 +57,6 @@ def matrix_normalization(data, resize_shape=(130, 200)):
             删除掉原来的矩阵
             '''
             d = data_shape[0]-resize_shape[0]
-            channels_del = np.random.randint(1, data_shape[0]-1, d)
+            channels_del = random.sample(range(1, data_shape[0]-1), d)
             data = np.delete(data, channels_del, axis=0)
     return data
