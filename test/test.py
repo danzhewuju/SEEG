@@ -193,12 +193,9 @@ def test_15():
 
 
 def test_17():
-    a = np.random.randint(-100, 100, (130, 200))
-    print(a)
-    a = np.array(a)
-    a = matrix_normalization(a, (130, 200))
-    print(a)
-    print(a.shape)
+    a = np.random.randint(0, 100, 10).tolist()
+    b = random.sample(a, 5)
+    print(b)
 
 
 def test_channels_matching():

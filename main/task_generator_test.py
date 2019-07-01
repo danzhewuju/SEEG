@@ -112,17 +112,17 @@ class MiniImagenet(FewShotDataset):
     def __getitem__(self, idx):
         image_root = self.image_roots[idx]
         image = np.load(image_root)
-        image = matrix_normalization(image, (130, 200))
-        image = image.astype('float32')
-        image = torch.from_numpy(image)
-        image = image[np.newaxis, :]
+        result = matrix_normalization(image, (130, 200))
+        result = result.astype('float32')
+        result = torch.from_numpy(image)
+        result = result[np.newaxis, :]
         # image = image.convert('RGB')
         # if self.transform is not None:
         #     image = self.transform(image)
         label = self.labels[idx]
         # if self.target_transform is not None:
         #     label = self.target_transform(label)
-        return image, label
+        return result, label
 
 
 class ClassBalancedSampler(Sampler):
