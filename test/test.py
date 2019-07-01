@@ -193,11 +193,12 @@ def test_15():
 
 
 def test_17():
-    a = np.random.randint(-100, 100, (102, 200))
+    a = np.random.randint(-100, 100, (130, 200))
     print(a)
-    b = matrix_normalization(a, (130, 200))
-    print(b)
-    print(b.shape)
+    a = np.array(a)
+    a = matrix_normalization(a, (130, 200))
+    print(a)
+    print(a.shape)
 
 
 def test_channels_matching():
@@ -222,5 +223,5 @@ def test_18():
     # print(path_a)
     dd = np.load(path_a[0])
     print(dd.shape)
-    dd = matrix_normalization(dd, (200, 200))
+    dd = matrix_normalization(dd, (130, 200))
     print(dd.shape)

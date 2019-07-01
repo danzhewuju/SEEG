@@ -152,10 +152,10 @@ class MyDataset(Dataset):  # 重写dateset的相关类
     def __getitem__(self, index):
         fn, label = self.imgs[index]
         data = np.load(fn)
-        data = matrix_normalization(data, (130, 200))
-        data = data.astype('float32')
-        data = data[np.newaxis, :]
-        return data, label
+        result = matrix_normalization(data, (130, 200))
+        result = result.astype('float32')
+        result = result[np.newaxis, :]
+        return result, label
 
     def __len__(self):
         return len(self.imgs)

@@ -40,23 +40,24 @@ def matrix_normalization(data, resize_shape=(130, 200)):
     :return:
     '''
     data_shape = data.shape  # 这个必须要求的是numpy的文件格式
-    if resize_shape[0] > data_shape[0]:  # 做插入处理
-        '''
-        扩大原来的矩阵
-        '''
-        d = resize_shape[0] - data_shape[0]
-        channels_add = random.sample(range(1, data_shape[0]-1), d)
-        fake_channel = []  # 添加信道列表的值
-        for c in channels_add:
-            tmp = (data[c - 1] + data[c]) * 1.0 / 2
-            fake_channel.append(tmp)
-        data = np.insert(data, channels_add, fake_channel, axis=0)
-    else:
-        if resize_shape[0] < data_shape[0]:  # 做删除处理
+    if data_shape[0] != resize_shape[0]:
+        if resize_shape[0] > data_shape[0]:  # 做插入处理
             '''
-            删除掉原来的矩阵
+            扩大原来的矩阵
             '''
-            d = data_shape[0]-resize_shape[0]
-            channels_del = random.sample(range(1, data_shape[0]-1), d)
-            data = np.delete(data, channels_del, axis=0)
+            d = resize_shape[0] - data_shape[0]
+            channels_add = random.sample(range(1, data_shape[0] - 1), d)
+            fake_channel = []  # 添加信道列表的值
+            for c in channels_add:
+                tmp = (data[c - 1] + data[c]) * 1.0 / 2
+                fake_channel.append(tmp)
+            data = np.insert(data, channels_add, fake_channel, axis=0)
+        else:
+            if resize_shape[0] < data_shape[0]:  # 做删除处理
+                '''
+                删除掉原来的矩阵
+                '''
+                d = data_shape[0] - resize_shape[0]
+                channels_del = random.sample(range(1, data_shape[0] - 1), d)
+                data = np.delete(data, channels_del, axis=0)
     return data
