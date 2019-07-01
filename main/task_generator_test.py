@@ -114,7 +114,7 @@ class MiniImagenet(FewShotDataset):
         image = np.load(image_root)
         result = matrix_normalization(image, (130, 200))
         result = result.astype('float32')
-        result = torch.from_numpy(image)
+        result = torch.from_numpy(result)
         result = result[np.newaxis, :]
         # image = image.convert('RGB')
         # if self.transform is not None:

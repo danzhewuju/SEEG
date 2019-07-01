@@ -98,15 +98,19 @@ def generate_data(path, flag, name, path_commom_channel, flag_duration=0):
     data_save(path, name, flag, common_channels, flag_duration=flag_duration)
 
 
-def sleep_normal_handle(path_commom_channel):
+def sleep_normal_handle():
     '''
 
     :return:
     流程操作， 将正常的睡眠进行切片划分
     '''
+    path_commom_channel = "../data/seizure/channels_info/LK_common_channels.csv"
     path_raw_normal_sleep = ["../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif",
                              '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-1.fif',
-                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif'
+                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif',
+                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-4-0.fif',
+                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-6-0.fif'
+
                              ]  # 数据太多，因此只是选取部分的数据进行处理
     name = "LK"
     flag = 2  # 正常睡眠时间
@@ -141,6 +145,38 @@ def pre_seizure_biclass_handle():
     for p in os.listdir(path_dir):
         path_raw = os.path.join(path_dir, p)
         name = "ZK"
+        generate_data(path_raw, flag, name, path_commom_channel)
+
+    path_commom_channel = "../data/seizure/channels_info/WSH_seq.csv"
+    path_dir = "../data/raw_data/WSH/WSH_Pre_seizure"
+    flag = 0
+    for p in os.listdir(path_dir):
+        path_raw = os.path.join(path_dir, p)
+        name = "WSH"
+        generate_data(path_raw, flag, name, path_commom_channel)
+
+    path_commom_channel = "../data/seizure/channels_info/SYF_seq.csv"
+    path_dir = "../data/raw_data/SYF/SYF_Pre_seizure"
+    flag = 0
+    for p in os.listdir(path_dir):
+        path_raw = os.path.join(path_dir, p)
+        name = "SYF"
+        generate_data(path_raw, flag, name, path_commom_channel)
+
+    path_commom_channel = "../data/seizure/channels_info/BDP_seq.csv"
+    path_dir = "../data/raw_data/BDP/BDP_Pre_seizure"
+    flag = 0  # 指明了存储位置
+    for p in os.listdir(path_dir):
+        path_raw = os.path.join(path_dir, p)
+        name = "BDP"
+        generate_data(path_raw, flag, name, path_commom_channel)
+
+    path_commom_channel = "../data/seizure/channels_info/BDP_seq.csv"
+    path_dir = "../data/raw_data/BDP/BDP_SLEEP"
+    flag = 2  # 指明了存储位置
+    for p in os.listdir(path_dir):
+        path_raw = os.path.join(path_dir, p)
+        name = "BDP"
         generate_data(path_raw, flag, name, path_commom_channel)
 
     # path_commom_channel = "../data/seizure/channels_info/WSH_seq.csv"
@@ -211,5 +247,6 @@ def pre_seizure_multiclass_handle(path_commom_channel):
 
 
 if __name__ == '__main__':
-    pre_seizure_biclass_handle()
+    sleep_normal_handle()
+    # pre_seizure_biclass_handle()
     # sleep_normal_handle()

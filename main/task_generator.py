@@ -2,7 +2,6 @@
 # 数据的预处理的一些方法
 # ---------------------
 
-import random
 import time
 
 import torch
@@ -93,7 +92,7 @@ class MiniImagenet(FewShotDataset):
     def __getitem__(self, idx):
         image_root = self.image_roots[idx]
         image = np.load(image_root)
-        result = matrix_normalization(image, (130, 200)) # 矩阵的归一化
+        result = matrix_normalization(image, (130, 200))  # 矩阵的归一化
         result = result.astype('float32')
         result = torch.from_numpy(result)
         result = result[np.newaxis, :]

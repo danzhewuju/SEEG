@@ -2,10 +2,12 @@
 数据预处理，主要是讲数据进行划分，训练集和测试集以及验证集，划分的数据集用于few-shot learning, cnn 的训练效果
 '''
 
-import random
+import argparse
 
 from main import *
-import argparse
+import os
+import numpy as np
+import random
 
 parser = argparse.ArgumentParser(description="data split")
 parser.add_argument('-r', '--ratio', type=float, default=0.6)  # 将数据集划分为测试集，以及验证集
@@ -75,24 +77,26 @@ def data_process():
 
     seeg = seegdata()
     tmp_normal = seeg.get_all_path_by_keyword('sleep')
-    sleep_label0 = tmp_normal['LK']  # 正常人的睡眠时间
+    sleep_normal = []  # 正常人的睡眠时间
+    for dp in tmp_normal.values():
+        for p in dp:
+            sleep_normal.append(p)
     sleep_pre = seeg.get_all_path_by_keyword('preseizure')
-    sleep_label1 = sleep_pre['LK']  # 发病前的一段时间
-    tmp_a = sleep_pre['ZK']
-    sleep_label1 = sleep_label1+ tmp_a
+    sleep_pre_seizure = []
 
-    awake_label2 = seeg.get_all_path_by_keyword('awake')
-    awake_label2 = awake_label2['LK']
+    for dp in sleep_pre.values(): # 获取的是所有的癫痫发作前数据
+        for p in dp:
+            sleep_pre_seizure.append(p)
 
-
-    # print("normal sleep:{} pre seizure:{} awake:{} ".format(len(sleep_label0), len(sleep_label1), len(awake_label2))) # 三分类
-    print("normal sleep:{} pre seizure:{}".format(len(sleep_label0), len(sleep_label1)))
-    random.shuffle(sleep_label0)
-    random.shuffle(sleep_label1)
+    # print("normal sleep:{} pre seizure:{} awake:{} ".format(len(sleep_label0), len(sleep_label1), len(awake_label2)))
+    # 三分类
+    print("normal sleep:{} pre seizure:{}".format(len(sleep_normal), len(sleep_pre_seizure)))
+    random.shuffle(sleep_normal)
+    random.shuffle(sleep_pre_seizure)
     # random.shuffle(awake_label2)
-    min_data = min(len(sleep_label0), len(sleep_label1))  # 让两个数据集的个数相等
-    sleep_label1 = sleep_label1[:min_data]
-    sleep_label0 = sleep_label0[:min_data]
+    min_data = min(len(sleep_normal), len(sleep_pre_seizure))  # 让两个数据集的个数相等
+    sleep_label1 = sleep_pre_seizure[:min_data]
+    sleep_label0 = sleep_normal[:min_data]
     train_num = int(TRAIN_RATIO * len(sleep_label0))
     test_num = int(VAL_RATIO * len(sleep_label0))
 
@@ -112,7 +116,7 @@ def data_process():
 
         np.save(save_path, d)
 
-    print("Successfully write for normal data!!!")
+    print("Successfully write for normal sleep data!!!")
     for (i, p) in enumerate(sleep_label1):
         name = p.split('/')[-1]
         d = np.load(p)
@@ -125,7 +129,7 @@ def data_process():
                 save_path = os.path.join(val_folder_dir_pre, name)
 
         np.save(save_path, d)
-    print("Successfully write for pre sleep data!!!")
+    print("Successfully write for pre seizure sleep data!!!")
 
     # for (i, p) in enumerate(awake_label2):
     #     name = p.split('/')[-1]
