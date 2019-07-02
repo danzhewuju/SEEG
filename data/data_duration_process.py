@@ -5,6 +5,9 @@
 import random
 
 from main import *
+import argparse
+import numpy as np
+import os
 
 parser = argparse.ArgumentParser(description="data split")
 parser.add_argument('-r', '--ratio', type=float, default=0.6)  # 将数据集划分为测试集，以及验证集

@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-import random
-
 import librosa
 import librosa.display
 import pandas as pd
@@ -222,3 +220,15 @@ def test_18():
     print(dd.shape)
     dd = matrix_normalization(dd, (130, 200))
     print(dd.shape)
+
+
+def test_cvs():
+    data = {'id': [1, 2, 3],
+            'name':['yuhao', 'alex', 'jj']
+            }
+    d = pd.DataFrame(data)
+    print(d)
+    c = d[d.id == 2].index
+    print(c)
+    # d.loc[c, 'name'] = 'lijian'
+    # print(d)
