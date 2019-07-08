@@ -1,5 +1,6 @@
 '''
 数据预处理，主要是讲数据进行划分，训练集和测试集以及验证集，划分的数据集用于few-shot learning, cnn 的训练效果
+训练集的划分主要是根据参数来确定
 '''
 
 import argparse
@@ -21,22 +22,26 @@ VAL_RATIO = args.val
 
 
 def data_process():
-    train_folder = "./seeg/train"
-    test_folder = "./seeg/test"
-    val_folder = './seeg/val'
+    '''
+    function： 混合式的数据划分，
+    :return:
+    '''
+    train_folder = "./seeg/mixed_data/train"
+    test_folder = "./seeg/mixed_data/test"
+    val_folder = './seeg/mixed_data/val'
 
     if os.path.exists(train_folder) is not True:
         os.makedirs(train_folder)
     else:
-        os.system("rm -r ./seeg/train/*")
+        os.system("rm -r ./seeg/mixed_data/train/*")
     if os.path.exists(test_folder) is not True:
         os.makedirs(test_folder)
     else:
-        os.system("rm -r ./seeg/test/*")
+        os.system("rm -r ./seeg/mixed_data/test/*")
     if os.path.exists(val_folder) is not True:
         os.makedirs(val_folder)
     else:
-        os.system("rm -r ./seeg/val/*")
+        os.system("rm -r ./seeg/mixed_data/val/*")
 
     path_normal = "sleep_normal"
     path_pre_seizure = "pre_zeizure"
@@ -84,7 +89,7 @@ def data_process():
     sleep_pre = seeg.get_all_path_by_keyword('preseizure')
     sleep_pre_seizure = []
 
-    for dp in sleep_pre.values(): # 获取的是所有的癫痫发作前数据
+    for dp in sleep_pre.values():  # 获取的是所有的癫痫发作前数据
         for p in dp:
             sleep_pre_seizure.append(p)
 
@@ -146,5 +151,141 @@ def data_process():
     # print("Successfully write for awake data!!!")
 
 
+def data_process_n_1():
+    '''
+    function: 数据划分流程：
+              1. 将数据集进行划分，训练的数据集来自于前n-1个人
+              2. 然后利用第n个人的数据进行测试，其中第n个人的数据集并没有见过
+    :return:
+    '''
+    dataset_dir = './seeg/zero_data'  # 当前所在的数据集, 不同的方法会在不同的数据集上
+    train_folder = os.path.join(dataset_dir, 'train')
+    test_folder = os.path.join(dataset_dir, 'test')
+    val_folder = os.path.join(dataset_dir, 'val')
+
+    if os.path.exists(train_folder) is not True:
+        os.makedirs(train_folder)
+    else:
+        os.system("rm -r {}".format(train_folder))
+    if os.path.exists(test_folder) is not True:
+        os.makedirs(test_folder)
+    else:
+        os.system("rm -r {}".format(test_folder))
+    if os.path.exists(val_folder) is not True:
+        os.makedirs(val_folder)
+    else:
+        os.system("rm -r {}".format(val_folder))
+
+    path_normal = "sleep_normal"
+    path_pre_seizure = "pre_zeizure"
+    train_folder_dir_normal = os.path.join(train_folder, path_normal)
+    train_folder_dir_pre = os.path.join(train_folder, path_pre_seizure)
+    # train_folder_dir_awake = os.path.join(train_folder, path_awake)
+
+    test_folder_dir_normal = os.path.join(test_folder, path_normal)
+    test_folder_dir_pre = os.path.join(test_folder, path_pre_seizure)
+    # test_folder_dir_awake = os.path.join(test_folder, path_awake)
+
+    val_folder_dir_normal = os.path.join(val_folder, path_normal)
+    val_folder_dir_pre = os.path.join(val_folder, path_pre_seizure)
+    # val_folder_dir_awake = os.path.join(val_folder, path_awake)
+
+    if os.path.exists(train_folder_dir_normal) is not True:
+        os.makedirs(train_folder_dir_normal)
+    if os.path.exists(train_folder_dir_pre) is not True:
+        os.makedirs(train_folder_dir_pre)
+    # if os.path.exists(train_folder_dir_awake) is not True:
+    #     os.makedirs(train_folder_dir_awake)
+
+    if os.path.exists(test_folder_dir_normal) is not True:
+        os.makedirs(test_folder_dir_normal)
+    if os.path.exists(test_folder_dir_pre) is not True:
+        os.makedirs(test_folder_dir_pre)
+    # if os.path.exists(test_folder_dir_awake) is not True:
+    #     os.makedirs(test_folder_dir_awake)
+
+    if os.path.exists(val_folder_dir_normal) is not True:
+        os.makedirs(val_folder_dir_normal)
+    if os.path.exists(val_folder_dir_pre) is not True:
+        os.makedirs(val_folder_dir_pre)
+    # if os.path.exists(val_folder_dir_awake) is not True:
+    #     os.makedirs(val_folder_dir_awake)
+
+    # n-1 机制，前面的人进行训练，后面人的数据进行验证
+    seeg = seegdata()
+    tmp_normal = seeg.get_all_path_by_keyword('sleep')
+    val_normal = []  # 将这个人的数据最为一个验证的数据集
+    sleep_normal = []  # 正常人的睡眠时间
+    for key, dp in tmp_normal.items():
+        if key != 'BDP':
+            for p in dp:
+                sleep_normal.append(p)
+        else:
+            for p in dp:
+                val_normal.append(p)
+    sleep_pre = seeg.get_all_path_by_keyword('preseizure')
+    sleep_pre_seizure = []
+    val_pre_seizure = []
+    for key, dp in sleep_pre.items():  # 获取的是所有的癫痫发作前数据
+        if key != 'BDP':
+            for p in dp:
+                sleep_pre_seizure.append(p)
+        else:
+            for p in dp:
+                val_pre_seizure.append(p)
+    print("normal sleep:{} pre seizure:{}".format(len(sleep_normal), len(sleep_pre_seizure)))
+    random.shuffle(sleep_normal)
+    random.shuffle(sleep_pre_seizure)
+
+    random.shuffle(val_normal)
+    random.shuffle(val_pre_seizure)
+    # random.shuffle(awake_label2)
+    min_data = min(len(sleep_normal), len(sleep_pre_seizure))  # 让两个数据集的个数相等
+    sleep_label1 = sleep_pre_seizure[:min_data]
+    sleep_label0 = sleep_normal[:min_data]
+    min_length_val = min(len(val_normal), len(val_pre_seizure))
+    val_normal = val_normal[:min_length_val]
+    val_pre_seizure = val_pre_seizure[:min_length_val]
+
+    train_num = int(TRAIN_RATIO * len(sleep_label0))
+    test_num = int((VAL_RATIO+VAL_RATIO) * len(sleep_label0))
+
+    print("train number:{}, test number:{}, val number:{}".format(train_num, test_num,len(val_normal)))
+
+    # 训练集和测试集的划分
+    for (i, p) in enumerate(sleep_label0):
+        name = p.split('/')[-1]
+        d = np.load(p)
+        if i <= int(train_num):
+            save_path = os.path.join(train_folder_dir_normal, name)
+        else:
+            save_path = os.path.join(test_folder_dir_normal, name)
+        np.save(save_path, d)
+
+    for i, p in enumerate(val_normal):
+        name = p.split('/')[-1]
+        d = np.load(p)
+        save_path = os.path.join(val_folder_dir_normal, name)
+        np.save(save_path, d)
+
+    # 训练集和测试集的划分
+    print("Successfully write for normal sleep data!!!")
+    for (i, p) in enumerate(sleep_label1):
+        name = p.split('/')[-1]
+        d = np.load(p)
+        if i <= int(train_num):
+            save_path = os.path.join(train_folder_dir_pre, name)
+        else:
+            save_path = os.path.join(test_folder_dir_pre, name)
+        np.save(save_path, d)
+    for i, p in enumerate(val_pre_seizure):
+        name = p.split('/')[-1]
+        d = np.load(p)
+        save_path = os.path.join(val_folder_dir_pre, name)
+        np.save(save_path, d)
+    print("Successfully write for pre seizure sleep data!!!")
+
+
 if __name__ == '__main__':
-    data_process()
+    # data_process()
+    data_process_n_1()
