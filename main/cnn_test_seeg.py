@@ -12,7 +12,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
-from util import *
+import sys
+sys.path.append('../')
+from util.util_file import matrix_normalization
 
 parser = argparse.ArgumentParser(description="CNN parameter setting!")
 parser.add_argument('-t', '--time', default=2)  # 每一帧的长度

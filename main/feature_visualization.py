@@ -13,6 +13,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
+from util.util_file import matrix_normalization
 
 parser = argparse.ArgumentParser(description="CNN parameter setting!")
 parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
@@ -114,15 +115,16 @@ class MyDataset(Dataset):
     def __getitem__(self, item):
         d_p, label = self.datas[item]
         data = np.load(d_p)
-        data = data.astype('float32')
-        data = data[np.newaxis, :]
-        return data, label
+        result = matrix_normalization(data, (130, 200))
+        result = result.astype('float32')
+        result = result[np.newaxis, :]
+        return result, label
 
     def __len__(self):
         return len(self.datas)
 
 
-def get_features(pretrained_model, x, layers=[3, 4, 9]):  ## get_features 其实很简单
+def get_features(pretrained_model, x, layers=[0, 3, 7]):  # get_features 其实很简单
     '''
     1.首先import model
     2.将weights load 进model
