@@ -30,6 +30,7 @@ parser.add_argument("-t", "--test_episode", type=int, default=10)
 parser.add_argument("-l", "--learning_rate", type=float, default=0.001)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-u", "--hidden_unit", type=int, default=10)
+parser.add_argument("-mn", '--model_name', type=str, default='mixed_data')
 args = parser.parse_args()
 
 # Hyper Parameters
@@ -43,6 +44,8 @@ TEST_EPISODE = args.test_episode
 LEARNING_RATE = args.learning_rate
 GPU = args.gpu
 HIDDEN_UNIT = args.hidden_unit
+MODEL_NAME = args.mn
+
 
 # 118
 # x_ = 28
@@ -147,7 +150,7 @@ def main():
     # Step 1: init data folders
     print("init data folders")
     # init character folders for dataset construction
-    metatrain_folders, metatest_folders = tg.mini_data_folders()
+    metatrain_folders, metatest_folders = tg.mini_data_folders(MODEL_NAME)
 
     # Step 2: init neural networks
     print("init neural networks")

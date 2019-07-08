@@ -32,9 +32,9 @@ def imshow(img):
 #         return x
 
 
-def mini_imagenet_folders():
-    train_folder = '../data/seeg/zero_data/train'
-    test_folder = '../data/seeg/zero_data/val'
+def mini_imagenet_folders(model_name = 'mixed_data'):
+    train_folder = '../data/seeg/{}/train'.format(model_name)
+    test_folder = '../data/seeg/{}/test'.format(model_name)
 
     metatrain_folders = [os.path.join(train_folder, label) \
                          for label in os.listdir(train_folder) \

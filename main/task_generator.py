@@ -15,9 +15,16 @@ sys.path.append('../')
 from util.util_file import matrix_normalization
 
 
-def mini_data_folders():
-    train_folder = '../data/seeg/mixed_data/train'
-    test_folder = '../data/seeg/mixed_data/test'
+def mini_data_folders(model_name = 'mixed_data'):
+    '''
+
+    :param model: 训练的模式选择， 0：mixed, 1: inter_person
+    :return:
+    '''
+
+    train_folder = '../data/seeg/{}/train'.format(model_name)
+    test_folder = '../data/seeg/{}/test'.format(model_name)
+
     metatrain_folders = [os.path.join(train_folder, label)
                          for label in os.listdir(train_folder)
                          if os.path.isdir(os.path.join(train_folder, label))]
