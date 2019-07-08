@@ -8,7 +8,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
-from util.util_file import *
+import sys
+from util import *
 
 '''
 一般CNN模型的训练
@@ -17,9 +18,9 @@ from util.util_file import *
 parser = argparse.ArgumentParser(description="CNN parameter setting!")
 parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
 parser.add_argument('-s', '--sample', default=100)  # 对其进行重采样
-parser.add_argument('-train_p', '--train_path', default='../data/seeg/train')
-parser.add_argument('-test_p', '--test_path', default='../data/seeg/test')
-parser.add_argument('-val_p', '--val_path', default='../data/seeg/val')
+parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/train')
+parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/test')
+parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/val')
 parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
 parser.add_argument('-b', '--batch_size', type=int, default=32)

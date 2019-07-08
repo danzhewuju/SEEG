@@ -7,8 +7,9 @@ import time
 import torch
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.data.sampler import Sampler
-import sys
-sys.path.append('../')
+import os
+import random
+import numpy as np
 from util.util_file import matrix_normalization
 
 

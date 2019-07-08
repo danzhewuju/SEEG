@@ -12,15 +12,13 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
-import sys
-sys.path.append('../')
-from util.util_file import matrix_normalization
+from util import *
 
 parser = argparse.ArgumentParser(description="CNN parameter setting!")
 parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
 parser.add_argument('-s', '--sample', default=100)  # 对其进行重采样
-parser.add_argument('-train_p', '--train_path', default='../data/seeg/mixed_data/train')
-parser.add_argument('-test_p', '--test_path', default='../data/seeg/mixed_data/test')
+parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/train')
+parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/test')
 parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/val')
 parser.add_argument('-m_p', '--model_path', default='./models/model-cnn.ckpt')
 parser.add_argument('-g', '--GPU', type=int, default=0)
@@ -128,7 +126,7 @@ class MyDataset(Dataset):
 def run():
     start_time = time.time()  # 开始时间
     data_info = Data_info(VAL_PATH)
-    val_data = MyDataset(data_info.val)  # 标准数据集的构造?
+    val_data = MyDataset(data_info.val)  # 标准数据集的构造
     val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True)
 
     model = CNN().cuda(GPU)  # 保持和之前的神经网络相同的结构特征?
