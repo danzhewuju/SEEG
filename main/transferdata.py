@@ -104,21 +104,45 @@ def sleep_normal_handle():
     :return:
     流程操作， 将正常的睡眠进行切片划分
     '''
-    path_commom_channel = "../data/seizure/channels_info/LK_common_channels.csv"
-    path_raw_normal_sleep = ["../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif",
-                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-1.fif',
-                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif',
-                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-4-0.fif',
-                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-6-0.fif'
+    # path_commom_channel = "../data/seizure/channels_info/LK_common_channels.csv"
+    # path_raw_normal_sleep = ["../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif",
+    #                          '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-1.fif',
+    #                          '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif',
+    #                          '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-4-0.fif',
+    #                          '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-6-0.fif'
+    #
+    #                          ]  # 数据太多，因此只是选取部分的数据进行处理
+    # name = "LK"
+    # flag = 2  # 正常睡眠时间
+    #
+    # for path_raw in path_raw_normal_sleep:
+    #     generate_data(path_raw, flag, name, path_commom_channel)
+    #
+    # print("{}正常睡眠的数据处理完成！".format(name))
 
-                             ]  # 数据太多，因此只是选取部分的数据进行处理
-    name = "LK"
-    flag = 2  # 正常睡眠时间
-
+    path_commom_channel = "../data/seizure/channels_info/BDP_seq.csv"
+    path_raw_normal_sleep = ['../data/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif']
+    name = "BDP"
+    flag = 2
     for path_raw in path_raw_normal_sleep:
         generate_data(path_raw, flag, name, path_commom_channel)
+    print("{}正常睡眠的数据处理完成！".format(name))
 
-    print("正常睡眠的数据处理完成！")
+    path_commom_channel = "../data/seizure/channels_info/SYF_seq.csv"
+    path_raw_normal_sleep = ['../data/raw_data/SYF/SYF_SLEEP/SYF_Sleep_raw.fif']
+    name = "SYF"
+    flag = 2
+    for path_raw in path_raw_normal_sleep:
+        generate_data(path_raw, flag, name, path_commom_channel)
+    print("{}正常睡眠的数据处理完成！".format(name))
+
+    path_commom_channel = "../data/seizure/channels_info/WSH_seq.csv"
+    path_raw_normal_sleep = ['../data/raw_data/WSH/WSH_SLEEP/WSH_Sleep_raw.fif']
+    name = "WSH"
+    flag = 2
+    for path_raw in path_raw_normal_sleep:
+        generate_data(path_raw, flag, name, path_commom_channel)
+    print("{}正常睡眠的数据处理完成！".format(name))
     return True
 
 
@@ -247,6 +271,7 @@ def pre_seizure_multiclass_handle(path_commom_channel):
 
 
 if __name__ == '__main__':
+    # 正常的睡眠时间
     sleep_normal_handle()
     # pre_seizure_biclass_handle()
     # sleep_normal_handle()

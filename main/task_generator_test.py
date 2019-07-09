@@ -12,6 +12,7 @@ import numpy as np
 from torch.utils.data.sampler import Sampler
 import time
 import sys
+
 sys.path.append('../')
 from util.util_file import *
 
@@ -32,17 +33,17 @@ def imshow(img):
 #         return x
 
 
-def mini_imagenet_folders(model_name = 'mixed_data'):
+def mini_imagenet_folders(model_name):
     train_folder = '../data/seeg/{}/train'.format(model_name)
-    test_folder = '../data/seeg/{}/test'.format(model_name)
+    test_folder = '../data/seeg/{}/val'.format(model_name)
 
-    metatrain_folders = [os.path.join(train_folder, label) \
-                         for label in os.listdir(train_folder) \
-                         if os.path.isdir(os.path.join(train_folder, label)) \
+    metatrain_folders = [os.path.join(train_folder, label)
+                         for label in os.listdir(train_folder)
+                         if os.path.isdir(os.path.join(train_folder, label))
                          ]
-    metatest_folders = [os.path.join(test_folder, label) \
-                        for label in os.listdir(test_folder) \
-                        if os.path.isdir(os.path.join(test_folder, label)) \
+    metatest_folders = [os.path.join(test_folder, label)
+                        for label in os.listdir(test_folder)
+                        if os.path.isdir(os.path.join(test_folder, label))
                         ]
     t = time.time()
     random.seed(t)

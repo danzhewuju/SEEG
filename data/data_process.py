@@ -218,6 +218,7 @@ def data_process_n_1():
     sleep_normal = []  # 正常人的睡眠时间
     test_persons_normal_sleep = ['BDP']
     min_length_normal = min([len(x) for key, x in tmp_normal.items() if key not in test_persons_normal_sleep])
+    print("{} sample of per normal sleeping  person.".format(min_length_normal))
     for key, dp in tmp_normal.items():
         dp = random.sample(dp, min_length_normal)  # 从数据中进行随机抽选
         if key not in test_persons_normal_sleep:
@@ -231,7 +232,8 @@ def data_process_n_1():
     val_pre_seizure = []
     test_persons_pre_seizure = ['BDP']  # 用于测试的脑电
     min_length_pre_seizure = min([len(x) for key, x in sleep_pre.items() if key not in test_persons_pre_seizure])
-    for key, dp in sleep_pre.items():  # 获取的是所有的癫痫发作前数据
+    print("{} sample of per pre seizure sleeping  person.".format(min_length_pre_seizure))
+    for key, dp in sleep_pre.items():  # 获取的是所有的癫痫发前数据
         dp = random.sample(dp, min_length_pre_seizure)
         if key not in test_persons_pre_seizure:
             for p in dp:
@@ -293,5 +295,6 @@ def data_process_n_1():
 
 
 if __name__ == '__main__':
+    # 两种模式， mixed, 前n-1个人的数据
     # data_process()
     data_process_n_1()

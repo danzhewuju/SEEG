@@ -1,5 +1,6 @@
 #!/usr/bin/python
-
+import sys
+sys.path.append('../')
 from util import *
 
 
@@ -44,13 +45,13 @@ class seegdata:
             return None
 
 
-if __name__ == '__main__':
-    path_dir = "../data/seizure/split"
-    seeg = seegdata()
-    p = seeg.get_all_path_by_keyword('sleep')
-    data_path = []
-    for dp in p.values():
-        for p in dp:
-            data_path.append(p)
-    print(data_path.__len__())
+# if __name__ == '__main__':
+#     path_dir = "../data/seizure/split"
+#     seeg = seegdata()
+#     p = seeg.get_all_path_by_keyword('sleep')
+#     data_path = []
+#     for dp in p.values():
+#         for p in dp:
+#             data_path.append(p)
+#     print(data_path.__len__())
 

@@ -30,7 +30,7 @@ parser.add_argument("-t", "--test_episode", type=int, default=10)
 parser.add_argument("-l", "--learning_rate", type=float, default=0.001)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-u", "--hidden_unit", type=int, default=10)
-parser.add_argument("-mn", '--model_name', type=str, default='mixed_data')
+parser.add_argument("-mn", '--model_name', type=str, default="zero_data")
 args = parser.parse_args()
 
 # Hyper Parameters
