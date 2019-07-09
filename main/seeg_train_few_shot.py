@@ -45,6 +45,8 @@ LEARNING_RATE = args.learning_rate
 GPU = args.gpu
 HIDDEN_UNIT = args.hidden_unit
 MODEL_NAME = args.model_name
+print("running on data set :{}".format(MODEL_NAME))
+
 
 
 # 118
