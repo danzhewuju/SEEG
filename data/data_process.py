@@ -216,8 +216,11 @@ def data_process_n_1():
     tmp_normal = seeg.get_all_path_by_keyword('sleep')
     val_normal = []  # 将这个人的数据最为一个验证的数据集
     sleep_normal = []  # 正常人的睡眠时间
+    test_persons_normal_sleep = ['BDP']
+    min_length_normal = min([len(x) for key, x in tmp_normal.items() if key not in test_persons_normal_sleep])
     for key, dp in tmp_normal.items():
-        if key != 'BDP':
+        dp = random.sample(dp, min_length_normal)  # 从数据中进行随机抽选
+        if key not in test_persons_normal_sleep:
             for p in dp:
                 sleep_normal.append(p)
         else:
@@ -226,8 +229,11 @@ def data_process_n_1():
     sleep_pre = seeg.get_all_path_by_keyword('preseizure')
     sleep_pre_seizure = []
     val_pre_seizure = []
+    test_persons_pre_seizure = ['BDP']  # 用于测试的脑电
+    min_length_pre_seizure = min([len(x) for key, x in sleep_pre.items() if key not in test_persons_pre_seizure])
     for key, dp in sleep_pre.items():  # 获取的是所有的癫痫发作前数据
-        if key != 'BDP':
+        dp = random.sample(dp, min_length_pre_seizure)
+        if key not in test_persons_pre_seizure:
             for p in dp:
                 sleep_pre_seizure.append(p)
         else:
