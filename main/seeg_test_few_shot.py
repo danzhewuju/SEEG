@@ -44,7 +44,7 @@ TEST_EPISODE = args.test_episode
 LEARNING_RATE = args.learning_rate
 GPU = args.gpu
 HIDDEN_UNIT = args.hidden_unit
-MODEL_NAME = args.mn
+MODEL_NAME = args.model_name
 
 # 118
 # x_ = 28
