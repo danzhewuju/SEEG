@@ -2,18 +2,29 @@
 # 数据的预处理的一些方法
 # ---------------------
 
+import time
+
 import torch
-import torchvision.transforms as transforms
 from torch.utils.data import DataLoader, Dataset
-import random
-import os
-import numpy as np
 from torch.utils.data.sampler import Sampler
+import os
+import random
+import numpy as np
+import sys
+sys.path.append('../')
+from util.util_file import matrix_normalization
 
 
-def mini_data_folders():
-    train_folder = '../data/seeg/train'
-    test_folder = '../data/seeg/test'
+def mini_data_folders(model_name = 'mixed_data'):
+    '''
+
+    :param model: 训练的模式选择， 0：mixed, 1: inter_person
+    :return:
+    '''
+
+    train_folder = '../data/seeg/{}/train'.format(model_name)
+    test_folder = '../data/seeg/{}/test'.format(model_name)
+
     metatrain_folders = [os.path.join(train_folder, label)
                          for label in os.listdir(train_folder)
                          if os.path.isdir(os.path.join(train_folder, label))]
@@ -52,14 +63,15 @@ class MiniDataTask(object):
 
         self.train_labels = [labels[self.get_class(x)] for x in self.train_roots]
         self.test_labels = [labels[self.get_class(x)] for x in self.test_roots]
-        # random shuffle
-        # random.seed(1)
+        # t = time.time()
+        # random.seed(t)
         # random.shuffle(self.train_labels)
-        # random.seed(1)
+        # random.seed(t)
         # random.shuffle(self.train_roots)
-        random.seed(2)
+        t = time.time()
+        random.seed(t)
         random.shuffle(self.test_labels)
-        random.seed(2)
+        random.seed(t)
         random.shuffle(self.test_roots)
 
     def get_class(self, sample):
@@ -91,16 +103,17 @@ class MiniImagenet(FewShotDataset):
     def __getitem__(self, idx):
         image_root = self.image_roots[idx]
         image = np.load(image_root)
-        image = image.astype('float32')
-        image = torch.from_numpy(image)
-        image = image[np.newaxis, :]
+        result = matrix_normalization(image, (130, 200))  # 矩阵的归一化
+        result = result.astype('float32')
+        result = torch.from_numpy(result)
+        result = result[np.newaxis, :]
         # image = image.convert('RGB')
         # if self.transform is not None:
         #     image = self.transform(image)
         label = self.labels[idx]
         # if self.target_transform is not None:
         #     label = self.target_transform(label)
-        return image, label
+        return result, label
 
 
 class ClassBalancedSampler(Sampler):
@@ -132,9 +145,10 @@ class ClassBalancedSampler(Sampler):
 
 
 def get_mini_imagenet_data_loader(task, num_per_class=1, split='train', shuffle=False):
-    normalize = transforms.Normalize(mean=[0.92206], std=[0.08426])
+    # normalize = transforms.Normalize(mean=[0.92206], std=[0.08426])
+    dataset = MiniImagenet(task, split=split)
 
-    dataset = MiniImagenet(task, split=split, transform=transforms.Compose([transforms.ToTensor(), normalize]))
+    # dataset = MiniImagenet(task, split=split, transform=transforms.Compose([transforms.ToTensor(), normalize]))
 
     if split == 'train':
         sampler = ClassBalancedSampler(num_per_class, task.num_classes, task.train_num, shuffle=shuffle)

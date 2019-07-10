@@ -1,13 +1,11 @@
 #!/usr/bin/python
-import numpy as np
-from main.pre_Processing import *
-import glob
-import os
+
 import librosa
 import librosa.display
-import random
 import pandas as pd
-import uuid
+
+from main.Seegdata import *
+from util.util_file import *
 
 
 def test_1():
@@ -27,20 +25,6 @@ def test_2():
     data = np.load(path)
     print(data.shape)
     print(data)
-
-
-def test_3():
-    '''
-
-    :return: 图像的展示
-    '''
-    path_data = "../data/output_data/sleep_frame_eeg.npy"
-    sleep_time_frame = read_sleep_date(path_data)
-    length = len(sleep_time_frame[0])
-    ratio = duration_time / length
-    print("length:{} ratio:{}".format(length, ratio))
-    x = [ratio * x for x in range(length)]
-    draw_plot(x, sleep_time_frame[0])
 
 
 def test_4(path="../data/data_path.txt"):
@@ -104,7 +88,7 @@ def test_8():  # 关于数据过零率的相关统计信息
             counts.append(len([x for x in c if x == True]))
         avg_count = sum(counts) / channel_num
         avg_counts_lk.append(avg_count)
-    # plt.figure()
+    # plt.visualization_feature()
     # plt.title("zero_crossing LK")
     # plt.plot(range(len(avg_counts_cases)), avg_counts_cases)
     print(np.mean(np.array(avg_counts_lk)))
@@ -146,15 +130,105 @@ def test_10():
 
 
 def test_11():
-    a = np.random.randint(0, 10, 10)
-    b = a.copy()
+    path_dir = '../data/raw_data/Pre_seizure'
+    print(os.listdir(path_dir))
 
-    random.seed(1)
-    random.shuffle(a)
-    print(a)
-    random.seed(1)
-    random.shuffle(b)
-    print(b)
+
+def test_12():
+    path_channel = '../data/seizure/common_channels.csv'
+    path = '../data/raw_data/LK_Pre_seizure/LK_SZ1_pre_seizure_raw.fif'
+    raw_data = read_raw(path)
+    raw_data.plot()
+    print(raw_data.info['ch_names'])
+    data = pd.read_csv(path_channel, sep=',')
+    d_list = data['channels']
+    common_channels = list(d_list)
+    new_raw_data = select_channel_data_mne(raw_data, common_channels)
+    new_raw_data.reorder_channels(common_channels)
+    new_raw_data.plot()
+    print(new_raw_data.info['ch_names'])
 
     # print(d_list)
     # print(data['channels'])
+
+
+def test_13():
+    a = np.random.randint(0, 100, 20)
+    b = a.copy()
+    c = a.copy()
+    random.shuffle(b)
+    random.shuffle(c)
+    print(a, b, c)
+
+
+def test_14():
+    seeg = seegdata()
+    path_dir_seizure = "../data/seizure/split/preseizure"
+    seeg.set_path_dir(path_dir_seizure)
+    sleep_bwt = seeg.get_all_path_by_keyword('within_warning_time')
+    sleep_bwt_label1 = sleep_bwt['LK']  # 发病前的一段时间,警戒线之外
+    for p in sleep_bwt_label1:
+        d = np.load(p)
+        print(d.shape)
+
+
+def test_15():
+    path = './path.csv'
+    paths = pd.read_csv(path, sep=',')
+    print(paths)
+    raw_data_path = paths['path']
+    raw_name = paths['name']
+    f = open('./channel.txt', 'w', encoding='UTF-8')
+    f.writelines('name, channels\n')
+    for n, p in zip(raw_name, raw_data_path):
+        data = read_edf_raw(p)
+        channels = get_channels_names(data)
+        # print(channels)
+        print("name:{}, channels: {}".format(n, len(channels)))
+        dd = n + ',' + str(channels) + '\n'
+        f.writelines(dd)
+    f.close()
+
+
+def test_17():
+    a = np.random.randint(0, 100, 10).tolist()
+    b = random.sample(a, 5)
+    print(b)
+
+
+def test_channels_matching():
+    path = '../data/raw_data/ZK/ZK_Pre_seizure/ZK_SZ1_pre_seizure_raw.fif'
+    data = read_raw(path)
+    channels_name = get_channels_names(data)
+    f = open('./ZK_channels.txt', 'w')
+    f.write(str(channels_name))
+    f.close()
+    print(channels_name)
+
+
+def test_18():
+    path = '../data/seeg/val/pre_zeizure'
+    paths = [os.path.join(path, x) for x in os.listdir(path)]
+    # print(paths)
+    path_a = []
+    for p in paths:
+        d = np.load(p)
+        if d.shape != (130, 200):
+            path_a.append(p)
+    # print(path_a)
+    dd = np.load(path_a[0])
+    print(dd.shape)
+    dd = matrix_normalization(dd, (130, 200))
+    print(dd.shape)
+
+
+def test_cvs():
+    data = {'id': [1, 2, 3],
+            'name':['yuhao', 'alex', 'jj']
+            }
+    d = pd.DataFrame(data)
+    print(d)
+    c = d[d.id == 2].index
+    print(c)
+    # d.loc[c, 'name'] = 'lijian'
+    # print(d)

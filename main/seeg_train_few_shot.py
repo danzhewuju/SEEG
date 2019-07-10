@@ -16,6 +16,8 @@ import math
 import argparse
 import scipy as sp
 import scipy.stats
+import matplotlib.pyplot as plt
+from util.util_file import *
 
 parser = argparse.ArgumentParser(description="One Shot Visual Recognition")
 parser.add_argument("-f", "--feature_dim", type=int, default=64)
@@ -23,11 +25,12 @@ parser.add_argument("-r", "--relation_dim", type=int, default=8)
 parser.add_argument("-w", "--class_num", type=int, default=2)
 parser.add_argument("-s", "--sample_num_per_class", type=int, default=10)
 parser.add_argument("-b", "--batch_num_per_class", type=int, default=5)
-parser.add_argument("-e", "--episode", type=int, default=10000)
+parser.add_argument("-e", "--episode", type=int, default=1000)
 parser.add_argument("-t", "--test_episode", type=int, default=10)
 parser.add_argument("-l", "--learning_rate", type=float, default=0.001)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-u", "--hidden_unit", type=int, default=10)
+parser.add_argument("-mn", '--model_name', type=str, default="zero_data")
 args = parser.parse_args()
 
 # Hyper Parameters
@@ -41,9 +44,19 @@ TEST_EPISODE = args.test_episode
 LEARNING_RATE = args.learning_rate
 GPU = args.gpu
 HIDDEN_UNIT = args.hidden_unit
+MODEL_NAME = args.model_name
+print("running on data set :{}".format(MODEL_NAME))
 
-x_ = 28
+
+
+# 118
+# x_ = 28
+# y_ = 48
+# f1_line = 50
+
+x_ = 31
 y_ = 48
+f1_line = 60
 
 
 def mean_confidence_interval(data, confidence=0.95):
@@ -104,7 +117,7 @@ class RelationNetwork(nn.Module):
             nn.BatchNorm2d(64, momentum=1, affine=True),
             nn.ReLU(),
             nn.MaxPool2d(2))
-        self.fc1 = nn.Linear(input_size * 50, hidden_size)
+        self.fc1 = nn.Linear(input_size * f1_line, hidden_size)
         self.fc2 = nn.Linear(hidden_size, 1)
 
     def forward(self, x):
@@ -139,7 +152,7 @@ def main():
     # Step 1: init data folders
     print("init data folders")
     # init character folders for dataset construction
-    metatrain_folders, metatest_folders = tg.mini_data_folders()
+    metatrain_folders, metatest_folders = tg.mini_data_folders(MODEL_NAME)
 
     # Step 2: init neural networks
     print("init neural networks")
@@ -175,8 +188,12 @@ def main():
     print("Training...")
 
     last_accuracy = 0.0
+    plt_test_acc = []
+    plt_test_loss = []
+    plt_train_acc = []
+    plt_train_loss = []
 
-    for episode in range(EPISODE):   # default=1000
+    for episode in range(EPISODE):  # default=1000
 
         feature_encoder_scheduler.step(episode)
         relation_network_scheduler.step(episode)
@@ -227,10 +244,19 @@ def main():
         feature_encoder_optim.step()
         relation_network_optim.step()
 
-        if (episode + 1) % 100 == 0:
+        _, predict_labels = torch.max(relations.data, 1)
+
+        batch_labels = batch_labels.cuda(GPU)
+
+        rewards = [1 if predict_labels[j] == batch_labels[j] else 0 for j in range(BATCH_NUM_PER_CLASS * CLASS_NUM)]
+        train_acc = sum(rewards) / (BATCH_NUM_PER_CLASS * CLASS_NUM)
+        plt_train_acc.append(train_acc)
+        plt_train_loss.append(loss.item())
+
+        if (episode + 1) % 10 == 0:
             print("episode:", episode + 1, "loss", loss.item())
 
-        if episode % 500 == 0:
+        if episode % 10 == 0:
 
             # test
             print("Testing...")
@@ -240,7 +266,7 @@ def main():
                 task = tg.MiniDataTask(metatest_folders, CLASS_NUM, SAMPLE_NUM_PER_CLASS, 15)
                 sample_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=SAMPLE_NUM_PER_CLASS,
                                                                      split="train", shuffle=False)
-                num_per_class = 5
+                num_per_class = 20
                 test_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=num_per_class, split="test",
                                                                    shuffle=False)
 
@@ -278,6 +304,8 @@ def main():
                 accuracies.append(accuracy)
 
             test_accuracy, h = mean_confidence_interval(accuracies)
+            plt_test_acc.append(test_accuracy)
+            plt_test_loss.append(loss.item())
 
             print("test accuracy:", test_accuracy, "h:", h)
 
@@ -293,6 +321,26 @@ def main():
                 print("save networks for episode:", episode)
 
                 last_accuracy = test_accuracy
+
+    plt.figure()
+    plt.title("validation info")
+    plt.xlabel("episode")
+    plt.ylabel("Acc/loss")
+    plt.plot(plt_test_loss, label='Loss')
+    plt.plot(plt_test_acc, label='Acc')
+    plt.legend(loc='upper right')
+    plt.savefig('./drawing/test.png')
+    plt.show()
+
+    plt.figure()
+    plt.title("training info")
+    plt.xlabel("episode")
+    plt.ylabel("Acc/loss")
+    plt.plot(plt_train_loss, label='Loss')
+    plt.plot(plt_train_acc, label='Acc')
+    plt.legend(loc='upper right')
+    plt.savefig('./drawing/train.png')
+    plt.show()
 
 
 if __name__ == '__main__':

@@ -23,13 +23,14 @@ parser = argparse.ArgumentParser(description="One Shot Visual Recognition")
 parser.add_argument("-f", "--feature_dim", type=int, default=64)
 parser.add_argument("-r", "--relation_dim", type=int, default=8)
 parser.add_argument("-w", "--class_num", type=int, default=2)
-parser.add_argument("-s", "--sample_num_per_class", type=int, default=5)
-parser.add_argument("-b", "--batch_num_per_class", type=int, default=10)
+parser.add_argument("-s", "--sample_num_per_class", type=int, default=10)
+parser.add_argument("-b", "--batch_num_per_class", type=int, default=5)
 parser.add_argument("-e", "--episode", type=int, default=10)
 parser.add_argument("-t", "--test_episode", type=int, default=100)
 parser.add_argument("-l", "--learning_rate", type=float, default=0.001)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-u", "--hidden_unit", type=int, default=10)
+parser.add_argument("-mn", '--model_name', type=str, default="zero_data")
 args = parser.parse_args()
 
 # Hyper Parameters
@@ -43,9 +44,17 @@ TEST_EPISODE = args.test_episode
 LEARNING_RATE = args.learning_rate
 GPU = args.gpu
 HIDDEN_UNIT = args.hidden_unit
+MODEL_NAME = args.model_name
+print("running on data set :{}".format(MODEL_NAME))
 
-x_ = 28
+# 118
+# x_ = 28
+# y_ = 48
+# f1_line = 50
+
+x_ = 31
 y_ = 48
+f1_line = 60
 
 
 def mean_confidence_interval(data, confidence=0.95):
@@ -104,7 +113,7 @@ class RelationNetwork(nn.Module):
             nn.BatchNorm2d(64, momentum=1, affine=True),
             nn.ReLU(),
             nn.MaxPool2d(2))
-        self.fc1 = nn.Linear(input_size * 50, hidden_size)
+        self.fc1 = nn.Linear(input_size * f1_line, hidden_size)
         self.fc2 = nn.Linear(hidden_size, 1)
 
     def forward(self, x):
@@ -136,7 +145,7 @@ def main():
     # Step 1: init data folders
     print("init data folders")
     # init character folders for dataset construction
-    metatrain_folders, metatest_folders = tg.mini_imagenet_folders()
+    metatrain_folders, metatest_folders = tg.mini_imagenet_folders(MODEL_NAME)
 
     # Step 2: init neural networks
     print("init neural networks")
@@ -177,7 +186,7 @@ def main():
             task = tg.MiniImagenetTask(metatest_folders, CLASS_NUM, SAMPLE_NUM_PER_CLASS, 15)
             sample_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=SAMPLE_NUM_PER_CLASS,
                                                                  split="train", shuffle=False)
-            num_per_class = 5
+            num_per_class = 30
             test_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=num_per_class, split="test",
                                                                shuffle=False)
 

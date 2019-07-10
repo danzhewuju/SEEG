@@ -10,6 +10,11 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 from torch.utils.data.sampler import Sampler
+import time
+import sys
+
+sys.path.append('../')
+from util.util_file import *
 
 
 def imshow(img):
@@ -28,22 +33,22 @@ def imshow(img):
 #         return x
 
 
-def mini_imagenet_folders():
-    train_folder = '../data/seeg/train'
-    test_folder = '../data/seeg/test'
+def mini_imagenet_folders(model_name):
+    train_folder = '../data/seeg/{}/train'.format(model_name)
+    test_folder = '../data/seeg/{}/val'.format(model_name)
 
-    metatrain_folders = [os.path.join(train_folder, label) \
-                         for label in os.listdir(train_folder) \
-                         if os.path.isdir(os.path.join(train_folder, label)) \
+    metatrain_folders = [os.path.join(train_folder, label)
+                         for label in os.listdir(train_folder)
+                         if os.path.isdir(os.path.join(train_folder, label))
                          ]
-    metatest_folders = [os.path.join(test_folder, label) \
-                        for label in os.listdir(test_folder) \
-                        if os.path.isdir(os.path.join(test_folder, label)) \
+    metatest_folders = [os.path.join(test_folder, label)
+                        for label in os.listdir(test_folder)
+                        if os.path.isdir(os.path.join(test_folder, label))
                         ]
-
-    random.seed(1)
+    t = time.time()
+    random.seed(t)
     random.shuffle(metatrain_folders)
-    random.seed(1)
+    random.seed(t)
     random.shuffle(metatest_folders)
 
     return metatrain_folders, metatest_folders
@@ -75,11 +80,11 @@ class MiniImagenetTask(object):
         self.train_labels = [labels[self.get_class(x)] for x in self.train_roots]
         self.test_labels = [labels[self.get_class(x)] for x in self.test_roots]
 
-        # random.seed(2)
-        # random.shuffle(self.test_labels)
-        # random.seed(2)
-        # random.shuffle(self.test_roots)
-
+        t = time.time()
+        random.seed(t)
+        random.shuffle(self.test_labels)
+        random.seed(t)
+        random.shuffle(self.test_roots)
 
     def get_class(self, sample):
         return os.path.join(*sample.split('/')[:-1])
@@ -110,16 +115,17 @@ class MiniImagenet(FewShotDataset):
     def __getitem__(self, idx):
         image_root = self.image_roots[idx]
         image = np.load(image_root)
-        image = image.astype('float32')
-        image = torch.from_numpy(image)
-        image = image[np.newaxis, :]
+        result = matrix_normalization(image, (130, 200))
+        result = result.astype('float32')
+        result = torch.from_numpy(result)
+        result = result[np.newaxis, :]
         # image = image.convert('RGB')
         # if self.transform is not None:
         #     image = self.transform(image)
         label = self.labels[idx]
         # if self.target_transform is not None:
         #     label = self.target_transform(label)
-        return image, label
+        return result, label
 
 
 class ClassBalancedSampler(Sampler):
@@ -180,9 +186,9 @@ class ClassBalancedSamplerOld(Sampler):
 
 
 def get_mini_imagenet_data_loader(task, num_per_class=1, split='train', shuffle=False):
-    normalize = transforms.Normalize(mean=[0.92206], std=[0.08426])
-
-    dataset = MiniImagenet(task, split=split, transform=transforms.Compose([transforms.ToTensor(), normalize]))
+    # normalize = transforms.Normalize(mean=[0.92206], std=[0.08426])
+    dataset = MiniImagenet(task, split=split)
+    # dataset = MiniImagenet(task, split=split, transform=transforms.Compose([transforms.ToTensor(), normalize]))
     if split == 'train':
         sampler = ClassBalancedSamplerOld(num_per_class, task.num_classes, task.train_num, shuffle=shuffle)
 
