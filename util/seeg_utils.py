@@ -2,9 +2,10 @@
 
 import os
 import uuid
-
+import pandas as pd
 import mne
 import numpy as np
+import scipy.io as sio
 import pyedflib
 from mne.time_frequency import *
 
@@ -142,23 +143,50 @@ def save_split_data(data_split, path, flag):  # 切片数据的保存
     return True
 
 
-def pre_process(raw, seeg=True, eeg=False):  # seeg及eeg预处理
+def seeg_preprocess(fin, fout, seeg_chan_name):
     '''
-
-    :param raw:  原数据
-    :param seeg:   是否为seeg数据
-    :param seeg:   是否为eeg数据
+    SEEG滤波
+    :param fin:  源数据文件名
+    :param fout:   输出文件名（***以_raw.fif结尾***）
+    :param seeg_chan_name：   需要滤波的信道名列表
     :return:
     '''
-    sfreq = raw.info['sfreq']
-    nyq = sfreq / 2.
-    if seeg:
-        high_pass = 0.5
-    elif eeg:
-        high_pass = 1.
-    raw.notch_filter(np.arange(50, nyq, 50), filter_length='auto', phase='zero')  # 滤去线路噪声
-    raw.filter(high_pass, None, fir_design='firwin')  # 滤去slow drifts
-    return raw
+    raw = mne.io.read_raw_edf(fin, preload=True)
+    specific_chans = raw.pick_channels(seeg_chan_name)
+    del raw
+    if len(specific_chans.info['ch_names']) != len(seeg_chan_name):
+        print("channels number not matched")
+        return
+    sfreq = specific_chans.info['sfreq']  # 采样频率
+    nyq = sfreq / 2.  # 奈奎斯特频率
+    specific_chans.notch_filter(np.arange(50, nyq, 50), filter_length='auto',
+                                phase='zero')
+    specific_chans.filter(0.5, None, fir_design='firwin')
+    specific_chans.save(fout)
+    del specific_chans
+
+
+def eeg_preprocess(fin, fout, eeg_chan_name):
+    '''
+    EEG滤波
+    :param fin:  源数据文件名
+    :param fout:   输出文件名（***以_raw.fif结尾***）
+    :param seeg_chan_name：   需要滤波的信道名列表
+    :return:
+    '''
+    raw = mne.io.read_raw_edf(fin, preload=True)
+    specific_chans = raw.copy().pick_channels(eeg_chan_name)
+    del raw
+    if len(specific_chans.info['ch_names']) != len(seeg_chan_name):
+        print("channels number not matched")
+        return
+    sfreq = specific_chans.info['sfreq']  # 采样频率
+    nyq = sfreq / 2.  # 奈奎斯特频率
+    specific_chans.notch_filter(np.arange(50, nyq, 50), filter_length='auto',
+                                phase='zero')
+    specific_chans.filter(1., None, fir_design='firwin')
+    specific_chans.save(fout)
+    del specific_chans
 
 
 def split_edf(filename, NEpochs=1):  # 把太大的edf文件分成NEpochs个小edf文件
@@ -296,3 +324,88 @@ def tfr_extract(power, tmin=0, tmax=None):
         end = int(tmax * sfreq)
         return np.array([[[k for k in power.data[i][j][start: end]] for j in range(len(power.data[i]))] for i in
                            range(len(power.data))])
+
+
+def get_cost_matrix(elec_pos):
+    '''
+    获取代价矩阵（不同电极之间的距离）
+    :param elec_pos:  含有信道名以及坐标的字典
+    :return:  cost_matrix：   代价矩阵
+    '''
+    n = len(elec_pos)
+    cost_matrix = [[0 for _ in range(n)] for _ in range(n)]
+    i = 0
+    while i < n:
+        j = i + 1
+        while j < n:
+            cost_matrix[i][j] = np.linalg.norm(elec_pos[i]['pos'] - elec_pos[j]['pos'])
+            cost_matrix[j][i] = cost_matrix[i][j]
+            j += 1
+        i += 1
+    return cost_matrix
+
+
+def least_traversal(elec_pos):
+    '''
+    枚举所有起点计算出最小代价的遍历路径
+    :param elec_pos:  含有信道名以及坐标的字典
+    :return:  min_cost：   最小代价
+    :return:  min_path：   对应路径
+    '''
+    cost_matrix = get_cost_matrix(elec_pos)
+    n = len(elec_pos)
+    maximum = 9999999
+    min_cost = maximum
+    min_path = None
+    for start in range(n):
+        visited = [False for _ in range(n)]
+        n_visited = 0
+        cur = start
+        cost = 0
+        path = [elec_pos[cur]['name']]
+        while n_visited < n - 1:
+            visited[cur] = True
+            n_visited += 1
+            min_d = maximum
+            min_i = 0
+            for i in range(n):
+                d = cost_matrix[cur][i]
+                if d < min_d and not visited[i]:
+                    min_d = d
+                    min_i = i
+            cost += min_d
+            path.append(elec_pos[min_i]['name'])
+            cur = min_i
+        if cost < min_cost:
+            min_cost = cost
+            min_path = path
+    return min_cost, min_path
+
+
+def retrieve_chs_from_mat(patient_name):
+    '''
+    提取.mat文件中的信道名和坐标信息
+    :param patient_name:   目标病人名（须保证文件名为patient_name.mat）
+    :return:  elec_pos：   含有信道名以及坐标的字典
+    '''
+    pos_info = sio.loadmat(patient_name+".mat")
+    elec_pos = list()
+    for i in range(pos_info['elec_Info_Final'][0][0][1][0].size): #name为字符串,pos为ndarray格式
+        elec_pos.append({'name': pos_info['elec_Info_Final'][0][0][0][0][i][0], 'pos': pos_info['elec_Info_Final'][0][0][1][0][i][0]})
+    return elec_pos
+
+
+def get_path(patient_name):
+    '''
+    获取当前病人的信道排列并保存在.csv文件中
+    :param patient_name:   目标病人名
+    '''
+    _, path = least_traversal(retrieve_chs_from_mat(patient_name))
+    print(path)
+    path_len = len(path)
+    print(path_len)
+    to_csv = [[i for i in range(path_len)], path]
+    to_csv = [[row[i] for row in to_csv] for i in range(path_len)]
+    col = ['ID', 'chan_name']
+    csv_frame = pd.DataFrame(columns=col,data=to_csv)
+    csv_frame.to_csv('./'+patient_name+'_seq.csv', encoding='utf-8')
