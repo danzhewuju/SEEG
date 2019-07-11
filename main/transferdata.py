@@ -3,9 +3,9 @@
 '''
 将数据按照标签进行转化，按照每一帧进行存储 默认每一帧的时间长度是2秒
 '''
-import pandas as pd
 
 from util import *
+import pandas as pd
 
 time = 2  # 每一帧的持续时间
 resample = 100  # 重采样的频率
@@ -163,45 +163,45 @@ def pre_seizure_biclass_handle():
     #     generate_data(path_raw, flag, name, path_commom_channel)
     # print("癫痫发作前的睡眠处理完成！！！")
 
-    path_commom_channel = "../data/seizure/channels_info/ZK_seq.csv"
-    path_dir = "../data/raw_data/ZK/ZK_Pre_seizure"
-    flag = 0
-    for p in os.listdir(path_dir):
-        path_raw = os.path.join(path_dir, p)
-        name = "ZK"
-        generate_data(path_raw, flag, name, path_commom_channel)
-
-    path_commom_channel = "../data/seizure/channels_info/WSH_seq.csv"
-    path_dir = "../data/raw_data/WSH/WSH_Pre_seizure"
-    flag = 0
-    for p in os.listdir(path_dir):
-        path_raw = os.path.join(path_dir, p)
-        name = "WSH"
-        generate_data(path_raw, flag, name, path_commom_channel)
-
-    path_commom_channel = "../data/seizure/channels_info/SYF_seq.csv"
-    path_dir = "../data/raw_data/SYF/SYF_Pre_seizure"
-    flag = 0
-    for p in os.listdir(path_dir):
-        path_raw = os.path.join(path_dir, p)
-        name = "SYF"
-        generate_data(path_raw, flag, name, path_commom_channel)
-
-    path_commom_channel = "../data/seizure/channels_info/BDP_seq.csv"
-    path_dir = "../data/raw_data/BDP/BDP_Pre_seizure"
-    flag = 0  # 指明了存储位置
-    for p in os.listdir(path_dir):
-        path_raw = os.path.join(path_dir, p)
-        name = "BDP"
-        generate_data(path_raw, flag, name, path_commom_channel)
-
-    path_commom_channel = "../data/seizure/channels_info/BDP_seq.csv"
-    path_dir = "../data/raw_data/BDP/BDP_SLEEP"
-    flag = 2  # 指明了存储位置
-    for p in os.listdir(path_dir):
-        path_raw = os.path.join(path_dir, p)
-        name = "BDP"
-        generate_data(path_raw, flag, name, path_commom_channel)
+    # path_commom_channel = "../data/seizure/channels_info/ZK_seq.csv"
+    # path_dir = "../data/raw_data/ZK/ZK_Pre_seizure"
+    # flag = 0
+    # for p in os.listdir(path_dir):
+    #     path_raw = os.path.join(path_dir, p)
+    #     name = "ZK"
+    #     generate_data(path_raw, flag, name, path_commom_channel)
+    #
+    # path_commom_channel = "../data/seizure/channels_info/WSH_seq.csv"
+    # path_dir = "../data/raw_data/WSH/WSH_Pre_seizure"
+    # flag = 0
+    # for p in os.listdir(path_dir):
+    #     path_raw = os.path.join(path_dir, p)
+    #     name = "WSH"
+    #     generate_data(path_raw, flag, name, path_commom_channel)
+    #
+    # path_commom_channel = "../data/seizure/channels_info/SYF_seq.csv"
+    # path_dir = "../data/raw_data/SYF/SYF_Pre_seizure"
+    # flag = 0
+    # for p in os.listdir(path_dir):
+    #     path_raw = os.path.join(path_dir, p)
+    #     name = "SYF"
+    #     generate_data(path_raw, flag, name, path_commom_channel)
+    #
+    # path_commom_channel = "../data/seizure/channels_info/BDP_seq.csv"
+    # path_dir = "../data/raw_data/BDP/BDP_Pre_seizure"
+    # flag = 0  # 指明了存储位置
+    # for p in os.listdir(path_dir):
+    #     path_raw = os.path.join(path_dir, p)
+    #     name = "BDP"
+    #     generate_data(path_raw, flag, name, path_commom_channel)
+    #
+    # path_commom_channel = "../data/seizure/channels_info/BDP_seq.csv"
+    # path_dir = "../data/raw_data/BDP/BDP_SLEEP"
+    # flag = 2  # 指明了存储位置
+    # for p in os.listdir(path_dir):
+    #     path_raw = os.path.join(path_dir, p)
+    #     name = "BDP"
+    #     generate_data(path_raw, flag, name, path_commom_channel)
 
     # path_commom_channel = "../data/seizure/channels_info/WSH_seq.csv"
     # path_dir = "../data/raw_data/WSH/WSH_Pre_seizure"
@@ -219,13 +219,13 @@ def pre_seizure_biclass_handle():
     #     name = "SJ"
     #     generate_data(path_raw, flag, name, path_commom_channel)
     #
-    # path_commom_channel = "../data/seizure/channels_info/JWJ_seq.csv"
-    # path_dir = "../data/raw_data/JWJ/JWJ_Pre_seizure"
-    # flag = 0
-    # for p in os.listdir(path_dir):
-    #     path_raw = os.path.join(path_dir, p)
-    #     name = "JWJ"
-    #     generate_data(path_raw, flag, name, path_commom_channel)
+    path_commom_channel = "../data/seizure/channels_info/JWJ_seq.csv"
+    path_dir = "../data/raw_data/JWJ/JWJ_Pre_seizure"
+    flag = 0
+    for p in os.listdir(path_dir):
+        path_raw = os.path.join(path_dir, p)
+        name = "JWJ"
+        generate_data(path_raw, flag, name, path_commom_channel)
 
     return True
 

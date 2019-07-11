@@ -95,7 +95,7 @@ def select_channel_data(raw, select_channel_names):  # 根据某些信道的名�
     return data
 
 
-def select_channel_data_mne(raw, select_channel_name):
+def select_channel_data_mne(raw, select_channel_name):  # 根据信道的顺序，重新选择信道
     chan_name = select_channel_name
     specific_chans = raw.copy().pick_channels(chan_name)
     # specific_chans.plot(block=True)
@@ -166,7 +166,7 @@ def seeg_preprocess(fin, fout, seeg_chan_name):
     del specific_chans
 
 
-def eeg_preprocess(fin, fout, eeg_chan_name):
+def eeg_preprocess(fin, fout, seeg_chan_name):
     '''
     EEG滤波
     :param fin:  源数据文件名
@@ -175,7 +175,7 @@ def eeg_preprocess(fin, fout, eeg_chan_name):
     :return:
     '''
     raw = mne.io.read_raw_edf(fin, preload=True)
-    specific_chans = raw.copy().pick_channels(eeg_chan_name)
+    specific_chans = raw.copy().pick_channels(seeg_chan_name)
     del raw
     if len(specific_chans.info['ch_names']) != len(seeg_chan_name):
         print("channels number not matched")

@@ -2,7 +2,6 @@
 
 import librosa
 import librosa.display
-import pandas as pd
 
 from main.Seegdata import *
 from util.util_file import *
@@ -122,21 +121,14 @@ def test_9():  # 其他功能的探索
     print(b)
 
 
-def test_10():
-    path = "../data/seeg/train/pre_zeizure/e01b382d-697b-11e9-bae7-e0d55ee63f3d-0.npy"
-    data = np.load(path)
-    print(data)
-    print(data.dtype)
-
-
 def test_11():
     path_dir = '../data/raw_data/Pre_seizure'
     print(os.listdir(path_dir))
 
 
 def test_12():
-    path_channel = '../data/seizure/common_channels.csv'
-    path = '../data/raw_data/LK_Pre_seizure/LK_SZ1_pre_seizure_raw.fif'
+    path_channel = '../data/seizure/channels_info/ZK_seq.csv'
+    path = '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw.fif'
     raw_data = read_raw(path)
     raw_data.plot()
     print(raw_data.info['ch_names'])
@@ -224,7 +216,7 @@ def test_18():
 
 def test_cvs():
     data = {'id': [1, 2, 3],
-            'name':['yuhao', 'alex', 'jj']
+            'name': ['yuhao', 'alex', 'jj']
             }
     d = pd.DataFrame(data)
     print(d)
@@ -232,3 +224,12 @@ def test_cvs():
     print(c)
     # d.loc[c, 'name'] = 'lijian'
     # print(d)
+
+
+def test_edf():
+    path_channel = '../data/seizure/channels_info/ZK_seq.csv'
+    path = '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw.fif'
+    data = read_raw(path)
+    time = data.times()
+    print(time)
+    return True

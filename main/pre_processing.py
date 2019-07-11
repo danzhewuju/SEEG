@@ -124,40 +124,40 @@ def bi_class_handle():
     '''
         对于二分类的数据进行预处理
     '''
-    # start = 0
-    # save_dir = "../data/raw_data/LK/LK_Pre_seizure"
-    #
-    # # 对应相关数据的目录
-    #
-    # raw_path = "../data/raw_data/LK_SZ/LK_SZ1_seeg_raw.fif"
-    # end_time = 546
-    # name = "LK_SZ1_pre_seizure"
-    # get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
-    #
-    # raw_path = "../data/raw_data/LK_SZ/LK_SZ2_seeg_raw.fif"
-    # end_time = 564
-    # name = "LK_SZ2_pre_seizure"
-    # get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
-    #
-    # raw_path = "../data/raw_data/LK_SZ/LK_SZ3_seeg_raw.fif"
-    # end_time = 733
-    # name = "LK_SZ3_pre_seizure"
-    # get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
-    #
-    # raw_path = "../data/raw_data/LK_SZ/LK_SZ4_seeg_raw.fif"
-    # end_time = 995
-    # name = "LK_SZ4_pre_seizure"
-    # get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
-    #
-    # raw_path = "../data/raw_data/LK_SZ/LK_SZ5_seeg_raw.fif"
-    # end_time = 1535
-    # name = "LK_SZ5_pre_seizure"
-    # get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
-    #
-    # raw_path = "../data/raw_data/LK_SZ/LK_SZ6_seeg_raw.fif"
-    # end_time = 702
-    # name = "LK_SZ6_pre_seizure"
-    # get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+    start = 0
+    save_dir = "../data/raw_data/LK/LK_Pre_seizure"
+
+    # 对应相关数据的目录，LK相关数据的处理
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ1_seeg_raw.fif"
+    end_time = 546
+    name = "LK_SZ1_pre_seizure"
+    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ2_seeg_raw.fif"
+    end_time = 564
+    name = "LK_SZ2_pre_seizure"
+    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ3_seeg_raw.fif"
+    end_time = 733
+    name = "LK_SZ3_pre_seizure"
+    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ4_seeg_raw.fif"
+    end_time = 995
+    name = "LK_SZ4_pre_seizure"
+    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ5_seeg_raw.fif"
+    end_time = 1535
+    name = "LK_SZ5_pre_seizure"
+    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+
+    raw_path = "../data/raw_data/LK_SZ/LK_SZ6_seeg_raw.fif"
+    end_time = 702
+    name = "LK_SZ6_pre_seizure"
+    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
 
     # -------------------------------------------------------------------------
     # 扩展了数据集
@@ -232,13 +232,29 @@ def bi_class_handle():
     name = "BDP_SZ2_pre_seizure"
     get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
 
-    # 一小时前的被认为是正常睡眠阶段
+    # 处理JWJ的数据
     start = 0
-    raw_path = '../data/raw_data/BDP/BDP_SZ/BDP_SZ2_raw.fif'
-    save_dir = "../data/raw_data/BDP/BDP_SLEEP"
-    end_time = 696
-    name = "BDP_SZ2_SLEEP"
+    save_dir = "../data/raw_data/JWJ/JWJ_Pre_seizure"
+    raw_path = "../data/raw_data/JWJ/JWJ_SZ/JWJ_SZ1_raw.fif"
+    end_time = 349
+    name = "JWJ_SZ1_pre_seizure"
     get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+
+    start = 0
+    save_dir = "../data/raw_data/JWJ/JWJ_Pre_seizure"
+    raw_path = "../data/raw_data/JWJ/JWJ_SZ/JWJ_SZ2_raw.fif"
+    end_time = 349
+    name = "JWJ_SZ2_pre_seizure"
+    get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
+
+    # 这部分的数据暂时不进行使用
+    # # 一小时前的被认为是正常睡眠阶段
+    # start = 0
+    # raw_path = '../data/raw_data/BDP/BDP_SZ/BDP_SZ2_raw.fif'
+    # save_dir = "../data/raw_data/BDP/BDP_SLEEP"
+    # end_time = 696
+    # name = "BDP_SZ2_SLEEP"
+    # get_duration_data(raw_path, name, save_dir, start, end_time, gap_time=30)
 
 
 if __name__ == '__main__':
