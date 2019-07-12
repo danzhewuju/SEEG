@@ -189,12 +189,10 @@ def test_17():
 
 
 def test_channels_matching():
-    path = '../data/raw_data/ZK/ZK_Pre_seizure/ZK_SZ1_pre_seizure_raw.fif'
-    data = read_raw(path)
+    path = '/home/cbd109-3/Users/data/hmq/Huashan_Hospital_Preprocessed_Data/huashan_data_normal_3/SJ_Sleep.edf'
+    data = read_edf_raw(path)
     channels_name = get_channels_names(data)
-    f = open('./ZK_channels.txt', 'w')
-    f.write(str(channels_name))
-    f.close()
+    print(len(channels_name))
     print(channels_name)
 
 
@@ -228,8 +226,15 @@ def test_cvs():
 
 def test_edf():
     path_channel = '../data/seizure/channels_info/ZK_seq.csv'
+    channel_info = pd.read_csv(path_channel)['channels']
+    query_t = [x for x in channel_info if "5" in x]
+
     path = '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw.fif'
     data = read_raw(path)
-    time = data.times()
+    time = data.times
+    channels_name = get_channels_names(data)
+    query = [x for x in channels_name if "5" in x]
     print(time)
+    print(query)
+    print(query_t)
     return True

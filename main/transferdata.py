@@ -120,29 +120,47 @@ def sleep_normal_handle():
     #
     # print("{}正常睡眠的数据处理完成！".format(name))
 
-    path_commom_channel = "../data/seizure/channels_info/BDP_seq.csv"
-    path_raw_normal_sleep = ['../data/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif']
-    name = "BDP"
+    # path_commom_channel = "../data/seizure/channels_info/BDP_seq.csv"
+    # path_raw_normal_sleep = ['../data/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif']
+    # name = "BDP"
+    # flag = 2
+    # for path_raw in path_raw_normal_sleep:
+    #     generate_data(path_raw, flag, name, path_commom_channel)
+    # print("{}正常睡眠的数据处理完成！".format(name))
+    #
+    # path_commom_channel = "../data/seizure/channels_info/SYF_seq.csv"
+    # path_raw_normal_sleep = ['../data/raw_data/SYF/SYF_SLEEP/SYF_Sleep_raw.fif']
+    # name = "SYF"
+    # flag = 2
+    # for path_raw in path_raw_normal_sleep:
+    #     generate_data(path_raw, flag, name, path_commom_channel)
+    # print("{}正常睡眠的数据处理完成！".format(name))
+
+    # path_commom_channel = "../data/seizure/channels_info/WSH_seq.csv"
+    # path_raw_normal_sleep = ['../data/raw_data/WSH/WSH_SLEEP/WSH_Sleep_raw.fif']
+    # name = "WSH"
+    # flag = 2
+    # for path_raw in path_raw_normal_sleep:
+    #     generate_data(path_raw, flag, name, path_commom_channel)
+    # print("{}正常睡眠的数据处理完成！".format(name))
+
+    path_commom_channel = "../data/seizure/channels_info/ZK_seq.csv"
+    path_raw_normal_sleep = ['../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-1.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-2.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-3.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-4.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-5.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-6.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-7.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-8.fif'
+                             ]
+    name = "ZK"
     flag = 2
     for path_raw in path_raw_normal_sleep:
         generate_data(path_raw, flag, name, path_commom_channel)
     print("{}正常睡眠的数据处理完成！".format(name))
 
-    path_commom_channel = "../data/seizure/channels_info/SYF_seq.csv"
-    path_raw_normal_sleep = ['../data/raw_data/SYF/SYF_SLEEP/SYF_Sleep_raw.fif']
-    name = "SYF"
-    flag = 2
-    for path_raw in path_raw_normal_sleep:
-        generate_data(path_raw, flag, name, path_commom_channel)
-    print("{}正常睡眠的数据处理完成！".format(name))
-
-    path_commom_channel = "../data/seizure/channels_info/WSH_seq.csv"
-    path_raw_normal_sleep = ['../data/raw_data/WSH/WSH_SLEEP/WSH_Sleep_raw.fif']
-    name = "WSH"
-    flag = 2
-    for path_raw in path_raw_normal_sleep:
-        generate_data(path_raw, flag, name, path_commom_channel)
-    print("{}正常睡眠的数据处理完成！".format(name))
     return True
 
 

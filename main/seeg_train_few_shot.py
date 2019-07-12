@@ -323,7 +323,7 @@ def main():
                 last_accuracy = test_accuracy
 
     plt.figure()
-    plt.title("validation info")
+    plt.title("testing info")
     plt.xlabel("episode")
     plt.ylabel("Acc/loss")
     plt.plot(plt_test_loss, label='Loss')
