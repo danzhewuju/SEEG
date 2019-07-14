@@ -238,3 +238,12 @@ def test_edf():
     print(query)
     print(query_t)
     return True
+
+
+def test_random():
+    a = [1, 2, 2, 5, 2]
+    b = [3, 4]
+    print(a)
+    print(b)
+    a = a+b
+    print(a)
