@@ -5,6 +5,7 @@ import librosa.display
 
 from main.Seegdata import *
 from util.util_file import *
+import re
 
 
 def test_1():
@@ -241,9 +242,6 @@ def test_edf():
 
 
 def test_random():
-    a = [1, 2, 2, 5, 2]
-    b = [3, 4]
-    print(a)
-    print(b)
-    a = a+b
-    print(a)
+    path = "../data/seizure/split/preseizure/WSH/583f2394-9bd9-11e9-912c-79975a8821be-0.npy"
+    data = path[:-4]
+    print(data)

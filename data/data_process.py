@@ -4,11 +4,13 @@
 '''
 
 import argparse
+import os
+import random
+
+import numpy as np
+from dataset_info import up_sampling, sampling_rewrite
 
 from main import *
-import os
-import numpy as np
-import random
 
 parser = argparse.ArgumentParser(description="data split")
 parser.add_argument('-r', '--ratio', type=float, default=0.6)  # 将数据集划分为测试集，以及验证集
@@ -158,6 +160,10 @@ def data_process_n_1():
               2. 然后利用第n个人的数据进行测试，其中第n个人的数据集并没有见过
     :return:
     '''
+    TRAIN_RATIO = 0.7
+    TEST_RATIO = 0.3
+
+    resampling_base_size = 3000
     dataset_dir = './seeg/zero_data'  # 当前所在的数据集, 不同的方法会在不同的数据集上
     train_folder = os.path.join(dataset_dir, 'train')
     test_folder = os.path.join(dataset_dir, 'test')
@@ -217,81 +223,75 @@ def data_process_n_1():
     val_normal = []  # 将这个人的数据最为一个验证的数据集
     sleep_normal = []  # 正常人的睡眠时间
     test_persons_normal_sleep = ['BDP']
-    min_length_normal = min([len(x) for key, x in tmp_normal.items() if key not in test_persons_normal_sleep])
-    print("{} sample of per normal sleeping  person.".format(min_length_normal))
-    for key, dp in tmp_normal.items():
-        dp = random.sample(dp, min_length_normal)  # 从数据中进行随机抽选
-        if key not in test_persons_normal_sleep:
-            for p in dp:
-                sleep_normal.append(p)
-        else:
-            for p in dp:
-                val_normal.append(p)
     sleep_pre = seeg.get_all_path_by_keyword('preseizure')
     sleep_pre_seizure = []
     val_pre_seizure = []
-    test_persons_pre_seizure = ['BDP']  # 用于测试的脑电
-    min_length_pre_seizure = min([len(x) for key, x in sleep_pre.items() if key not in test_persons_pre_seizure])
-    print("{} sample of per pre seizure sleeping  person.".format(min_length_pre_seizure))
+    test_persons_pre_seizure = ['BDP']  # 用于测试的病人的数据
+
+    m_normal = len(tmp_normal) - 1
+    n_preseizure = len(sleep_pre) - 1
+    resampling_size_normal = int((n_preseizure / m_normal) * resampling_base_size)
+    resampling_size_preseizure = resampling_base_size
+    print("size of sampling normal sleep:{}  size of sampling preseizure:{}".format(resampling_size_normal,
+                                                                                    resampling_size_preseizure))
+
+    for key, dp in tmp_normal.items():
+
+        if key not in test_persons_normal_sleep:
+            result = up_sampling(dp, resampling_size_normal)
+            for p in result.items():
+                sleep_normal.append(p)
+        else:
+            result = up_sampling(dp, resampling_base_size)
+            for p in result.items():
+                val_normal.append(p)
+    # 用于从采样的方法
+    # min_length_pre_seizure = min([len(x) for key, x in sleep_pre.items() if key not in test_persons_pre_seizure])
+    # print("{} sample of per pre seizure sleeping  person.".format(min_length_pre_seizure))
     for key, dp in sleep_pre.items():  # 获取的是所有的癫痫发前数据
-        dp = random.sample(dp, min_length_pre_seizure)
+        # 使用重采样的方法
+
         if key not in test_persons_pre_seizure:
-            for p in dp:
-                sleep_pre_seizure.append(p)
+            result = up_sampling(dp, resampling_size_preseizure)
+            for p in result.items():
+                sleep_pre_seizure.append(p)  # 加入的是字典
         else:
-            for p in dp:
+            result = up_sampling(dp, resampling_base_size)
+            for p in result.items():
                 val_pre_seizure.append(p)
-    print("normal sleep:{} pre seizure:{}".format(len(sleep_normal), len(sleep_pre_seizure)))
     random.shuffle(sleep_normal)
-    random.shuffle(sleep_pre_seizure)
+    random.shuffle(sleep_pre_seizure)  # 用于训练的数据集
 
-    random.shuffle(val_normal)
+    random.shuffle(val_normal)  # 用于验证的数据集
     random.shuffle(val_pre_seizure)
-    # random.shuffle(awake_label2)
-    min_data = min(len(sleep_normal), len(sleep_pre_seizure))  # 让两个数据集的个数相等
-    sleep_label1 = sleep_pre_seizure[:min_data]
-    sleep_label0 = sleep_normal[:min_data]
-    min_length_val = min(len(val_normal), len(val_pre_seizure))
-    val_normal = val_normal[:min_length_val]
-    val_pre_seizure = val_pre_seizure[:min_length_val]
 
-    train_num = int(TRAIN_RATIO * len(sleep_label0))
-    test_num = int((VAL_RATIO+VAL_RATIO) * len(sleep_label0))
+    # 接下来是数据集的划分
+    train_normal_number = int(TRAIN_RATIO * len(sleep_normal))
+    train_preseizure_number = int(TRAIN_RATIO * len(sleep_pre_seizure))
 
-    print("train number:{}, test number:{}, val number:{}".format(train_num, test_num,len(val_normal)))
+    train_normal_data_dict = sleep_normal[:train_normal_number]
+    test_normal_data_dict = sleep_normal[train_normal_number:]
 
-    # 训练集和测试集的划分
-    for (i, p) in enumerate(sleep_label0):
-        name = p.split('/')[-1]
-        d = np.load(p)
-        if i <= int(train_num):
-            save_path = os.path.join(train_folder_dir_normal, name)
-        else:
-            save_path = os.path.join(test_folder_dir_normal, name)
-        np.save(save_path, d)
+    train_preseizure_data_dict = sleep_pre_seizure[:train_preseizure_number]
+    test_preseizure_data_dict = sleep_pre_seizure[train_preseizure_number:]
 
-    for i, p in enumerate(val_normal):
-        name = p.split('/')[-1]
-        d = np.load(p)
-        save_path = os.path.join(val_folder_dir_normal, name)
-        np.save(save_path, d)
+    # 训练街和测试集的划分重写
+    sampling_rewrite(train_normal_data_dict, train_folder_dir_normal)
+    sampling_rewrite(test_normal_data_dict, test_folder_dir_normal)
 
-    # 训练集和测试集的划分
-    print("Successfully write for normal sleep data!!!")
-    for (i, p) in enumerate(sleep_label1):
-        name = p.split('/')[-1]
-        d = np.load(p)
-        if i <= int(train_num):
-            save_path = os.path.join(train_folder_dir_pre, name)
-        else:
-            save_path = os.path.join(test_folder_dir_pre, name)
-        np.save(save_path, d)
-    for i, p in enumerate(val_pre_seizure):
-        name = p.split('/')[-1]
-        d = np.load(p)
-        save_path = os.path.join(val_folder_dir_pre, name)
-        np.save(save_path, d)
-    print("Successfully write for pre seizure sleep data!!!")
+    sampling_rewrite(train_preseizure_data_dict, train_folder_dir_pre)
+    sampling_rewrite(test_preseizure_data_dict, test_folder_dir_pre)
+
+    # 验证集的采样重写
+    sampling_rewrite(val_normal, val_folder_dir_normal)
+    sampling_rewrite(val_pre_seizure, val_folder_dir_pre)
+
+    print("-" * 5 + "statistic information" + "-" * 5)
+    print("training data number of normal sleep :{} testing data number of normal sleep :{}\n"
+          "training data number of preseizure: {}  testing data number of preseizure: {}\n"
+          "validation data number of preseizure: {}  validation data number of preseizure: {}\n"
+          .format(len(train_normal_data_dict), len(test_normal_data_dict), len(train_preseizure_data_dict),
+                  len(test_preseizure_data_dict), len(val_normal), len(val_pre_seizure)))
 
 
 if __name__ == '__main__':
