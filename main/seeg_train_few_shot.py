@@ -25,8 +25,8 @@ parser.add_argument("-r", "--relation_dim", type=int, default=8)
 parser.add_argument("-w", "--class_num", type=int, default=2)
 parser.add_argument("-s", "--sample_num_per_class", type=int, default=10)
 parser.add_argument("-b", "--batch_num_per_class", type=int, default=5)
-parser.add_argument("-e", "--episode", type=int, default=1000)
-parser.add_argument("-t", "--test_episode", type=int, default=10)
+parser.add_argument("-e", "--episode", type=int, default=10000)
+parser.add_argument("-t", "--test_episode", type=int, default=50)
 parser.add_argument("-l", "--learning_rate", type=float, default=0.001)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-u", "--hidden_unit", type=int, default=10)
@@ -256,7 +256,7 @@ def main():
         if (episode + 1) % 10 == 0:
             print("episode:", episode + 1, "loss", loss.item())
 
-        if episode % 10 == 0:
+        if episode % TEST_EPISODE == 0:
 
             # test
             print("Testing...")
