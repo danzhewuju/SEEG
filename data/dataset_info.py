@@ -13,6 +13,7 @@ import random
 from collections import Counter
 
 import numpy as np
+import argparse
 
 
 class StatisticSeegDataset:
@@ -130,14 +131,15 @@ def sampling_rewrite(result_dic, save_dir):
         np.save(save_path, data)
     print("Successfully writen sampling data to {}".format(save_dir))
 
-# if __name__ == '__main__':
-#     parser = argparse.ArgumentParser(description="statistical seeg dataset information!")
-#     parser.add_argument('-rd', '--root_dir', default='../data/seizure/split')
-#     args = parser.parse_args()
-#     root_dir = args.root_dir  # 获得根目录的路径
-#     sta_info = StatisticSeegDataset(root_dir)
-#     sta_info.dataset_statistics_information(root_dir)
-#     sta_info.get_information()
-#     result = up_sampling(sta_info.pre_seizure["LK"], 1000)
-#     print("{}".format(result))
-#     # print("{}".format(len(result)))
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="statistical seeg dataset information!")
+    parser.add_argument('-rd', '--root_dir', default='../data/seizure/split')
+    args = parser.parse_args()
+    root_dir = args.root_dir  # 获得根目录的路径
+    sta_info = StatisticSeegDataset(root_dir)
+    sta_info.dataset_statistics_information(root_dir)
+    sta_info.get_information()
+    result = up_sampling(sta_info.pre_seizure["LK"], 1000)
+    print("{}".format(result))
+    # print("{}".format(len(result)))
