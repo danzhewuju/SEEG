@@ -2,9 +2,10 @@ import os
 import random
 
 import numpy as np
-import pandas as pd
 import torch
 from torch.utils.data import Dataset
+
+from util.util_file import get_label_data
 
 resize_x = 130
 resize_y = 200
@@ -80,8 +81,8 @@ class MiniImagenet(Dataset):
             mode, batchsz, n_way, k_shot, k_query))
 
         # reconstruct input
-        self.path = os.path.join(root, 'seeg')  # image path
-        csvdata, filename_label = self.loadCSV(os.path.join(root, mode + '.csv'))  # csv path
+
+        csvdata, filename_label = self.loadCSV(os.path.join(root, mode))  # csv path
         self.filename_label = filename_label
         self.data = []
         self.img2label = {}
@@ -91,7 +92,7 @@ class MiniImagenet(Dataset):
         self.cls_num = len(self.data)
         self.create_batch(self.batchsz)
 
-    def loadCSV(self, csvf):
+    def loadCSV(self, path):
         """
         return a dict saving the information of csv
         :param splitFile: csv file name
@@ -109,13 +110,18 @@ class MiniImagenet(Dataset):
         #             dictLabels[label].append(filename)
         #         else:
         #             dictLabels[label] = [filename]
-        data = pd.read_csv(csvf, sep=",")
-        filenames = list(data['filename'])
-        labels = list(data['label'])
-        filename_label = dict(zip(filenames, labels))
-        for i in range(len(labels)):
-            dictLabels[labels[i]].append(filenames[i])
-        return dictLabels, filename_label
+
+        # data = pd.read_csv(csvf, sep=",")
+        # filenames = list(data['filename'])
+        # labels = list(data['label'])
+        # filename_label = dict(zip(filenames, labels))
+        # for i in range(len(labels)):
+        #     dictLabels[labels[i]].append(filenames[i])
+        # return dictLabels, filename_label
+        data_labels = get_label_data(path)
+        for path, label in data_labels.items():
+            dictLabels[label].append(path)
+        return dictLabels, data_labels
 
     def create_batch(self, batchsz):
         """
@@ -165,15 +171,13 @@ class MiniImagenet(Dataset):
         # [querysz]
         query_y = np.zeros((self.querysz), dtype=np.int)
 
-        flatten_support_x = [os.path.join(self.path, item)
-                             for sublist in self.support_x_batch[index] for item in sublist]
+        flatten_support_x = [item for sublist in self.support_x_batch[index] for item in sublist]
         support_y = np.array(
             [self.img2label[self.filename_label[item]]
              # filename:n0153282900000005.jpg, the first 9 characters treated as label
              for sublist in self.support_x_batch[index] for item in sublist]).astype(np.int32)
 
-        flatten_query_x = [os.path.join(self.path, item)
-                           for sublist in self.query_x_batch[index] for item in sublist]
+        flatten_query_x = [item for sublist in self.query_x_batch[index] for item in sublist]
         query_y = np.array([self.img2label[self.filename_label[item]]
                             for sublist in self.query_x_batch[index] for item in sublist]).astype(np.int32)
 

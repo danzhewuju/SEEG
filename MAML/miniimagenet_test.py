@@ -66,10 +66,10 @@ def main():
     print('Total trainable tensors:', num)
 
     # batchsz here means total episode number
-    mini = MiniImagenet("./miniimagenet", mode='train', n_way=args.n_way, k_shot=args.k_spt,
+    mini = MiniImagenet(args.dataset_dir, mode='train', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
                         batchsz=10000)
-    mini_test = MiniImagenet("./miniimagenet", mode='val', n_way=args.n_way, k_shot=args.k_spt,
+    mini_test = MiniImagenet(args.dataset_dir, mode='val', n_way=args.n_way, k_shot=args.k_spt,
                              k_query=args.k_qry,
                              batchsz=100)
     test_accuracy = []
@@ -106,6 +106,7 @@ if __name__ == '__main__':
     argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
     argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
     argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
+    argparser.add_argument('--dataset_dir', type=str, help="training data set", default="../data/seeg/zero_data")
 
     args = argparser.parse_args()
     main()

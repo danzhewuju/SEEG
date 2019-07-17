@@ -1,13 +1,15 @@
 import argparse
+import sys
 
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats
 import torch
 from torch.utils.data import DataLoader
 
-from .MiniImagenet import MiniImagenet
-from .meta import Meta
-import matplotlib.pyplot as plt
+sys.path.append('../')
+from MiniImagenet import MiniImagenet
+from meta import Meta
 
 
 def mean_confidence_interval(accs, confidence=0.95):
@@ -54,10 +56,10 @@ def main():
     print('Total trainable tensors:', num)
 
     # batchsz here means total episode number
-    mini = MiniImagenet("./miniimagenet", mode='train', n_way=args.n_way, k_shot=args.k_spt,
+    mini = MiniImagenet(args.dataset_dir, mode='train', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
                         batchsz=10000)
-    mini_test = MiniImagenet("./miniimagenet", mode='test', n_way=args.n_way, k_shot=args.k_spt,
+    mini_test = MiniImagenet(args.dataset_dir, mode='test', n_way=args.n_way, k_shot=args.k_spt,
                              k_query=args.k_qry,
                              batchsz=100)
     last_accuracy = 0
@@ -65,7 +67,7 @@ def main():
     plt_train_acc = []
 
     plt_test_loss = []
-    plt_test_acc =[]
+    plt_test_acc = []
     for epoch in range(args.epoch // 10000):
         # fetch meta_batchsz num of episode each time
         db = DataLoader(mini, args.task_num, shuffle=True, num_workers=1, pin_memory=True)
@@ -92,7 +94,7 @@ def main():
                     x_spt, y_spt, x_qry, y_qry = x_spt.squeeze(0).to(device), y_spt.squeeze(0).to(device), \
                                                  x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
 
-                    accs, loss_test= maml.finetunning(x_spt, y_spt, x_qry, y_qry)
+                    accs, loss_test = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
 
                     loss_all_test.append(loss_test)
                     accs_all_test.append(accs)
@@ -145,6 +147,7 @@ if __name__ == '__main__':
     argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
     argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
     argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
+    argparser.add_argument('--dataset_dir', type=str, help="training data set", default="../data/seeg/zero_data")
 
     args = argparser.parse_args()
 

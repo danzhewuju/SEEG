@@ -5,9 +5,9 @@
 # ---------------------------------
 import glob
 import os
+import random
 
 import numpy as np
-import random
 
 
 def get_all_file_path(path, suffix='fif'):  # 主要是获取某文件夹下面所有的文件列表
@@ -61,3 +61,21 @@ def matrix_normalization(data, resize_shape=(130, 200)):
                 channels_del = random.sample(range(1, data_shape[0] - 1), d)
                 data = np.delete(data, channels_del, axis=0)
     return data
+
+
+def get_label_data(path):  # get data include label
+    class_name = os.listdir(path)
+    data_name = []
+    data_label = []
+    for i, name in enumerate(class_name):
+        new_path = os.path.join(path, name)
+        data_file = os.listdir(new_path)
+        path_file = [os.path.join(new_path, x) for x in data_file]
+        data_name += path_file
+        data_label += [i] * len(data_file)
+    result_data_label = dict(zip(data_name, data_label))
+    return result_data_label
+
+
+if __name__ == '__main__':
+    print(get_label_data("/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/test"))
