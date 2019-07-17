@@ -10,7 +10,7 @@ from util import *
 
 sys.path.append('..')
 
-from main.Seegdata import seegdata
+from RelationNet.Seegdata import seegdata
 
 
 def seeg_visualization(path):

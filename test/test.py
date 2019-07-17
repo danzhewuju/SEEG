@@ -3,7 +3,7 @@
 import librosa
 import librosa.display
 
-from main.Seegdata import *
+from RelationNet.Seegdata import *
 from util.util_file import *
 import re
 
@@ -128,7 +128,7 @@ def test_11():
 
 
 def test_12():
-    path_channel = '../data/seizure/channels_info/ZK_seq.csv'
+    path_channel = '../data/seizure/channels_info_back/ZK_seq.csv'
     path = '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw.fif'
     raw_data = read_raw(path)
     raw_data.plot()
@@ -226,7 +226,7 @@ def test_cvs():
 
 
 def test_edf():
-    path_channel = '../data/seizure/channels_info/ZK_seq.csv'
+    path_channel = '../data/seizure/channels_info_back/ZK_seq.csv'
     channel_info = pd.read_csv(path_channel)['channels']
     query_t = [x for x in channel_info if "5" in x]
 

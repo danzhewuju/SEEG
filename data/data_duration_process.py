@@ -4,7 +4,7 @@
 
 import random
 
-from main import *
+from RelationNet import *
 import argparse
 import numpy as np
 import os

@@ -141,5 +141,5 @@ if __name__ == '__main__':
     sta_info.dataset_statistics_information(root_dir)
     sta_info.get_information()
     result = up_sampling(sta_info.pre_seizure["LK"], 1000)
-    print("{}".format(result))
+    print("{}".format(len(result)))
     # print("{}".format(len(result)))

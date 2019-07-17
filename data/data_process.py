@@ -10,7 +10,7 @@ import random
 import numpy as np
 from dataset_info import up_sampling, sampling_rewrite
 
-from main import *
+from RelationNet import *
 
 parser = argparse.ArgumentParser(description="data split")
 parser.add_argument('-r', '--ratio', type=float, default=0.6)  # 将数据集划分为测试集，以及验证集
