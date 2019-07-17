@@ -134,7 +134,7 @@ def sampling_rewrite(result_dic, save_dir):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="statistical seeg dataset information!")
-    parser.add_argument('-rd', '--root_dir', default='../data/seizure/split')
+    parser.add_argument('-rd', '--root_dir', default="../data/data_slice/split")
     args = parser.parse_args()
     root_dir = args.root_dir  # 获得根目录的路径
     sta_info = StatisticSeegDataset(root_dir)

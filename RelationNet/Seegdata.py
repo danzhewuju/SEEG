@@ -5,14 +5,14 @@ from util import *
 
 
 class seegdata:
-    def __init__(self, path_dir="../data/seizure/split"):
+    def __init__(self, path_dir="../data/data_slice/split"):
         self.path_dir = path_dir
 
     def set_path_dir(self, new_path):
         self.path_dir = new_path
 
-    def get_split_npy_data(self, path_normal='../data/seizure/split/preseizure',
-                           path_cases='../data/seizure/split/cases'):
+    def get_split_npy_data(self, path_normal='../data/data_slice/split/preseizure',
+                           path_cases='../data/data_slice/split/cases'):
         self.path_cases = path_cases
         self.path_normal = path_normal  # 癫痫发作的前段时间
         map_cases = get_all_file_path(self.path_cases, 'npy')
@@ -46,7 +46,7 @@ class seegdata:
 
 
 # if __name__ == '__main__':
-#     path_dir = "../data/seizure/split"
+#     path_dir = "../data/data_slice/split"
 #     seeg = seegdata()
 #     p = seeg.get_all_path_by_keyword('sleep')
 #     data_path = []

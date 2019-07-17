@@ -13,8 +13,8 @@ import scipy.stats
 import torch
 from torch.utils.data import DataLoader
 
-from .MiniImagenet import MiniImagenet
-from .meta import Meta
+from MiniImagenet import MiniImagenet
+from meta import Meta
 
 
 def mean_confidence_interval(accs, confidence=0.95):

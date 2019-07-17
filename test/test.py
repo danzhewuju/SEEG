@@ -48,7 +48,7 @@ def test_4(path="../data/data_path.txt"):
 
 
 def test_6():
-    path_lk0 = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/split/cases/06f4fad8-65db-11e9-bae7-e0d55ee63f3d-1.npy'
+    path_lk0 = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/data_slice/split/cases/06f4fad8-65db-11e9-bae7-e0d55ee63f3d-1.npy'
     raw = np.load(path_lk0)
     plt.figure()
     librosa.display.waveplot(raw)
@@ -61,14 +61,14 @@ def test_6():
     #     plt.show()
 
     # # 模板 def test_n():
-    # path_normal = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/seizure/split/cases"
+    # path_normal = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/data_slice/split/cases"
     # f = list(os.walk(path_normal))
     # print(len(f[0][2]))
 
 
 def test_8():  # 关于数据过零率的相关统计信息
-    path_cases = '../data/seizure/split/cases'
-    path_normal = '../data/seizure/split/normal'
+    path_cases = '../data/data_slice/split/cases'
+    path_normal = '../data/data_slice/split/normal'
     map_cases = get_all_file_path(path_cases, 'npy')
     map_normal = get_all_file_path(path_normal, 'npy')
     # print(map_cases)
@@ -128,7 +128,7 @@ def test_11():
 
 
 def test_12():
-    path_channel = '../data/seizure/channels_info_back/ZK_seq.csv'
+    path_channel = '../data/data_slice/channels_info_back/ZK_seq.csv'
     path = '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw.fif'
     raw_data = read_raw(path)
     raw_data.plot()
@@ -156,7 +156,7 @@ def test_13():
 
 def test_14():
     seeg = seegdata()
-    path_dir_seizure = "../data/seizure/split/preseizure"
+    path_dir_seizure = "../data/data_slice/split/preseizure"
     seeg.set_path_dir(path_dir_seizure)
     sleep_bwt = seeg.get_all_path_by_keyword('within_warning_time')
     sleep_bwt_label1 = sleep_bwt['LK']  # 发病前的一段时间,警戒线之外
@@ -226,7 +226,7 @@ def test_cvs():
 
 
 def test_edf():
-    path_channel = '../data/seizure/channels_info_back/ZK_seq.csv'
+    path_channel = '../data/data_slice/channels_info_back/ZK_seq.csv'
     channel_info = pd.read_csv(path_channel)['channels']
     query_t = [x for x in channel_info if "5" in x]
 
@@ -242,6 +242,6 @@ def test_edf():
 
 
 def test_random():
-    path = "../data/seizure/split/preseizure/WSH/583f2394-9bd9-11e9-912c-79975a8821be-0.npy"
+    path = "../data/data_slice/split/preseizure/WSH/583f2394-9bd9-11e9-912c-79975a8821be-0.npy"
     data = path[:-4]
     print(data)

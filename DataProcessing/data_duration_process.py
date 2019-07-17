@@ -78,7 +78,7 @@ def data_process():
     seeg = seegdata()
     tmp_normal = seeg.get_all_path_by_keyword('sleep')
     sleep_label0 = tmp_normal['LK']  # 正常人的睡眠时间
-    path_dir_seizure = "../data/seizure/split/preseizure"
+    path_dir_seizure = "../data/data_slice/split/preseizure"
     seeg.set_path_dir(path_dir_seizure)
     sleep_bwt = seeg.get_all_path_by_keyword('before_warning_time')
     sleep_bwt_label1 = sleep_bwt['LK']  # 发病前的一段时间,警戒线之外
