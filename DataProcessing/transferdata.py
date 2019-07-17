@@ -223,13 +223,13 @@ def pre_seizure_biclass_handle():
         name = "WSH"
         generate_data(path_raw, flag, name, path_commom_channel)
 
-    path_commom_channel = "../data/data_slice/channels_info_back/SJ_seq.csv"
-    path_dir = "../data/raw_data/SJ/SJ_Pre_seizure"
-    flag = 0
-    for p in os.listdir(path_dir):
-        path_raw = os.path.join(path_dir, p)
-        name = "SJ"
-        generate_data(path_raw, flag, name, path_commom_channel)
+    # path_commom_channel = "../data/data_slice/channels_info/SJ_seq.csv"
+    # path_dir = "../data/raw_data/SJ/SJ_Pre_seizure"
+    # flag = 0
+    # for p in os.listdir(path_dir):
+    #     path_raw = os.path.join(path_dir, p)
+    #     name = "SJ"
+    #     generate_data(path_raw, flag, name, path_commom_channel)
 
     path_commom_channel = "../data/data_slice/channels_info/JWJ_seq.csv"
     path_dir = "../data/raw_data/JWJ/JWJ_Pre_seizure"
