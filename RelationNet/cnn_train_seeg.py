@@ -184,6 +184,7 @@ def run():
     Loss_h = []  # 用于画图的数据记录
     correct_h = []
     loss_h = []
+    last_accuracy = 0
     for epoch in range(NUM_EPOCH):
         for i, (images, labels) in enumerate(train_loader):
 
@@ -209,6 +210,10 @@ def run():
             if (i + 1) % 50 == 0:
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.4f}'
                       .format(epoch + 1, NUM_EPOCH, i + 1, total_step, loss.item(), correct_rate))
+                # if correct_rate > last_accuracy:
+                #     name = str("./models/model-cnn.ckpt")
+                #     torch.save(model.state_dict(), name)
+                # last_accuracy = correct_rate
             correct_h.append(correct_rate)
             loss_h.append(loss.item())
         Acc_h.append(np.mean(np.asarray(correct_h)))

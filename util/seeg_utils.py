@@ -2,11 +2,12 @@
 
 import os
 import uuid
-import pandas as pd
+
 import mne
 import numpy as np
-import scipy.io as sio
+import pandas as pd
 import pyedflib
+import scipy.io as sio
 from mne.time_frequency import *
 
 
@@ -23,6 +24,11 @@ def read_edf_raw(path):
 def get_channels_names(raw):
     channel_names = raw.info['ch_names']
     return channel_names
+
+
+def get_recorder_time(data):
+    time = data.times[-1]
+    return time
 
 
 def filter_hz(raw, high_pass, low_pass):  # 对数据进行滤波处理 对于（high_pass, low_pass）范围波形进行选择
@@ -319,11 +325,11 @@ def tfr_extract(power, tmin=0, tmax=None):
     start = int(tmin * sfreq)
     if tmax is None:
         return np.array([[[k for k in power.data[i][j][start:]] for j in range(len(power.data[i]))] for i in
-                           range(len(power.data))])
+                         range(len(power.data))])
     else:
         end = int(tmax * sfreq)
         return np.array([[[k for k in power.data[i][j][start: end]] for j in range(len(power.data[i]))] for i in
-                           range(len(power.data))])
+                         range(len(power.data))])
 
 
 def get_cost_matrix(elec_pos):
@@ -388,10 +394,11 @@ def retrieve_chs_from_mat(patient_name):
     :param patient_name:   目标病人名（须保证文件名为patient_name.mat）
     :return:  elec_pos：   含有信道名以及坐标的字典
     '''
-    pos_info = sio.loadmat(patient_name+".mat")
+    pos_info = sio.loadmat(patient_name + ".mat")
     elec_pos = list()
-    for i in range(pos_info['elec_Info_Final'][0][0][1][0].size): #name为字符串,pos为ndarray格式
-        elec_pos.append({'name': pos_info['elec_Info_Final'][0][0][0][0][i][0], 'pos': pos_info['elec_Info_Final'][0][0][1][0][i][0]})
+    for i in range(pos_info['elec_Info_Final'][0][0][1][0].size):  # name为字符串,pos为ndarray格式
+        elec_pos.append({'name': pos_info['elec_Info_Final'][0][0][0][0][i][0],
+                         'pos': pos_info['elec_Info_Final'][0][0][1][0][i][0]})
     return elec_pos
 
 
@@ -407,5 +414,5 @@ def get_path(patient_name):
     to_csv = [[i for i in range(path_len)], path]
     to_csv = [[row[i] for row in to_csv] for i in range(path_len)]
     col = ['ID', 'chan_name']
-    csv_frame = pd.DataFrame(columns=col,data=to_csv)
-    csv_frame.to_csv('./'+patient_name+'_seq.csv', encoding='utf-8')
+    csv_frame = pd.DataFrame(columns=col, data=to_csv)
+    csv_frame.to_csv('./' + patient_name + '_seq.csv', encoding='utf-8')

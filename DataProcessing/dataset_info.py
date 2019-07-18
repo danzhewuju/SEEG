@@ -140,6 +140,6 @@ if __name__ == '__main__':
     sta_info = StatisticSeegDataset(root_dir)
     sta_info.dataset_statistics_information(root_dir)
     sta_info.get_information()
-    result = up_sampling(sta_info.pre_seizure["LK"], 1000)
-    print("{}".format(len(result)))
+    # result = up_sampling(sta_info.pre_seizure["LK"], 1000)
+    # print("{}".format(len(result)))
     # print("{}".format(len(result)))

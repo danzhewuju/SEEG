@@ -241,7 +241,9 @@ def test_edf():
     return True
 
 
-def test_random():
-    path = "../data/data_slice/split/preseizure/WSH/583f2394-9bd9-11e9-912c-79975a8821be-0.npy"
-    data = path[:-4]
-    print(data)
+def test_def_eeg_information():
+    path = "../data/raw_data/WSH/WSH_Pre_seizure/WSH_SZ1_pre_seizure_raw.fif"
+    data = read_raw(path)
+    time = get_recorder_time(data)
+    print(time)
+
