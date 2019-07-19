@@ -32,7 +32,6 @@ def mini_data_folders(model_name = 'mixed_data'):
     metatest_folders = [os.path.join(test_folder, label)
                         for label in os.listdir(test_folder)
                         if os.path.isdir(os.path.join(test_folder, label))]
-    random.seed(1)
     random.shuffle(metatrain_folders)
     random.shuffle(metatest_folders)
 

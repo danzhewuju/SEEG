@@ -6,18 +6,19 @@
 # -------------------------------------
 
 
+import argparse
+import math
+import os
+
+import numpy as np
+import scipy as sp
+import scipy.stats
+import task_generator_test as tg
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
-import numpy as np
-import task_generator_test as tg
-import os
-import math
-import argparse
-import scipy as sp
-import scipy.stats
 
 parser = argparse.ArgumentParser(description="One Shot Visual Recognition")
 parser.add_argument("-f", "--feature_dim", type=int, default=64)
@@ -174,7 +175,7 @@ def main():
                 SAMPLE_NUM_PER_CLASS) + "shot.pkl")))
         print("load relation network success")
 
-    total_accuracy = 0.0
+    total_accuracy = []
     for episode in range(EPISODE):
 
         # test
@@ -227,9 +228,10 @@ def main():
 
         print("test accuracy:", test_accuracy, "h:", h)
 
-        total_accuracy += test_accuracy
+        total_accuracy.append(test_accuracy)
+    average_accuracy, h = mean_confidence_interval(total_accuracy)
 
-    print("aver_accuracy:", total_accuracy / EPISODE)
+    print("aver_accuracy:{}, h:{}".format(average_accuracy, h))
 
 
 if __name__ == '__main__':

@@ -89,8 +89,8 @@ def main():
         accs = np.array(accs_all_test).mean(axis=0).astype(np.float16)
         print('Test acc:', accs)
         test_accuracy.append(accs[-1])
-    average_accuracy = sum(test_accuracy) / len(test_accuracy)
-    print("average accuracy:{}".format(average_accuracy))
+    acc_mean, h = mean_confidence_interval(np.array(test_accuracy))
+    print("average accuracy :{}, h:{}".format(acc_mean, h))
 
 
 if __name__ == '__main__':
