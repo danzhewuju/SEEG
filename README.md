@@ -11,3 +11,10 @@
 *util*  including reading .*edf file methods, and filtering methods.
 
 *MAML* including MAML model
+
+Project structure
+
+![Project structure](project_structure.png)
+
+
+

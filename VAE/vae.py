@@ -104,7 +104,7 @@ def train(epoch):
         epoch, train_loss / len(train_loader.dataset)))
 
 
-def test(epoch):
+def vae_test(epoch):
     model.eval()
     test_loss = 0
     with torch.no_grad():
@@ -126,7 +126,7 @@ def test(epoch):
 if __name__ == "__main__":
     for epoch in range(1, args.epochs + 1):
         train(epoch)
-        test(epoch)
+        vae_test(epoch)
         with torch.no_grad():
             sample = torch.randn(64, 20).to(device)
             sample = model.decode(sample).cpu()
