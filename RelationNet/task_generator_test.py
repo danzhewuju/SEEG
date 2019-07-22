@@ -54,7 +54,7 @@ def mini_imagenet_folders(model_name):
     return metatrain_folders, metatest_folders
 
 
-class MiniImagenetTask(object):
+class SeegnetTask(object):
 
     def __init__(self, character_folders, num_classes, train_num, test_num):
         self.character_folders = character_folders
@@ -107,10 +107,10 @@ class FewShotDataset(Dataset):
         raise NotImplementedError("This is an abstract class. Subclass this class for your particular dataset.")
 
 
-class MiniImagenet(FewShotDataset):
+class Seegnet(FewShotDataset):
 
     def __init__(self, *args, **kwargs):
-        super(MiniImagenet, self).__init__(*args, **kwargs)
+        super(Seegnet, self).__init__(*args, **kwargs)
 
     def __getitem__(self, idx):
         image_root = self.image_roots[idx]
@@ -187,8 +187,8 @@ class ClassBalancedSamplerOld(Sampler):
 
 def get_mini_imagenet_data_loader(task, num_per_class=1, split='train', shuffle=False):
     # normalize = transforms.Normalize(mean=[0.92206], std=[0.08426])
-    dataset = MiniImagenet(task, split=split)
-    # dataset = MiniImagenet(task, split=split, transform=transforms.Compose([transforms.ToTensor(), normalize]))
+    dataset = Seegnet(task, split=split)
+    # dataset = Seegnet(task, split=split, transform=transforms.Compose([transforms.ToTensor(), normalize]))
     if split == 'train':
         sampler = ClassBalancedSamplerOld(num_per_class, task.num_classes, task.train_num, shuffle=shuffle)
 

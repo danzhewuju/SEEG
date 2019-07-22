@@ -3,7 +3,7 @@
 # @Time    : 2019/7/16 19:03
 # @Author  : Alex
 # @Site    : 
-# @File    : miniimagenet_test.py
+# @File    : seeg_maml_test.py
 # @Software: PyCharm
 import argparse
 import os
@@ -13,7 +13,7 @@ import scipy.stats
 import torch
 from torch.utils.data import DataLoader
 
-from MiniImagenet import MiniImagenet
+from Mamlnet import Seegnet
 from meta import Meta
 
 
@@ -55,8 +55,8 @@ def main():
     device = torch.device('cuda')
     maml = Meta(args, config).to(device)
     if os.path.exists(
-            "./models/" + str("./models/miniimagenet_maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")):
-        path = "./models/" + str("./models/miniimagenet_maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")
+            "./models/" + str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")):
+        path = "./models/" + str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")
         maml.load_state_dict(path)
         print("load model success")
 
@@ -66,10 +66,10 @@ def main():
     print('Total trainable tensors:', num)
 
     # batchsz here means total episode number
-    mini = MiniImagenet(args.dataset_dir, mode='train', n_way=args.n_way, k_shot=args.k_spt,
+    mini = Seegnet(args.dataset_dir, mode='train', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
                         batchsz=10000)
-    mini_test = MiniImagenet(args.dataset_dir, mode='val', n_way=args.n_way, k_shot=args.k_spt,
+    mini_test = Seegnet(args.dataset_dir, mode='val', n_way=args.n_way, k_shot=args.k_spt,
                              k_query=args.k_qry,
                              batchsz=100)
     test_accuracy = []

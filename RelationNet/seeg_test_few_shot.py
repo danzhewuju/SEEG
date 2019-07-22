@@ -184,7 +184,7 @@ def main():
         accuracies = []
         for i in range(TEST_EPISODE):
             total_rewards = 0
-            task = tg.MiniImagenetTask(metatest_folders, CLASS_NUM, SAMPLE_NUM_PER_CLASS, 15)
+            task = tg.SeegnetTask(metatest_folders, CLASS_NUM, SAMPLE_NUM_PER_CLASS, 15)
             sample_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=SAMPLE_NUM_PER_CLASS,
                                                                  split="train", shuffle=False)
             num_per_class = 30

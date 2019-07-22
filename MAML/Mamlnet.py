@@ -4,6 +4,8 @@ import random
 import numpy as np
 import torch
 from torch.utils.data import Dataset
+import sys
+sys.path.append('../')
 
 from util.util_file import get_label_data
 
@@ -44,7 +46,7 @@ def matrix_normalization(data, resize_shape=(130, 200)):
     return data
 
 
-class MiniImagenet(Dataset):
+class Seegnet(Dataset):
     """
     put mini-imagenet files as :
     root :
@@ -230,7 +232,7 @@ if __name__ == '__main__':
     plt.ion()
 
     tb = SummaryWriter('runs', 'miniimagenet')
-    mini = MiniImagenet('./miniimagenet/', mode='train', n_way=5, k_shot=1, k_query=1, batchsz=1000)
+    mini = Seegnet('./miniimagenet/', mode='train', n_way=5, k_shot=1, k_query=1, batchsz=1000)
 
     for i, set_ in enumerate(mini):
         # support_x: [k_shot*n_way, 3, 84, 84]

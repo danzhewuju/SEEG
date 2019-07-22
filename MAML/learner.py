@@ -1,6 +1,6 @@
-import  torch
-from    torch import nn
-from    torch.nn import functional as F
+import torch
+from torch import nn
+from torch.nn import functional as F
 
 
 class Learner(nn.Module):
@@ -71,39 +71,34 @@ class Learner(nn.Module):
             else:
                 raise NotImplementedError
 
-
-
-
-
-
     def extra_repr(self):
         info = ''
 
         for name, param in self.config:
             if name is 'conv2d':
-                tmp = 'conv2d:(ch_in:%d, ch_out:%d, k:%dx%d, stride:%d, padding:%d)'\
-                      %(param[1], param[0], param[2], param[3], param[4], param[5],)
+                tmp = 'conv2d:(ch_in:%d, ch_out:%d, k:%dx%d, stride:%d, padding:%d)' \
+                      % (param[1], param[0], param[2], param[3], param[4], param[5],)
                 info += tmp + '\n'
 
             elif name is 'convt2d':
-                tmp = 'convTranspose2d:(ch_in:%d, ch_out:%d, k:%dx%d, stride:%d, padding:%d)'\
-                      %(param[0], param[1], param[2], param[3], param[4], param[5],)
+                tmp = 'convTranspose2d:(ch_in:%d, ch_out:%d, k:%dx%d, stride:%d, padding:%d)' \
+                      % (param[0], param[1], param[2], param[3], param[4], param[5],)
                 info += tmp + '\n'
 
             elif name is 'linear':
-                tmp = 'linear:(in:%d, out:%d)'%(param[1], param[0])
+                tmp = 'linear:(in:%d, out:%d)' % (param[1], param[0])
                 info += tmp + '\n'
 
             elif name is 'leakyrelu':
-                tmp = 'leakyrelu:(slope:%f)'%(param[0])
+                tmp = 'leakyrelu:(slope:%f)' % (param[0])
                 info += tmp + '\n'
 
 
             elif name is 'avg_pool2d':
-                tmp = 'avg_pool2d:(k:%d, stride:%d, padding:%d)'%(param[0], param[1], param[2])
+                tmp = 'avg_pool2d:(k:%d, stride:%d, padding:%d)' % (param[0], param[1], param[2])
                 info += tmp + '\n'
             elif name is 'max_pool2d':
-                tmp = 'max_pool2d:(k:%d, stride:%d, padding:%d)'%(param[0], param[1], param[2])
+                tmp = 'max_pool2d:(k:%d, stride:%d, padding:%d)' % (param[0], param[1], param[2])
                 info += tmp + '\n'
             elif name in ['flatten', 'tanh', 'relu', 'upsample', 'reshape', 'sigmoid', 'use_logits', 'bn']:
                 tmp = name + ':' + str(tuple(param))
@@ -112,8 +107,6 @@ class Learner(nn.Module):
                 raise NotImplementedError
 
         return info
-
-
 
     def forward(self, x, vars=None, bn_training=True):
         """
@@ -153,7 +146,7 @@ class Learner(nn.Module):
                 # print('forward:', idx, x.norm().item())
             elif name is 'bn':
                 w, b = vars[idx], vars[idx + 1]
-                running_mean, running_var = self.vars_bn[bn_idx], self.vars_bn[bn_idx+1]
+                running_mean, running_var = self.vars_bn[bn_idx], self.vars_bn[bn_idx + 1]
                 x = F.batch_norm(x, running_mean, running_var, weight=w, bias=b, training=bn_training)
                 idx += 2
                 bn_idx += 2
@@ -186,9 +179,7 @@ class Learner(nn.Module):
         assert idx == len(vars)
         assert bn_idx == len(self.vars_bn)
 
-
         return x
-
 
     def zero_grad(self, vars=None):
         """
