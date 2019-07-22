@@ -4,19 +4,19 @@
 #
 # ----------------------------
 
+import argparse
+import math
+
+import matplotlib.pyplot as plt
+import scipy as sp
+import scipy.stats
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
-import numpy as np
+
 import task_generator as tg
-import os
-import math
-import argparse
-import scipy as sp
-import scipy.stats
-import matplotlib.pyplot as plt
 from util.util_file import *
 
 parser = argparse.ArgumentParser(description="One Shot Visual Recognition")
@@ -25,9 +25,9 @@ parser.add_argument("-r", "--relation_dim", type=int, default=8)
 parser.add_argument("-w", "--class_num", type=int, default=2)
 parser.add_argument("-s", "--sample_num_per_class", type=int, default=10)
 parser.add_argument("-b", "--batch_num_per_class", type=int, default=10)
-parser.add_argument("-e", "--episode", type=int, default=10000)
+parser.add_argument("-e", "--episode", type=int, default=1000)
 parser.add_argument("-t", "--test_episode", type=int, default=50)
-parser.add_argument("-l", "--learning_rate", type=float, default=0.0001)
+parser.add_argument("-l", "--learning_rate", type=float, default=0.001)
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-u", "--hidden_unit", type=int, default=10)
 parser.add_argument("-mn", '--model_name', type=str, default="zero_data")
@@ -47,8 +47,6 @@ HIDDEN_UNIT = args.hidden_unit
 MODEL_NAME = args.model_name
 print("running on data set :{}".format(MODEL_NAME))
 
-
-
 # 118
 # x_ = 28
 # y_ = 48
@@ -57,6 +55,14 @@ print("running on data set :{}".format(MODEL_NAME))
 x_ = 31
 y_ = 48
 f1_line = 60
+
+
+def setup_seed(seed):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.backends.cudnn.deterministic = True
 
 
 def mean_confidence_interval(data, confidence=0.95):
@@ -149,6 +155,8 @@ def weights_init(m):  # init weights
 
 
 def main():
+    # 设置随机数种子
+    setup_seed(1)
     # Step 1: init data folders
     print("init data folders")
     # init character folders for dataset construction
@@ -167,20 +175,20 @@ def main():
     relation_network.cuda(GPU)  # 利用gpu进行运算
 
     feature_encoder_optim = torch.optim.Adam(feature_encoder.parameters(), lr=LEARNING_RATE)
-    feature_encoder_scheduler = StepLR(feature_encoder_optim, step_size=100000, gamma=0.5)
+    feature_encoder_scheduler = StepLR(feature_encoder_optim, step_size=10000, gamma=0.5)
     relation_network_optim = torch.optim.Adam(relation_network.parameters(), lr=LEARNING_RATE)
-    relation_network_scheduler = StepLR(relation_network_optim, step_size=100000, gamma=0.5)
+    relation_network_scheduler = StepLR(relation_network_optim, step_size=10000, gamma=0.5)
 
-    if os.path.exists(str("./models/miniimagenet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
+    if os.path.exists(str("./models/seegnet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
             SAMPLE_NUM_PER_CLASS) + "shot.pkl")):
         feature_encoder.load_state_dict(torch.load(str(
-            "./models/miniimagenet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
+            "./models/seegnet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
                 SAMPLE_NUM_PER_CLASS) + "shot.pkl")))
         print("load feature encoder success")
-    if os.path.exists(str("./models/miniimagenet_relation_network_" + str(CLASS_NUM) + "way_" + str(
+    if os.path.exists(str("./models/seegnet_relation_network_" + str(CLASS_NUM) + "way_" + str(
             SAMPLE_NUM_PER_CLASS) + "shot.pkl")):
         relation_network.load_state_dict(torch.load(str(
-            "./models/miniimagenet_relation_network_" + str(CLASS_NUM) + "way_" + str(
+            "./models/seegnet_relation_network_" + str(CLASS_NUM) + "way_" + str(
                 SAMPLE_NUM_PER_CLASS) + "shot.pkl")))
         print("load relation network success")
 
@@ -312,10 +320,10 @@ def main():
             if test_accuracy > last_accuracy:
                 # save networks
                 torch.save(feature_encoder.state_dict(), str(
-                    "./models/miniimagenet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
+                    "./models/seegnet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
                         SAMPLE_NUM_PER_CLASS) + "shot.pkl"))
                 torch.save(relation_network.state_dict(), str(
-                    "./models/miniimagenet_relation_network_" + str(CLASS_NUM) + "way_" + str(
+                    "./models/seegnet_relation_network_" + str(CLASS_NUM) + "way_" + str(
                         SAMPLE_NUM_PER_CLASS) + "shot.pkl"))
 
                 print("save networks for episode:", episode)

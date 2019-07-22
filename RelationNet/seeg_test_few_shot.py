@@ -158,20 +158,20 @@ def main():
     relation_network.cuda(GPU)
 
     feature_encoder_optim = torch.optim.Adam(feature_encoder.parameters(), lr=LEARNING_RATE)
-    feature_encoder_scheduler = StepLR(feature_encoder_optim, step_size=100000, gamma=0.5)
+    feature_encoder_scheduler = StepLR(feature_encoder_optim, step_size=10000, gamma=0.5)
     relation_network_optim = torch.optim.Adam(relation_network.parameters(), lr=LEARNING_RATE)
-    relation_network_scheduler = StepLR(relation_network_optim, step_size=100000, gamma=0.5)
+    relation_network_scheduler = StepLR(relation_network_optim, step_size=10000, gamma=0.5)
 
-    if os.path.exists(str("./models/miniimagenet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
+    if os.path.exists(str("./models/seegnet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
             SAMPLE_NUM_PER_CLASS) + "shot.pkl")):
         feature_encoder.load_state_dict(torch.load(str(
-            "./models/miniimagenet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
+            "./models/seegnet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
                 SAMPLE_NUM_PER_CLASS) + "shot.pkl")))
         print("load feature encoder success")
-    if os.path.exists(str("./models/miniimagenet_relation_network_" + str(CLASS_NUM) + "way_" + str(
+    if os.path.exists(str("./models/seegnet_relation_network_" + str(CLASS_NUM) + "way_" + str(
             SAMPLE_NUM_PER_CLASS) + "shot.pkl")):
         relation_network.load_state_dict(torch.load(str(
-            "./models/miniimagenet_relation_network_" + str(CLASS_NUM) + "way_" + str(
+            "./models/seegnet_relation_network_" + str(CLASS_NUM) + "way_" + str(
                 SAMPLE_NUM_PER_CLASS) + "shot.pkl")))
         print("load relation network success")
 

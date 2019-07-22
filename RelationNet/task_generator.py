@@ -2,20 +2,21 @@
 # 数据的预处理的一些方法
 # ---------------------
 
+import os
+import random
+import sys
 import time
 
+import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.data.sampler import Sampler
-import os
-import random
-import numpy as np
-import sys
+
 sys.path.append('../')
 from util.util_file import matrix_normalization
 
 
-def mini_data_folders(model_name = 'mixed_data'):
+def mini_data_folders(model_name ='mixed_data'):
     '''
 
     :param model: 训练的模式选择， 0：mixed, 1: inter_person
@@ -32,6 +33,7 @@ def mini_data_folders(model_name = 'mixed_data'):
     metatest_folders = [os.path.join(test_folder, label)
                         for label in os.listdir(test_folder)
                         if os.path.isdir(os.path.join(test_folder, label))]
+    random.seed(1)  # 原始论文中存在的固定
     random.shuffle(metatrain_folders)
     random.shuffle(metatest_folders)
 

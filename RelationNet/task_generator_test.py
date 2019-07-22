@@ -34,7 +34,7 @@ def imshow(img):
 
 
 def mini_imagenet_folders(model_name):
-    train_folder = '../data/seeg/{}/train'.format(model_name)
+    train_folder = '../data/seeg/{}/test'.format(model_name)
     test_folder = '../data/seeg/{}/val'.format(model_name)
 
     metatrain_folders = [os.path.join(train_folder, label)
@@ -45,10 +45,8 @@ def mini_imagenet_folders(model_name):
                         for label in os.listdir(test_folder)
                         if os.path.isdir(os.path.join(test_folder, label))
                         ]
-    t = time.time()
-    random.seed(t)
+    random.seed(1)
     random.shuffle(metatrain_folders)
-    random.seed(t)
     random.shuffle(metatest_folders)
 
     return metatrain_folders, metatest_folders

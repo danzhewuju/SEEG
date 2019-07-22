@@ -232,7 +232,7 @@ if __name__ == '__main__':
     plt.ion()
 
     tb = SummaryWriter('runs', 'miniimagenet')
-    mini = Seegnet('./miniimagenet/', mode='train', n_way=5, k_shot=1, k_query=1, batchsz=1000)
+    mini = Seegnet('./seegnet/', mode='train', n_way=5, k_shot=1, k_query=1, batchsz=1000)
 
     for i, set_ in enumerate(mini):
         # support_x: [k_shot*n_way, 3, 84, 84]
