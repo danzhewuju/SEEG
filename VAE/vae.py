@@ -58,9 +58,9 @@ class Data_info():
             for n in dir_names:
                 full_path = os.path.join(path, n)
                 if name == "pre_zeizure":
-                    preseizure.append(full_path)
+                    preseizure.append((full_path, index))
                 else:
-                    sleep_normal.append(full_path)
+                    sleep_normal.append((full_path, index))
                 data_train.append((full_path, index))
 
         for index, name in enumerate(index_name_test):
@@ -69,9 +69,9 @@ class Data_info():
             for n in dir_names:
                 full_path = os.path.join(path, n)
                 if name == "pre_zeizure":
-                    preseizure.append(full_path)
+                    preseizure.append((full_path, index))
                 else:
-                    sleep_normal.append(full_path)
+                    sleep_normal.append((full_path, index))
                 data_test.append((full_path, index))
 
         # t = time.time()
@@ -187,7 +187,7 @@ def train_negative(epoch):
 
     print('====> Epoch: {} Average loss: {:.4f}'.format(
         epoch, train_loss / datas.train_length))
-    name = str("./models/model-vae-negative.ckpt")
+    name = str("./models/model-vae-negative_normalsleep.ckpt")
     torch.save(model.state_dict(), name)
     print("model has been saved!")
 
@@ -206,13 +206,13 @@ def train_positive(epoch):
         optimizer.step()
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data), len(datas.positive_loader),
-                       100. * batch_idx / len(negative_loader),
+                epoch, batch_idx * len(data), len(datas.preseizure),
+                       100. * batch_idx / len(positive_loader),
                        loss.item() / len(data)))
 
     print('====> Epoch: {} Average loss: {:.4f}'.format(
         epoch, train_loss / datas.train_length))
-    name = str("./models/model-vae-positive.ckpt")
+    name = str("./models/model-vae-positive-preseizure.ckpt")
     torch.save(model.state_dict(), name)
     print("model has been saved!")
 
@@ -255,7 +255,7 @@ def show_eeg(data):
 
 if __name__ == "__main__":
     for epoch in range(1, args.epochs + 1):
-        train_positive(epoch)
+        # train_positive(epoch)
         train_negative(epoch)
 
 # model = VAE().to(device)

@@ -2,15 +2,15 @@
 
 ## content
 
-*data*  There are some data about raw seeg data, processed data, and channels information.
+**data**  There are some data about raw seeg data, processed data, and channels information.
 
-*RelationNet*  including CNN coding, few-shot learning coding, and feature visualization methods.
+**RelationNet**  including CNN coding, few-shot learning coding, and feature visualization methods.
 
-*test*  including testing methods
+**test** including testing methods
 
-*util*  including reading .*edf file methods, and filtering methods.
+**util**  including reading .*edf file methods, and filtering methods.
 
-*MAML* including MAML model
+**MAML** including MAML model
 
 Project structure
 
