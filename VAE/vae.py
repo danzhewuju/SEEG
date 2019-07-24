@@ -256,7 +256,7 @@ def show_eeg(data):
 if __name__ == "__main__":
     for epoch in range(1, args.epochs + 1):
         train_positive(epoch)
-        # vae_test(epoch)
+        train_negative(epoch)
 
 # model = VAE().to(device)
 # path = "./models/model-vae.ckpt"
