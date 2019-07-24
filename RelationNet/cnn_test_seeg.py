@@ -15,6 +15,7 @@ from torch.utils.data import Dataset, DataLoader
 import sys
 sys.path.append('../')
 from util.util_file import matrix_normalization
+from VAE.vae import trans_data, VAE
 
 parser = argparse.ArgumentParser(description="CNN parameter setting!")
 parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
@@ -46,6 +47,12 @@ NUM_EPOCH = args.epoch
 x_ = 8
 y_ = 12
 
+
+# 预处理的模型加载
+path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/VAE/models/model-vae.ckpt"  # 模型所在的位置
+vae_model = VAE().cuda(GPU)
+vae_model.load_state_dict(torch.load(path))
+vae_model.eval()
 
 class CNN(nn.Module):
     def __init__(self):
@@ -119,6 +126,7 @@ class MyDataset(Dataset):
         result = matrix_normalization(data, (130, 200))
         result = result.astype('float32')
         result = result[np.newaxis, :]
+        result = trans_data(vae_model, result)
         return result, label
 
     def __len__(self):

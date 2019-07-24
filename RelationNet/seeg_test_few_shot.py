@@ -1,7 +1,7 @@
 # -------------------------------------
 # Project: Learning to Compare: Relation Network for Few-Shot Learning
 # Date: 2017.9.21
-# Author: Flood Sung
+# Author: ALex
 # All Rights Reserved
 # -------------------------------------
 

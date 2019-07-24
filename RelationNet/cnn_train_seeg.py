@@ -1,16 +1,16 @@
 #!/usr/bin/python
 import argparse
-import os
+import sys
 import time
 
-import matplotlib.pyplot as plt
-import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
-import sys
+
 sys.path.append('../')
+sys.path.append('../VAE')
 from util import *
+from VAE.vae import trans_data, VAE
 
 '''
 一般CNN模型的训练
@@ -26,7 +26,7 @@ parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
 parser.add_argument('-b', '--batch_size', type=int, default=32)
 parser.add_argument('-l', '--learning_rate', type=float, default=0.001)
-parser.add_argument('-e', '--epoch', type=int, default=5)
+parser.add_argument('-e', '--epoch', type=int, default=10)
 args = parser.parse_args()
 
 # hyper parameter setting
@@ -43,6 +43,20 @@ NUM_EPOCH = args.epoch
 # input = 130*200
 x_ = 8
 y_ = 12
+
+# 预处理的模型加载
+path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/VAE/models/model-vae.ckpt"  # 模型所在的位置
+vae_model = VAE().cuda(GPU)
+vae_model.load_state_dict(torch.load(path))
+vae_model.eval()
+
+
+def setup_seed(seed):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.backends.cudnn.deterministic = True
 
 
 def show_plt(accuracy, loss):  # 画出accuracy,loss的趋势图
@@ -157,6 +171,7 @@ class MyDataset(Dataset):  # 重写dateset的相关类
         result = matrix_normalization(data, (130, 200))
         result = result.astype('float32')
         result = result[np.newaxis, :]
+        result = trans_data(vae_model, result)
         return result, label
 
     def __len__(self):
@@ -250,4 +265,5 @@ def run():
 
 
 if __name__ == '__main__':
+    # setup_seed(1)
     run()
