@@ -10,7 +10,6 @@ import torch.utils.data
 from torch import nn, optim
 from torch.nn import functional as F
 from torch.utils.data import Dataset
-from torchvision.utils import save_image
 
 from util.util_file import matrix_normalization
 
@@ -108,8 +107,11 @@ class MyDataset(Dataset):  # 重写dateset的相关类
 
 
 datas = Data_info(path_train=TRAIN_PATH, path_test=TEST_PATH)
+all_data = datas.data_train + datas.data_test
 positive_loader = MyDataset(datas.preseizure)  # 作为训练集
 negative_loader = MyDataset(datas.sleep_normal)  # 作为测试集
+
+all_loader = MyDataset(all_data)
 
 
 # train_loader = torch.utils.data.DataLoader(
@@ -217,6 +219,31 @@ def train_positive(epoch):
     print("model has been saved!")
 
 
+def train_all_data():
+    model.train()
+    train_loss = 0
+    for batch_idx, (data, _) in enumerate(all_loader):
+        data = torch.from_numpy(data)
+        data = data.to(device)
+        optimizer.zero_grad()
+        recon_batch, mu, logvar = model(data)
+        loss = loss_function(recon_batch, data, mu, logvar)
+        loss.backward()
+        train_loss += loss.item()
+        optimizer.step()
+        if batch_idx % args.log_interval == 0:
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                epoch, batch_idx * len(data), len(all_data),
+                       100. * batch_idx / len(all_loader),
+                       loss.item() / len(data)))
+
+    print('====> Epoch: {} Average loss: {:.4f}'.format(
+        epoch, train_loss / datas.train_length))
+    name = str("./models/model-vae.ckpt")
+    torch.save(model.state_dict(), name)
+    print("model has been saved!")
+
+
 def trans_data(vae_model, data, shape=(130, 200)):
     data_tmp = torch.from_numpy(data)
     data_input = data_tmp.cuda(0)
@@ -232,66 +259,7 @@ def show_eeg(data):
     plt.show()
 
 
-# def vae_test(epoch):
-#     model.eval()
-#     test_loss = 0
-#     with torch.no_grad():
-#         for i, (data, _) in enumerate(test_loader):
-#             data = torch.from_numpy(data)
-#             data = data.to(device)
-#             recon_batch, mu, logvar = model(data)
-#             test_loss += loss_function(recon_batch, data, mu, logvar).item()
-#             if i == 0:
-#                 n = min(data.size(0), 8)
-#                 comparison = torch.cat([data[:n],
-#                                         recon_batch.view(1, resize[0], resize[1])[:n]])
-#                 save_image(comparison.cpu(),
-#                            'results/reconstruction_' + str(epoch) + '.png', nrow=n)
-#
-#     test_loss /= datas.test_length
-#     print('====> Test set loss: {:.4f}'.format(test_loss))
-
-
 if __name__ == "__main__":
     for epoch in range(1, args.epochs + 1):
         # train_positive(epoch)
         train_negative(epoch)
-
-# model = VAE().to(device)
-# path = "./models/model-vae.ckpt"
-# model.load_state_dict(torch.load(path))
-# vae_test(1)
-
-# path = "../data/seeg/zero_data/train/sleep_normal/12110f04-a840-11e9-893a-e197cbdc17cd-2.npy"
-# data = np.load(path)
-# model_path = "./models/model-vae.ckpt"
-# model.load_state_dict(torch.load(model_path))
-# show_eeg(data)
-# print(data.shape)
-# result = matrix_normalization(data, (130, 200))
-# result = result.astype('float32')
-# result = result[np.newaxis, :]
-# for i in range(16):
-#     result_image = trans_data(model, result)
-#     result_image = result_image.reshape(130, 200)
-#     plt.subplot(4, 4, i + 1)
-#     plt.imshow(result_image)
-#     # show_eeg(result_image)
-# plt.show()
-# if __name__ == '__main__':
-#     path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/VAE/models/model-vae.ckpt"  # 模型所在的位置
-#     vae_model = VAE()
-#     vae_model.load_state_dict(torch.load(path))
-
-
-# 测试的样本
-# path = "../data/seeg/zero_data/train/sleep_normal/12110f04-a840-11e9-893a-e197cbdc17cd-2.npy"
-# model_path = "./models/model-vae.ckpt"
-# model.load_state_dict(torch.load(model_path))
-# with torch.no_grad():
-#     sample = torch.randn(1, 20).to(device)
-#     print(sample)
-#     sample = model.decode(sample).cpu()
-#     sample = sample.reshape(130, 200)
-#     plt.imshow(sample)
-#     plt.show()
