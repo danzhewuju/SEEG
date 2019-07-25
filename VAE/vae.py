@@ -224,7 +224,6 @@ def trans_data(vae_model, data, shape=(130, 200)):
     recon_batch = recon_batch.cpu()
     result = recon_batch.detach().numpy()
     result = result.reshape(shape)
-    result = result[np.newaxis, :]
     return result
 
 

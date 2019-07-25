@@ -77,5 +77,17 @@ def get_label_data(path):  # get data include label
     return result_data_label
 
 
-if __name__ == '__main__':
-    print(get_label_data("/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/test"))
+def clean_dir(path):
+    print("this is danger operation!")
+    clean_path = os.path.join(path, "*")
+    print("you will clean all files in {}, do you continued?(y/n)".format(clean_path))
+    key = str(input())
+    if key == "y":
+        print("cleaning the files in {}".format(clean_path))
+        os.system("rm -r {}".format(clean_path))
+        print("clean finished!")
+    else:
+        print("cancel operation !")
+
+# if __name__ == '__main__':
+#     print(get_label_data("/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/test"))

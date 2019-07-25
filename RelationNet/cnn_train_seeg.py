@@ -19,14 +19,14 @@ from VAE.vae import trans_data, VAE
 parser = argparse.ArgumentParser(description="CNN parameter setting!")
 parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
 parser.add_argument('-s', '--sample', default=100)  # 对其进行重采样
-parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/train')
-parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/test')
+parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/train_vae')
+parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/test_vae')
 parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/val')
 parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
 parser.add_argument('-b', '--batch_size', type=int, default=32)
 parser.add_argument('-l', '--learning_rate', type=float, default=0.001)
-parser.add_argument('-e', '--epoch', type=int, default=10)
+parser.add_argument('-e', '--epoch', type=int, default=2)
 args = parser.parse_args()
 
 # hyper parameter setting
@@ -45,10 +45,10 @@ x_ = 8
 y_ = 12
 
 # 预处理的模型加载
-path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/VAE/models/model-vae.ckpt"  # 模型所在的位置
-vae_model = VAE().cuda(GPU)
-vae_model.load_state_dict(torch.load(path))
-vae_model.eval()
+# path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/VAE/models/model-vae.ckpt"  # 模型所在的位置
+# vae_model = VAE().cuda(GPU)
+# vae_model.load_state_dict(torch.load(path))
+# vae_model.eval()
 
 
 def setup_seed(seed):
@@ -171,7 +171,7 @@ class MyDataset(Dataset):  # 重写dateset的相关类
         result = matrix_normalization(data, (130, 200))
         result = result.astype('float32')
         result = result[np.newaxis, :]
-        result = trans_data(vae_model, result)
+        # result = trans_data(vae_model, result)
         return result, label
 
     def __len__(self):

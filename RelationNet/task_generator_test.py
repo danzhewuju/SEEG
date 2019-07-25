@@ -34,8 +34,8 @@ def imshow(img):
 
 
 def mini_imagenet_folders(model_name):
-    train_folder = '../data/seeg/{}/train'.format(model_name)
-    test_folder = '../data/seeg/{}/val'.format(model_name)
+    train_folder = '../data/seeg/{}/train_vae'.format(model_name)
+    test_folder = '../data/seeg/{}/val_vae'.format(model_name)
 
     metatrain_folders = [os.path.join(train_folder, label)
                          for label in os.listdir(train_folder)

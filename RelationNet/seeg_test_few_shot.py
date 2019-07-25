@@ -13,12 +13,13 @@ import os
 import numpy as np
 import scipy as sp
 import scipy.stats
-import task_generator_test as tg
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
+
+import task_generator_test as tg
 
 parser = argparse.ArgumentParser(description="One Shot Visual Recognition")
 parser.add_argument("-f", "--feature_dim", type=int, default=64)

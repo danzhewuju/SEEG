@@ -23,8 +23,8 @@ def mini_data_folders(model_name ='mixed_data'):
     :return:
     '''
 
-    train_folder = '../data/seeg/{}/train'.format(model_name)
-    test_folder = '../data/seeg/{}/test'.format(model_name)
+    train_folder = '../data/seeg/{}/train_vae'.format(model_name)
+    test_folder = '../data/seeg/{}/test_vae'.format(model_name)
 
     metatrain_folders = [os.path.join(train_folder, label)
                          for label in os.listdir(train_folder)
