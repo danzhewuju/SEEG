@@ -25,7 +25,7 @@ parser.add_argument("-r", "--relation_dim", type=int, default=8)
 parser.add_argument("-w", "--class_num", type=int, default=2)
 parser.add_argument("-s", "--sample_num_per_class", type=int, default=10)
 parser.add_argument("-b", "--batch_num_per_class", type=int, default=10)
-parser.add_argument("-e", "--episode", type=int, default=5000)
+parser.add_argument("-e", "--episode", type=int, default=2000)
 parser.add_argument("-t", "--test_episode", type=int, default=50)
 parser.add_argument("-l", "--learning_rate", type=float, default=0.001)
 parser.add_argument("-g", "--gpu", type=int, default=0)
@@ -179,18 +179,18 @@ def main():
     relation_network_optim = torch.optim.Adam(relation_network.parameters(), lr=LEARNING_RATE)
     relation_network_scheduler = StepLR(relation_network_optim, step_size=10000, gamma=0.5)
 
-    if os.path.exists(str("./models/seegnet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
-            SAMPLE_NUM_PER_CLASS) + "shot.pkl")):
-        feature_encoder.load_state_dict(torch.load(str(
-            "./models/seegnet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
-                SAMPLE_NUM_PER_CLASS) + "shot.pkl")))
-        print("load feature encoder success")
-    if os.path.exists(str("./models/seegnet_relation_network_" + str(CLASS_NUM) + "way_" + str(
-            SAMPLE_NUM_PER_CLASS) + "shot.pkl")):
-        relation_network.load_state_dict(torch.load(str(
-            "./models/seegnet_relation_network_" + str(CLASS_NUM) + "way_" + str(
-                SAMPLE_NUM_PER_CLASS) + "shot.pkl")))
-        print("load relation network success")
+    # if os.path.exists(str("./models/seegnet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
+    #         SAMPLE_NUM_PER_CLASS) + "shot.pkl")):
+    #     feature_encoder.load_state_dict(torch.load(str(
+    #         "./models/seegnet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
+    #             SAMPLE_NUM_PER_CLASS) + "shot.pkl")))
+    #     print("load feature encoder success")
+    # if os.path.exists(str("./models/seegnet_relation_network_" + str(CLASS_NUM) + "way_" + str(
+    #         SAMPLE_NUM_PER_CLASS) + "shot.pkl")):
+    #     relation_network.load_state_dict(torch.load(str(
+    #         "./models/seegnet_relation_network_" + str(CLASS_NUM) + "way_" + str(
+    #             SAMPLE_NUM_PER_CLASS) + "shot.pkl")))
+    #     print("load relation network success")
 
     # Step 3: build graph
     print("Training...")
@@ -314,8 +314,6 @@ def main():
             test_accuracy, h = mean_confidence_interval(accuracies)
             plt_test_acc.append(test_accuracy)
             plt_test_loss.append(loss.item())
-
-            print("test accuracy:", test_accuracy, "h:", h)
 
             if test_accuracy > last_accuracy:
                 # save networks
