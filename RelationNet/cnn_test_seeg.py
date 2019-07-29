@@ -15,6 +15,8 @@ from torch.utils.data import Dataset, DataLoader
 import sys
 sys.path.append('../')
 from util.util_file import matrix_normalization
+import scipy as sp
+import scipy.stats
 from VAE.vae import trans_data, VAE
 
 parser = argparse.ArgumentParser(description="CNN parameter setting!")
@@ -53,6 +55,13 @@ y_ = 12
 # vae_model = VAE().cuda(GPU)
 # vae_model.load_state_dict(torch.load(path))
 # vae_model.eval()
+
+def mean_confidence_interval(data, confidence=0.95):
+    a = 1.0 * np.array(data)
+    n = len(a)
+    m, se = np.mean(a), scipy.stats.sem(a)
+    h = se * sp.stats.t._ppf((1 + confidence) / 2., n - 1)
+    return m, h
 
 class CNN(nn.Module):
     def __init__(self):
@@ -148,16 +157,23 @@ def run():
 
     # Test the model
     model.eval()  # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance) 对于单个图片的测试
-    with torch.no_grad():
-        for (data, labels) in val_loader:
-            data = data.cuda(GPU)
-            labels = labels.cuda(GPU)
+    total_acc = []
+    for i in range(10):
+        correct = 0
+        with torch.no_grad():
+            for (data, labels) in val_loader:
+                data = data.cuda(GPU)
+                labels = labels.cuda(GPU)
 
-            outputs = model(data)  # 直接获得模型的结果
-            _, predicted = torch.max(outputs.data, 1)
-            correct += (predicted == labels).sum().item()
-    print('Test Accuracy of the model on the {} test seegs: {} %'.format(total,
-                                                                         100 * correct / total))
+                outputs = model(data)  # 直接获得模型的结果
+                _, predicted = torch.max(outputs.data, 1)
+                correct += (predicted == labels).sum().item()
+        acc = correct / total
+        total_acc.append(acc)
+        print('Test Accuracy of the model on the {} test seegs of {} epoch: {} %'.format(total, i+1,
+                                                                             100 * correct / total))
+    avg_acc, h = mean_confidence_interval(total_acc)
+    print("Accuracy:{}, h:{}".format(avg_acc, h))
     end_time = time.time()
     run_time = end_time - start_time
     print("Running Time {:.4f}".format(run_time))

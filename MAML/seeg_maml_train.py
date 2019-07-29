@@ -57,18 +57,18 @@ def main():
 
     # batchsz here means total episode number
     mini = Seegnet(args.dataset_dir, mode='train_vae', n_way=args.n_way, k_shot=args.k_spt,
-                        k_query=args.k_qry,
-                        batchsz=10000)
+                   k_query=args.k_qry,
+                   batchsz=args.epoch)
     mini_test = Seegnet(args.dataset_dir, mode='test_vae', n_way=args.n_way, k_shot=args.k_spt,
-                             k_query=args.k_qry,
-                             batchsz=100)
-    last_accuracy = 0
+                        k_query=args.k_qry,
+                        batchsz=100)
+    last_accuracy = 0.0
     plt_train_loss = []
     plt_train_acc = []
 
     plt_test_loss = []
     plt_test_acc = []
-    for epoch in range(args.epoch // 1000):
+    for epoch in range(args.epoch // args.epoch):
         # fetch meta_batchsz num of episode each time
         db = DataLoader(mini, args.task_num, shuffle=True, num_workers=1, pin_memory=True)
 
@@ -106,8 +106,8 @@ def main():
                 plt_test_loss.append(avg_loss)
 
                 print('Test acc:', accs)
-                test_accuracy = np.mean(np.array(accs))
-                if test_accuracy > last_accuracy:
+                test_accuracy = accs[-1]
+                if test_accuracy >= last_accuracy:
                     # save networks
                     torch.save(maml.state_dict(), str(
                         "./models/maml" + str(args.n_way) + "way_" + str(
@@ -136,7 +136,7 @@ def main():
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('--epoch', type=int, help='epoch number', default=5000)
+    argparser.add_argument('--epoch', type=int, help='epoch number', default=500)
     argparser.add_argument('--n_way', type=int, help='n way', default=2)
     argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=10)
     argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=10)
