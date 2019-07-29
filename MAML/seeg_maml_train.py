@@ -20,9 +20,9 @@ def mean_confidence_interval(accs, confidence=0.95):
 
 
 def main():
-    torch.manual_seed(222)  # 为cpu设置种子，为了使结果是确定的
-    torch.cuda.manual_seed_all(222)  # 为GPU设置种子，为了使结果是确定的
-    np.random.seed(222)
+    # torch.manual_seed(222)  # 为cpu设置种子，为了使结果是确定的
+    # torch.cuda.manual_seed_all(222)  # 为GPU设置种子，为了使结果是确定的
+    # np.random.seed(222)
 
     print(args)
 
@@ -136,7 +136,7 @@ def main():
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('--epoch', type=int, help='epoch number', default=500)
+    argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
     argparser.add_argument('--n_way', type=int, help='n way', default=2)
     argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=10)
     argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=10)
