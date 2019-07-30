@@ -19,9 +19,10 @@ from VAE.vae import trans_data, VAE
 parser = argparse.ArgumentParser(description="CNN parameter setting!")
 parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
 parser.add_argument('-s', '--sample', default=100)  # 对其进行重采样
-parser.add_argument('-train_p', '--train_path', default='../data/seeg/mixed_data/train_vae')
-parser.add_argument('-test_p', '--test_path', default='../data/seeg/mixed_data/test_vae')
-parser.add_argument('-val_p', '--val_path', default='../data/seeg/mixed_data/val')
+parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/train')
+parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/test')
+parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/val')
+parser.add_argument('--model_path', default="./models/cnn_model/model-cnn.ckpt")
 parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
 parser.add_argument('-b', '--batch_size', type=int, default=32)
@@ -39,7 +40,7 @@ NUM_CLASS = args.class_number  # 分类的个数
 BATCH_SIZE = args.batch_size
 LEARNING_RATE = args.learning_rate
 NUM_EPOCH = args.epoch
-
+MODEL_PATH = args.model_path
 # input = 130*200
 x_ = 8
 y_ = 12
@@ -257,8 +258,7 @@ def run():
 
     # Save the model checkpoint
     timestamp = str(int(time.time()))
-    name = str("./models/cnn_model/model-cnn.ckpt")
-    torch.save(model.state_dict(), name)
+    torch.save(model.state_dict(), MODEL_PATH)
     end_time = time.time()
     run_time = end_time - start_time
     print("Running Time {:.4f}".format(run_time))

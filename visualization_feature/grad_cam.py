@@ -1,4 +1,5 @@
 import argparse
+import json
 
 import cv2
 import numpy as np
@@ -6,13 +7,16 @@ import torch
 import torch.nn as nn
 from torch.autograd import Function
 from torch.autograd import Variable
+import os
 
-from util.util_file import matrix_normalization, trans_numpy_cv2
+from util.util_file import matrix_normalization, trans_numpy_cv2, get_all_file_path
 
 x_ = 8
 y_ = 12
 NUM_CLASS = 2
 shape = (130, 200)
+
+
 # full_connection =
 
 
@@ -57,8 +61,6 @@ class CNN(nn.Module):
         self.fc1 = nn.Linear(x_ * y_ * 32, 32)  # x_ y_ 和你输入的矩阵有关系
         self.fc2 = nn.Linear(32, 8)
         self.fc3 = nn.Linear(8, NUM_CLASS)  # 取决于最后的个数种类
-
-
 
     def forward(self, x):
         out = self.layer1(x)
@@ -133,16 +135,14 @@ def preprocess_image(img):
     return input
 
 
-def show_cam_on_image(img, mask):
+def show_cam_on_image(img, mask, save_path):
     # img = np.transpose(img, (1, 0, 2))
     # mask = mask.T
     heatmap = cv2.applyColorMap(np.uint8(255 * mask), cv2.COLORMAP_JET)
     heatmap = np.float32(heatmap) / 255
     cam = heatmap + np.float32(img)
     cam = cam / np.max(cam)
-    # result = cam.reshape(200, 130, 3)
-    # # cam = cam.T
-    cv2.imwrite("./examples/seeg.jpg", np.uint8(255 * cam))
+    cv2.imwrite(save_path, np.uint8(255 * cam))
 
 
 class GradCam:
@@ -278,14 +278,7 @@ def get_args():
     return args
 
 
-if __name__ == '__main__':
-    """ python grad_cam.py <path_to_image>
-    1. Loads an image with opencv.
-    2. Preprocesses it for VGG19 and converts to a pytorch variable.
-    3. Makes a forward pass to find the category index with the highest score,
-    and computes intermediate activations.
-    Makes the visualization. """
-
+def get_feature_map(path_data):
     args = get_args()
 
     # Can work with any model, but it assumes that the model has a
@@ -298,7 +291,7 @@ if __name__ == '__main__':
     grad_cam = GradCam(model=model_cnn, target_layer_names=["layer4"], use_cuda=args.use_cuda)
 
     # img = cv2.imread(args.image_path, 1)
-    data = np.load(args.image_path)
+    data = np.load(path_data)
     data_numpy = matrix_normalization(data)
     img = trans_numpy_cv2(data_numpy)
 
@@ -308,11 +301,13 @@ if __name__ == '__main__':
 
     # If None, returns the map for the highest scoring category.
     # Otherwise, targets the requested index.
-    target_index = 1
+    target_index = None
 
     mask = grad_cam(input, target_index)
+    name = path_data.split("/")[-1][:-4]+".jpg"
+    save_path = os.path.join("./examples", name)
 
-    show_cam_on_image(img, mask)  # 将热力图写回到原来的图片
+    show_cam_on_image(img, mask, save_path)  # 将热力图写回到原来的图片
 
     # gb_model = GuidedBackpropReLUModel(model=models.vgg19(pretrained=True), use_cuda=args.use_cuda)
     # gb = gb_model(input, index=target_index)
@@ -324,3 +319,6 @@ if __name__ == '__main__':
     #
     # cam_gb = np.multiply(cam_mask, gb)
     # utils.save_image(torch.from_numpy(cam_gb), './examples/cam_gb.jpg')
+
+
+
