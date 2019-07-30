@@ -13,15 +13,16 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
+
 from util.util_file import matrix_normalization
 
 parser = argparse.ArgumentParser(description="CNN parameter setting!")
 parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
 parser.add_argument('-s', '--sample', default=100)  # 对其进行重采样
-parser.add_argument('-train_p', '--train_path', default='../data/seeg/train')
-parser.add_argument('-test_p', '--test_path', default='../data/seeg/test')
-parser.add_argument('-val_p', '--val_path', default='../data/seeg/val')
-parser.add_argument('-m_p', '--model_path', default='./models/model-cnn.ckpt')
+parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/train')
+parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/test')
+parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/val')
+parser.add_argument('-m_p', '--model_path', default='../RelationNet/models/model-cnn.ckpt')
 parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
 parser.add_argument('-b', '--batch_size', type=int, default=16)
@@ -124,7 +125,7 @@ class MyDataset(Dataset):
         return len(self.datas)
 
 
-def get_features(pretrained_model, x, layers=[0, 3, 7]):  # get_features 其实很简单
+def get_features(pretrained_model, x, layers=[0, 4]):  # get_features 其实很简单
     '''
     1.首先import model
     2.将weights load 进model
@@ -147,12 +148,13 @@ def get_features(pretrained_model, x, layers=[0, 3, 7]):  # get_features 其实�
 
 
 def run():
-    start_time = time.time()  # 图像风格图像
+    start_time = time.time()
     data_info = Data_info(VAL_PATH)
     val_data = MyDataset(data_info.val)  # 标准数据集的构造?
     val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True)
 
-    model = CNN().cuda(GPU)  # 保持和之前的神经网络相同的结构特征?
+    model = CNN().cuda(GPU)  # 保持和之前的神经网络相同的结构特征
+    print(model)
     model.load_state_dict(torch.load(MODLE_PATH))
     print("Loading {} model!".format(MODLE_PATH))
 

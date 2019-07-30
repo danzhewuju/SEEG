@@ -4,8 +4,13 @@ import librosa
 import librosa.display
 
 from RelationNet.Seegdata import *
+import cv2
 from util.util_file import *
 import re
+import math
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
 
 
 def test_1():
@@ -246,4 +251,20 @@ def test_def_eeg_information():
     data = read_raw(path)
     time = get_recorder_time(data)
     print(time)
+
+
+def test19():
+    path = "../data/seeg/zero_data/val/pre_zeizure/0db9c69c-a842-11e9-b4a4-331cd3a6dda7-0.npy"
+    data = np.load(path)
+    img = trans_numpy_cv2(data)
+    cv2.imwrite("./test.png", img)
+    # cv2.imshow("test", img)
+    # cv2.waitKey(0)
+    plt.imshow(img)
+    plt.show()
+    plt.imshow(data)
+    plt.show()
+
+
+
 

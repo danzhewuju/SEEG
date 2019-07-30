@@ -7,7 +7,12 @@ import glob
 import os
 import random
 
+import cv2
 import numpy as np
+
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
 
 
 def get_all_file_path(path, suffix='fif'):  # 主要是获取某文件夹下面所有的文件列表
@@ -88,6 +93,17 @@ def clean_dir(path):
         print("clean finished!")
     else:
         print("cancel operation !")
+
+
+def trans_numpy_cv2(data):
+    data1 = sigmoid(data)
+    min_data = np.min(data1)
+    data1 = data1 - min_data
+    max_data = np.max(data1)
+    data1 = data1 / max_data * 255
+    result = data1.astype(np.uint8)
+    result = cv2.merge([result])
+    return result
 
 # if __name__ == '__main__':
 #     print(get_label_data("/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/test"))
