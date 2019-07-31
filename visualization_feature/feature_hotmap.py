@@ -11,8 +11,7 @@ import random
 from grad_cam import *
 
 
-def select_examplea(name="LK", number=10):
-    path_dir = "../data/data_slice/split/preseizure"
+def select_examplea(name="LK", number=10, path_dir="../data/data_slice/split/preseizure"):
     path_dict = get_all_file_path(path_dir, "npy")
     path_LK = path_dict[name]
     select_data = random.sample(path_LK, number)
@@ -23,6 +22,7 @@ def select_examplea(name="LK", number=10):
 
 
 if __name__ == '__main__':
+    # select_examplea(path_dir="../data/data_slice/split/sleep")
     f = open('./json_path/LK_path.json', 'r')
     data = f.read()
     json_data = json.loads(data)
