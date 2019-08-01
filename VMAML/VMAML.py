@@ -7,20 +7,14 @@
 # @Software: PyCharm
 
 from __future__ import print_function
-from MAML import *
-from torch.utils.data import DataLoader
 
 import argparse
-import os
 
 import matplotlib.pyplot as plt
-import numpy as np
-import torch
 import torch.utils.data
-from torch import nn, optim
-from torch.nn import functional as F
-from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
 
+from MAML import *
 from util.util_file import matrix_normalization
 
 parser = argparse.ArgumentParser(description='VAE MNIST Example')
@@ -163,7 +157,7 @@ class VAE(nn.Module):
 
 
 model = VAE().to(device)
-optimizer = optim.Adam(model.parameters(), lr=1e-3)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 
 # Reconstruction + KL divergence losses summed over all elements and batch
@@ -180,7 +174,7 @@ def loss_function(recon_x, x, mu, logvar):
 
 
 def train_negative(epoch):
-    model.train()
+    model_n.train()
     train_loss = 0
     for batch_idx, (data, _) in enumerate(negative_loader):
         data = torch.from_numpy(data)
@@ -300,6 +294,7 @@ def maml_framwork():
 
     device = torch.device('cuda')
     maml = Meta(args, config).to(device)
+    vae_p = VAE()
 
     tmp = filter(lambda x: x.requires_grad, maml.parameters())
     num = sum(map(lambda x: np.prod(x.shape), tmp))
@@ -387,5 +382,5 @@ def maml_framwork():
 
 if __name__ == "__main__":
     for epoch in range(1, args.epochs + 1):
-        # train_positive(epoch)
+        train_positive(epoch)
         train_negative(epoch)
