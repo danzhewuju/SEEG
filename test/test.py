@@ -8,6 +8,9 @@ import cv2
 from util.util_file import *
 import re
 import math
+from tqdm import tqdm
+import time
+
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -266,5 +269,8 @@ def test19():
     plt.show()
 
 
+def test20():
+    for i in tqdm(range(1000),desc="yh"):
+        # time.sleep(0.1)
 
-
+        pass

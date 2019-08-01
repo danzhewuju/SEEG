@@ -69,6 +69,11 @@ def matrix_normalization(data, resize_shape=(130, 200)):
 
 
 def get_label_data(path):  # get data include label
+    '''
+
+    :param path:
+    :return: {"path":1, "path2":2}
+    '''
     class_name = os.listdir(path)
     data_name = []
     data_label = []
