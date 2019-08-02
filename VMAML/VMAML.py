@@ -10,34 +10,38 @@ from __future__ import print_function
 
 import argparse
 
-import matplotlib.pyplot as plt
 import torch.utils.data
 from torch.utils.data import DataLoader
 
 from MAML import *
+from meta import *
 from util.util_file import matrix_normalization
+import matplotlib.pyplot as plt
 
-parser = argparse.ArgumentParser(description='VAE MNIST Example')
-parser.add_argument('--batch-size', type=int, default=128, metavar='N',
-                    help='input batch size for training (default: 128)')
-parser.add_argument('--epochs', type=int, default=5, metavar='N',
-                    help='number of epochs to train (default: 10)')
-parser.add_argument('--no-cuda', action='store_true', default=False,
-                    help='enables CUDA training')
-parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/train')
-parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/test')
-parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/val')
-parser.add_argument('--seed', type=int, default=1, metavar='S',
-                    help='random seed (default: 1)')
-parser.add_argument('--log-interval', type=int, default=10, metavar='N',
-                    help='how many batches to wait before logging training status')
-args = parser.parse_args()
+argparser = argparse.ArgumentParser()
+argparser.add_argument('--epoch', type=int, help='epoch number', default=100)
+argparser.add_argument('--n_way', type=int, help='n way', default=2)
+argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=10)
+argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=10)
+argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
+argparser.add_argument('--imgc', type=int, help='imgc', default=5)
+argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
+argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=1e-3)
+argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
+argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
+argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
+argparser.add_argument('--dataset_dir', type=str, help="training data set", default="../data/seeg/zero_data")
+argparser.add_argument('--no-cuda', action='store_true', default=False, help='enables CUDA training')
+argparser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/train')
+argparser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/test')
+argparser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/val')
+
+args = argparser.parse_args()
+
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 TEST_PATH = args.test_path
 TRAIN_PATH = args.train_path
 VAL_PATH = args.val_path
-torch.manual_seed(args.seed)
-
 device = torch.device("cuda" if args.cuda else "cpu")
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
@@ -169,79 +173,80 @@ def loss_function(recon_x, x, mu, logvar):
     return BCE + KLD
 
 
-def train_negative(epoch):
-    model_n.train()
-    train_loss = 0
-    for batch_idx, (data, _) in enumerate(negative_loader):
-        data = torch.from_numpy(data)
-        data = data.to(device)
-        optimizer.zero_grad()
-        recon_batch, mu, logvar = model(data)
-        loss = loss_function(recon_batch, data, mu, logvar)
-        loss.backward()
-        train_loss += loss.item()
-        optimizer.step()
-        if batch_idx % args.log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data), len(datas.sleep_normal),
-                       100. * batch_idx / len(negative_loader),
-                       loss.item() / len(data)))
-
-    print('====> Epoch: {} Average loss: {:.4f}'.format(
-        epoch, train_loss / datas.train_length))
-    name = str("./models/model-vae-negative_normalsleep.ckpt")
-    torch.save(model.state_dict(), name)
-    print("model has been saved!")
-
-
-def train_positive(epoch):
-    model.train()
-    train_loss = 0
-    for batch_idx, (data, _) in enumerate(positive_loader):
-        data = torch.from_numpy(data)
-        data = data.to(device)
-        optimizer.zero_grad()
-        recon_batch, mu, logvar = model(data)
-        loss = loss_function(recon_batch, data, mu, logvar)
-        loss.backward()
-        train_loss += loss.item()
-        optimizer.step()
-        if batch_idx % args.log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data), len(datas.preseizure),
-                       100. * batch_idx / len(positive_loader),
-                       loss.item() / len(data)))
-
-    print('====> Epoch: {} Average loss: {:.4f}'.format(
-        epoch, train_loss / datas.train_length))
-    name = str("./models/model-vae-positive-preseizure.ckpt")
-    torch.save(model.state_dict(), name)
-    print("model has been saved!")
-
-
-def train_all_data():
-    model.train()
-    train_loss = 0
-    for batch_idx, (data, _) in enumerate(all_loader):
-        data = torch.from_numpy(data)
-        data = data.to(device)
-        optimizer.zero_grad()
-        recon_batch, mu, logvar = model(data)
-        loss = loss_function(recon_batch, data, mu, logvar)
-        loss.backward()
-        train_loss += loss.item()
-        optimizer.step()
-        if batch_idx % args.log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data), len(all_data),
-                       100. * batch_idx / len(all_loader),
-                       loss.item() / len(data)))
-
-    print('====> Epoch: {} Average loss: {:.4f}'.format(
-        epoch, train_loss / datas.train_length))
-    name = str("./models/model-vae.ckpt")
-    torch.save(model.state_dict(), name)
-    print("model has been saved!")
+#
+# def train_negative(epoch):
+#     model_n.train()
+#     train_loss = 0
+#     for batch_idx, (data, _) in enumerate(negative_loader):
+#         data = torch.from_numpy(data)
+#         data = data.to(device)
+#         optimizer.zero_grad()
+#         recon_batch, mu, logvar = model(data)
+#         loss = loss_function(recon_batch, data, mu, logvar)
+#         loss.backward()
+#         train_loss += loss.item()
+#         optimizer.step()
+#         if batch_idx % args.log_interval == 0:
+#             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+#                 epoch, batch_idx * len(data), len(datas.sleep_normal),
+#                        100. * batch_idx / len(negative_loader),
+#                        loss.item() / len(data)))
+#
+#     print('====> Epoch: {} Average loss: {:.4f}'.format(
+#         epoch, train_loss / datas.train_length))
+#     name = str("./models/model-vae-negative_normalsleep.ckpt")
+#     torch.save(model.state_dict(), name)
+#     print("model has been saved!")
+#
+#
+# def train_positive(epoch):
+#     model.train()
+#     train_loss = 0
+#     for batch_idx, (data, _) in enumerate(positive_loader):
+#         data = torch.from_numpy(data)
+#         data = data.to(device)
+#         optimizer.zero_grad()
+#         recon_batch, mu, logvar = model(data)
+#         loss = loss_function(recon_batch, data, mu, logvar)
+#         loss.backward()
+#         train_loss += loss.item()
+#         optimizer.step()
+#         if batch_idx % args.log_interval == 0:
+#             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+#                 epoch, batch_idx * len(data), len(datas.preseizure),
+#                        100. * batch_idx / len(positive_loader),
+#                        loss.item() / len(data)))
+#
+#     print('====> Epoch: {} Average loss: {:.4f}'.format(
+#         epoch, train_loss / datas.train_length))
+#     name = str("./models/model-vae-positive-preseizure.ckpt")
+#     torch.save(model.state_dict(), name)
+#     print("model has been saved!")
+#
+#
+# def train_all_data():
+#     model.train()
+#     train_loss = 0
+#     for batch_idx, (data, _) in enumerate(all_loader):
+#         data = torch.from_numpy(data)
+#         data = data.to(device)
+#         optimizer.zero_grad()
+#         recon_batch, mu, logvar = model(data)
+#         loss = loss_function(recon_batch, data, mu, logvar)
+#         loss.backward()
+#         train_loss += loss.item()
+#         optimizer.step()
+#         if batch_idx % args.log_interval == 0:
+#             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+#                 epoch, batch_idx * len(data), len(all_data),
+#                        100. * batch_idx / len(all_loader),
+#                        loss.item() / len(data)))
+#
+#     print('====> Epoch: {} Average loss: {:.4f}'.format(
+#         epoch, train_loss / datas.train_length))
+#     name = str("./models/model-vae.ckpt")
+#     torch.save(model.state_dict(), name)
+#     print("model has been saved!")
 
 
 def trans_data(vae_model, data, shape=(130, 200)):
@@ -257,6 +262,31 @@ def trans_data(vae_model, data, shape=(130, 200)):
 def show_eeg(data):
     plt.imshow(data)
     plt.show()
+
+
+# vae 模块
+def trans_data_vae(vae_model_p, vae_model_n, data, label_data):
+    shape_data = data.shape
+    data_view = data.reshape((-1, resize[0], resize[1]))
+    shape_label = label_data.shape
+    label_list = label_data.flatten()
+    number = shape_label[0] * shape_label[1]
+    result = []
+    loss = 0.0
+    for i in range(number):
+        data_tmp = data_view[number]
+        data_tmp = data_tmp.to(device)
+        if label_list[i] == 1:  # positive
+            recon_batch, mu, logvar = vae_model_p(data_tmp)
+        else:
+            recon_batch, mu, logvar = vae_model_n(data_tmp)
+        loss += loss_function(recon_batch, data, mu, logvar)
+        # data_result = recon_batch.cpu()
+        data_result = data_result[np.newaxis, :]
+        result.append(data_result)
+    result = result.reshape(shape_data)
+    loss = loss / number
+    return result, loss
 
 
 # maml 的网络架构, 需要融合vae模块
@@ -285,29 +315,26 @@ def maml_framwork():
         ('bn', [32]),
         ('max_pool2d', [2, 1, 0]),
         ('flatten', []),
-        ('linear', [args.n_way, 7040])
-    ]
+        ('linear', [args.n_way, 7040])]
 
     # 引入vae的模块
     device = torch.device('cuda')
     maml = Meta(args, config).to(device)
     maml_modl = Learner(config).to(device)
-    model_p = VAE().to(device)
-    model_n = VAE().to(device)
-    optiizer = optim.Adam([{'params': maml_modl}, {'params': model_n},
-                           {'params': model_p}
-                           ], lr=1e-3)
-
+    vae_p = VAE()
+    vae_n = VAE()
+    optimizer = optim.Adam(
+        [{'params': maml_modl.parameters()}, {'params': vae_n.parameters()}, {'params': vae_p.parameters()}], lr=1e-3)
     tmp = filter(lambda x: x.requires_grad, maml.parameters())
     num = sum(map(lambda x: np.prod(x.shape), tmp))
     print(maml)
     print('Total trainable tensors:', num)
 
     # batchsz here means total episode number
-    mini = Seegnet(args.dataset_dir, mode='train_vae', n_way=args.n_way, k_shot=args.k_spt,
+    mini = Seegnet(args.dataset_dir, mode='train', n_way=args.n_way, k_shot=args.k_spt,
                    k_query=args.k_qry,
                    batchsz=args.epoch)
-    mini_test = Seegnet(args.dataset_dir, mode='test_vae', n_way=args.n_way, k_shot=args.k_spt,
+    mini_test = Seegnet(args.dataset_dir, mode='test', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
                         batchsz=100)
     last_accuracy = 0.0
@@ -322,7 +349,12 @@ def maml_framwork():
 
         for step, (x_spt, y_spt, x_qry, y_qry) in enumerate(db):
 
-            x_spt, y_spt, x_qry, y_qry = x_spt.to(device), y_spt.to(device), x_qry.to(device), y_qry.to(device)
+            # x_spt, y_spt, x_qry, y_qry = x_spt.to(device), y_spt.to(device), x_qry.to(device), y_qry.to(device)
+
+            # 插入vae模块
+            data_x = x_spt.numpy()
+            label_y = y_spt.numpy()
+            test_x, loss_t = trans_data_vae(vae_p, vae_n, data_x, label_y)
 
             accs, loss_q = maml(x_spt, y_spt, x_qry, y_qry)
 
@@ -383,6 +415,7 @@ def maml_framwork():
 
 
 if __name__ == "__main__":
+    maml_framwork()
 # for epoch in range(1, args.epochs + 1):
 #     train_positive(epoch)
 #     train_negative(epoch)

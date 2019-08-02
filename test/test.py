@@ -270,7 +270,7 @@ def test19():
 
 
 def test20():
-    for i in tqdm(range(1000),desc="yh"):
-        # time.sleep(0.1)
-
-        pass
+    a = np.random.randint(0, 100, (10, 10))
+    print(a)
+    b = a.flatten()
+    print(b)
