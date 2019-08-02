@@ -8,7 +8,7 @@ class Learner(nn.Module):
 
     """
 
-    def __init__(self, config, imgc, imgsz):
+    def __init__(self, config):
         """
 
         :param config: network config file, type:list of (string, list)

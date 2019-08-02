@@ -30,8 +30,8 @@ class Meta(nn.Module):
         self.update_step = args.update_step
         self.update_step_test = args.update_step_test
 
-        self.net = Learner(config, args.imgc, args.imgsz)
-        self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
+        # self.net = Learner(config)  # 生成一个构造的网络
+        # self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
 
     def clip_grad_by_norm_(self, grad, max_norm):
         """

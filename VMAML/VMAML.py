@@ -156,10 +156,6 @@ class VAE(nn.Module):
         return self.decode(z), mu, logvar
 
 
-model = VAE().to(device)
-optimizer = optim.Adam(model.parameters(), lr=0.001)
-
-
 # Reconstruction + KL divergence losses summed over all elements and batch
 def loss_function(recon_x, x, mu, logvar):
     BCE = F.binary_cross_entropy(recon_x, x.view(-1, resize[0] * resize[1]), reduction='sum')
@@ -263,7 +259,7 @@ def show_eeg(data):
     plt.show()
 
 
-# maml 的网络架构
+# maml 的网络架构, 需要融合vae模块
 def maml_framwork():
     torch.manual_seed(222)  # 为cpu设置种子，为了使结果是确定的
     torch.cuda.manual_seed_all(222)  # 为GPU设置种子，为了使结果是确定的
@@ -292,9 +288,15 @@ def maml_framwork():
         ('linear', [args.n_way, 7040])
     ]
 
+    # 引入vae的模块
     device = torch.device('cuda')
     maml = Meta(args, config).to(device)
-    vae_p = VAE()
+    maml_modl = Learner(config).to(device)
+    model_p = VAE().to(device)
+    model_n = VAE().to(device)
+    optiizer = optim.Adam([{'params': maml_modl}, {'params': model_n},
+                           {'params': model_p}
+                           ], lr=1e-3)
 
     tmp = filter(lambda x: x.requires_grad, maml.parameters())
     num = sum(map(lambda x: np.prod(x.shape), tmp))
@@ -381,6 +383,6 @@ def maml_framwork():
 
 
 if __name__ == "__main__":
-    for epoch in range(1, args.epochs + 1):
-        train_positive(epoch)
-        train_negative(epoch)
+# for epoch in range(1, args.epochs + 1):
+#     train_positive(epoch)
+#     train_negative(epoch)
