@@ -270,7 +270,13 @@ def test19():
 
 
 def test20():
-    a = np.random.randint(0, 100, (10, 10))
-    print(a)
-    b = a.flatten()
-    print(b)
+    result = []
+    for i in range(100):
+        d = np.random.randint(0, 100, (1, 130, 200))
+        result.append(d)
+    # print(result)
+    r = np.array(result)
+    print(r.shape)
+    t =  r.reshape((5, 20, 1, 130, 200))
+    print(t.shape)
+    # print(r)

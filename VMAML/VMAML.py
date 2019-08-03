@@ -264,8 +264,12 @@ def show_eeg(data):
     plt.show()
 
 
+vae_p = VAE()
+vae_n = VAE()
+
+
 # vae 模块
-def trans_data_vae(vae_model_p, vae_model_n, data, label_data):
+def trans_data_vae(data, label_data):
     shape_data = data.shape
     data_view = data.reshape((-1, resize[0], resize[1]))
     shape_label = label_data.shape
@@ -274,19 +278,24 @@ def trans_data_vae(vae_model_p, vae_model_n, data, label_data):
     result = []
     loss = 0.0
     for i in range(number):
-        data_tmp = data_view[number]
-        data_tmp = data_tmp.to(device)
+        data_tmp = data_view[i]
+        data_tmp = torch.from_numpy(data_tmp)
+        data_tmp = data_tmp
         if label_list[i] == 1:  # positive
-            recon_batch, mu, logvar = vae_model_p(data_tmp)
+            recon_batch, mu, logvar = vae_p(data_tmp)
         else:
-            recon_batch, mu, logvar = vae_model_n(data_tmp)
-        loss += loss_function(recon_batch, data, mu, logvar)
+            recon_batch, mu, logvar = vae_n(data_tmp)
+        loss += loss_function(recon_batch, data_tmp, mu, logvar)
+        recon_batch = recon_batch.cpu()
+        result_tmp = recon_batch.detach().numpy()
+        result_tmp = result_tmp.reshape(resize)
         # data_result = recon_batch.cpu()
-        data_result = data_result[np.newaxis, :]
+        data_result = result_tmp[np.newaxis, :]
         result.append(data_result)
-    result = result.reshape(shape_data)
+    result_t = np.array(result)
+    result_r = result_t.reshape(shape_data)
     loss = loss / number
-    return result, loss
+    return result_r, loss
 
 
 # maml 的网络架构, 需要融合vae模块
@@ -321,8 +330,6 @@ def maml_framwork():
     device = torch.device('cuda')
     maml = Meta(args, config).to(device)
     maml_modl = Learner(config).to(device)
-    vae_p = VAE()
-    vae_n = VAE()
     optimizer = optim.Adam(
         [{'params': maml_modl.parameters()}, {'params': vae_n.parameters()}, {'params': vae_p.parameters()}], lr=1e-3)
     tmp = filter(lambda x: x.requires_grad, maml.parameters())
@@ -354,7 +361,7 @@ def maml_framwork():
             # 插入vae模块
             data_x = x_spt.numpy()
             label_y = y_spt.numpy()
-            test_x, loss_t = trans_data_vae(vae_p, vae_n, data_x, label_y)
+            test_x, loss_t = trans_data_vae(data_x, label_y)
 
             accs, loss_q = maml(x_spt, y_spt, x_qry, y_qry)
 
