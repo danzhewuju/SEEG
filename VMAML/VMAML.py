@@ -10,19 +10,19 @@ from __future__ import print_function
 
 import argparse
 
+import matplotlib.pyplot as plt
 import torch.utils.data
 from torch.utils.data import DataLoader
 
 from MAML import *
 from meta import *
 from util.util_file import matrix_normalization
-import matplotlib.pyplot as plt
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=100)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
-argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=10)
-argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=10)
+argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=7)
+argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=7)
 argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
@@ -135,11 +135,11 @@ class VAE(nn.Module):
     def __init__(self):
         super(VAE, self).__init__()
 
-        self.fc1 = nn.Linear(resize[0] * resize[1], 400)
-        self.fc21 = nn.Linear(400, 20)
-        self.fc22 = nn.Linear(400, 20)
-        self.fc3 = nn.Linear(20, 400)
-        self.fc4 = nn.Linear(400, resize[0] * resize[1])
+        self.fc1 = nn.Linear(resize[0] * resize[1], 200)
+        self.fc21 = nn.Linear(200, 20)
+        self.fc22 = nn.Linear(200, 20)
+        self.fc3 = nn.Linear(20, 200)
+        self.fc4 = nn.Linear(200, resize[0] * resize[1])
 
     def encode(self, x):
         h1 = F.relu(self.fc1(x))
@@ -173,82 +173,6 @@ def loss_function(recon_x, x, mu, logvar):
     return BCE + KLD
 
 
-#
-# def train_negative(epoch):
-#     model_n.train()
-#     train_loss = 0
-#     for batch_idx, (data, _) in enumerate(negative_loader):
-#         data = torch.from_numpy(data)
-#         data = data.to(device)
-#         optimizer.zero_grad()
-#         recon_batch, mu, logvar = model(data)
-#         loss = loss_function(recon_batch, data, mu, logvar)
-#         loss.backward()
-#         train_loss += loss.item()
-#         optimizer.step()
-#         if batch_idx % args.log_interval == 0:
-#             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-#                 epoch, batch_idx * len(data), len(datas.sleep_normal),
-#                        100. * batch_idx / len(negative_loader),
-#                        loss.item() / len(data)))
-#
-#     print('====> Epoch: {} Average loss: {:.4f}'.format(
-#         epoch, train_loss / datas.train_length))
-#     name = str("./models/model-vae-negative_normalsleep.ckpt")
-#     torch.save(model.state_dict(), name)
-#     print("model has been saved!")
-#
-#
-# def train_positive(epoch):
-#     model.train()
-#     train_loss = 0
-#     for batch_idx, (data, _) in enumerate(positive_loader):
-#         data = torch.from_numpy(data)
-#         data = data.to(device)
-#         optimizer.zero_grad()
-#         recon_batch, mu, logvar = model(data)
-#         loss = loss_function(recon_batch, data, mu, logvar)
-#         loss.backward()
-#         train_loss += loss.item()
-#         optimizer.step()
-#         if batch_idx % args.log_interval == 0:
-#             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-#                 epoch, batch_idx * len(data), len(datas.preseizure),
-#                        100. * batch_idx / len(positive_loader),
-#                        loss.item() / len(data)))
-#
-#     print('====> Epoch: {} Average loss: {:.4f}'.format(
-#         epoch, train_loss / datas.train_length))
-#     name = str("./models/model-vae-positive-preseizure.ckpt")
-#     torch.save(model.state_dict(), name)
-#     print("model has been saved!")
-#
-#
-# def train_all_data():
-#     model.train()
-#     train_loss = 0
-#     for batch_idx, (data, _) in enumerate(all_loader):
-#         data = torch.from_numpy(data)
-#         data = data.to(device)
-#         optimizer.zero_grad()
-#         recon_batch, mu, logvar = model(data)
-#         loss = loss_function(recon_batch, data, mu, logvar)
-#         loss.backward()
-#         train_loss += loss.item()
-#         optimizer.step()
-#         if batch_idx % args.log_interval == 0:
-#             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-#                 epoch, batch_idx * len(data), len(all_data),
-#                        100. * batch_idx / len(all_loader),
-#                        loss.item() / len(data)))
-#
-#     print('====> Epoch: {} Average loss: {:.4f}'.format(
-#         epoch, train_loss / datas.train_length))
-#     name = str("./models/model-vae.ckpt")
-#     torch.save(model.state_dict(), name)
-#     print("model has been saved!")
-
-
 def trans_data(vae_model, data, shape=(130, 200)):
     data_tmp = torch.from_numpy(data)
     data_input = data_tmp.cuda(0)
@@ -264,8 +188,10 @@ def show_eeg(data):
     plt.show()
 
 
-vae_p = VAE()
-vae_n = VAE()
+vae_p = VAE().to(device)
+vae_n = VAE().to(device)
+optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=1e-3)
+optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=1e-3)
 
 
 # vae 模块
@@ -276,20 +202,26 @@ def trans_data_vae(data, label_data):
     label_list = label_data.flatten()
     number = shape_label[0] * shape_label[1]
     result = []
-    loss = 0.0
+    loss_all = 0.0
     for i in range(number):
         data_tmp = data_view[i]
         data_tmp = torch.from_numpy(data_tmp)
-        data_tmp = data_tmp
+        data_tmp = data_tmp.to(device)
         if label_list[i] == 1:  # positive
+            optimizer_vae_p.zero_grad()
             recon_batch, mu, logvar = vae_p(data_tmp)
+            loss = loss_function(recon_batch, data_tmp, mu, logvar)
+            loss.backward()
+            optimizer_vae_p.step()
         else:
+            optimizer_vae_n.zero_grad()
             recon_batch, mu, logvar = vae_n(data_tmp)
-        loss += loss_function(recon_batch, data_tmp, mu, logvar)
-        recon_batch = recon_batch.cpu()
-        result_tmp = recon_batch.detach().numpy()
+            loss = loss_function(recon_batch, data_tmp, mu, logvar)
+            loss.backward()
+            optimizer_vae_n.step()
+        loss_all += loss.item()
+        result_tmp = recon_batch.detach().cpu().numpy()
         result_tmp = result_tmp.reshape(resize)
-        # data_result = recon_batch.cpu()
         data_result = result_tmp[np.newaxis, :]
         result.append(data_result)
     result_t = np.array(result)
@@ -327,11 +259,8 @@ def maml_framwork():
         ('linear', [args.n_way, 7040])]
 
     # 引入vae的模块
-    device = torch.device('cuda')
+    # device = torch.device('cuda')
     maml = Meta(args, config).to(device)
-    maml_modl = Learner(config).to(device)
-    optimizer = optim.Adam(
-        [{'params': maml_modl.parameters()}, {'params': vae_n.parameters()}, {'params': vae_p.parameters()}], lr=1e-3)
     tmp = filter(lambda x: x.requires_grad, maml.parameters())
     num = sum(map(lambda x: np.prod(x.shape), tmp))
     print(maml)
@@ -356,14 +285,16 @@ def maml_framwork():
 
         for step, (x_spt, y_spt, x_qry, y_qry) in enumerate(db):
 
-            # x_spt, y_spt, x_qry, y_qry = x_spt.to(device), y_spt.to(device), x_qry.to(device), y_qry.to(device)
-
             # 插入vae模块
-            data_x = x_spt.numpy()
-            label_y = y_spt.numpy()
-            test_x, loss_t = trans_data_vae(data_x, label_y)
+            x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt)
+            x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry)
+            x_spt_vae = torch.from_numpy(x_spt_vae)
+            x_qry_vae = torch.from_numpy(x_qry_vae)
+            x_spt_vae, y_spt, x_qry_vae, y_qry = x_spt_vae.to(device), y_spt.to(device), x_qry_vae.to(device), y_qry.to(
+                device)
 
-            accs, loss_q = maml(x_spt, y_spt, x_qry, y_qry)
+            accs, loss_q = maml(x_spt_vae, y_spt, x_qry_vae, y_qry)
+            loss = loss_spt + loss_qry + loss_q
 
             if step % 20 == 0:
                 d = loss_q.cpu()
@@ -372,25 +303,29 @@ def maml_framwork():
                 plt_train_acc.append(accs[-1])
                 print('step:', step, '\ttraining acc:', accs)
 
-            if step % 50 == 0:  # evaluation
-                db_test = DataLoader(mini_test, 1, shuffle=True, num_workers=1, pin_memory=True)
-                accs_all_test = []
-                loss_all_test = []
+                if step % 50 == 0:  # evaluation
+                    db_test = DataLoader(mini_test, 1, shuffle=True, num_workers=1, pin_memory=True)
+                    accs_all_test = []
+                    loss_all_test = []
 
-                for x_spt, y_spt, x_qry, y_qry in db_test:
-                    x_spt, y_spt, x_qry, y_qry = x_spt.squeeze(0).to(device), y_spt.squeeze(0).to(device), \
-                                                 x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
+                    for x_spt, y_spt, x_qry, y_qry in db_test:
+                        x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt)
+                        x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry)
+                        x_spt_vae = torch.from_numpy(x_spt_vae)
+                        x_qry_vae = torch.from_numpy(x_qry_vae)
+                        x_spt_vae, y_spt, x_qry_vae, y_qry = x_spt_vae.squeeze(0).to(device), y_spt.squeeze(0).to(
+                            device), x_qry_vae.squeeze(0).to(device), y_qry.squeeze(0).to(device)
 
-                    accs, loss_test = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
+                        accs, loss_test = maml.finetunning(x_spt_vae, y_spt, x_qry_vae, y_qry)
 
-                    loss_all_test.append(loss_test)
-                    accs_all_test.append(accs)
+                        loss_all_test.append(loss_test)
+                        accs_all_test.append(accs)
 
-                # [b, update_step+1]
-                accs = np.array(accs_all_test).mean(axis=0).astype(np.float16)
-                plt_test_acc.append(accs[-1])
-                avg_loss = np.mean(np.array(loss_all_test))
-                plt_test_loss.append(avg_loss)
+                    # [b, update_step+1]
+                    accs = np.array(accs_all_test).mean(axis=0).astype(np.float16)
+                    plt_test_acc.append(accs[-1])
+                    avg_loss = np.mean(np.array(loss_all_test))
+                    plt_test_loss.append(avg_loss)
 
                 print('Test acc:', accs)
                 test_accuracy = accs[-1]

@@ -30,7 +30,7 @@ class Meta(nn.Module):
         self.update_step = args.update_step
         self.update_step_test = args.update_step_test
 
-        self.net = Learner(config)  # 生成一个构造的网络
+        self.net = Learner(config)
         self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
 
     def clip_grad_by_norm_(self, grad, max_norm):
@@ -123,14 +123,16 @@ class Meta(nn.Module):
         # end of all tasks
         # sum over all losses on query set across all tasks
         loss_q = losses_q[-1] / task_num
-        accs = np.array(corrects) / (querysz * task_num)
 
         # optimize theta parameters
-        # 总体的优化器
         self.meta_optim.zero_grad()
         loss_q.backward()
+        # print('meta update')
+        # for p in self.net.parameters()[:5]:
+        # 	print(torch.norm(p).item())
         self.meta_optim.step()
 
+        accs = np.array(corrects) / (querysz * task_num)
 
         return accs, loss_q
 
