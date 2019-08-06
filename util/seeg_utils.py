@@ -9,6 +9,7 @@ import pandas as pd
 import pyedflib
 import scipy.io as sio
 from mne.time_frequency import *
+import matplotlib.pyplot as plt
 
 
 def read_raw(path):
@@ -193,6 +194,25 @@ def eeg_preprocess(fin, fout, seeg_chan_name):
     specific_chans.filter(1., None, fir_design='firwin')
     specific_chans.save(fout)
     del specific_chans
+
+
+def seeg_npy_plot(data, channels):
+    '''
+
+    :param data: numpy 格式的数据
+    :param cahnnels: 所选择的信道list
+    :return:
+    '''
+    k = len(channels)
+    for i in range(k):
+        plt.subplot(k, 1, i+1)
+        plt.title("channel:{}".format(channels[i]))
+        plt.plot(data[channels[i]])
+
+    plt.show()
+    return True
+
+
 
 
 def split_edf(filename, NEpochs=1):  # 把太大的edf文件分成NEpochs个小edf文件

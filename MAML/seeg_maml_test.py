@@ -33,7 +33,7 @@ def main():
 
     config = [
         ('conv2d', [32, 1, 3, 3, 1, 0]),
-        ('relu', [True]),1
+        ('relu', [True]),
         ('bn', [32]),
         ('max_pool2d', [2, 2, 0]),
         ('conv2d', [32, 32, 3, 3, 1, 0]),
