@@ -13,7 +13,10 @@ import scipy.stats
 import torch
 from torch.utils.data import DataLoader
 
-from Mamlnet import Seegnet
+import sys
+
+sys.path.append('../')
+from MAML.Mamlnet import Seegnet
 from meta import Meta
 
 
