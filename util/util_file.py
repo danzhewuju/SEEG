@@ -87,6 +87,41 @@ def get_label_data(path):  # get data include label
     return result_data_label
 
 
+def get_matrix_max_location(mtx_data, k, reverse=False):
+    '''
+
+    :param mtx_data: 矩阵的数据
+    :param k: 获取前K 个最大、最小
+    :param reverse: True : 最大， False: 最小
+    :return:
+    '''
+    d_f = mtx_data.flatten()
+    if reverse is not True:
+        index_id = d_f.argsort()[-k:]
+    else:
+        index_id = d_f.argsort()[k:]
+    x_index, y_index = np.unravel_index(index_id, mtx_data.shape)
+    location = list(zip(x_index, y_index))
+    return location
+
+
+def mtx_similarity(mtx_a, mtx_b):
+    '''
+
+    :param mtx_a:
+    :param mtx_b:
+    :return:  计算矩阵的相似度
+    '''
+    mtx_1 = mtx_a.flatten()  # 展开为一维
+    mtx_2 = mtx_b.flatten()
+    min_length = min(len(mtx_1), len(mtx_2))
+    mtx_1 = mtx_1[:min_length]
+    mtx_2 = mtx_2[:min_length]
+    result = np.dot(mtx_1, mtx_2.T) / (np.linalg.norm(mtx_1) * np.linalg.norm(mtx_2))
+    result = abs(result)
+    return result
+
+
 def clean_dir(path):
     print("this is danger operation!")
     clean_path = os.path.join(path, "*")

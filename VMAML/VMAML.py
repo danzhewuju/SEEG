@@ -10,7 +10,6 @@ from __future__ import print_function
 
 import argparse
 
-import matplotlib.pyplot as plt
 import torch.utils.data
 from torch.utils.data import DataLoader
 
@@ -21,8 +20,8 @@ from util.util_file import matrix_normalization
 argparser = argparse.ArgumentParser()
 argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
-argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=7)
-argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=7)
+argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
+argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
 argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
@@ -190,8 +189,8 @@ def show_eeg(data):
 
 vae_p = VAE().to(device)
 vae_n = VAE().to(device)
-optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=1e-3)
-optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=1e-3)
+optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=1e-4)
+optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=1e-4)
 
 
 # vae 模块
@@ -208,26 +207,26 @@ def trans_data_vae(data, label_data):
         data_tmp = torch.from_numpy(data_tmp)
         data_tmp = data_tmp.to(device)
         if label_list[i] == 1:  # positive
-            optimizer_vae_p.zero_grad()
+            # optimizer_vae_p.zero_grad()
             recon_batch, mu, logvar = vae_p(data_tmp)
-            loss = loss_function(recon_batch, data_tmp, mu, logvar)
-            loss.backward()
-            optimizer_vae_p.step()
+            # loss = loss_function(recon_batch, data_tmp, mu, logvar)
+            # loss.backward()
+            # optimizer_vae_p.step()
         else:
-            optimizer_vae_n.zero_grad()
+            # optimizer_vae_n.zero_grad()
             recon_batch, mu, logvar = vae_n(data_tmp)
-            loss = loss_function(recon_batch, data_tmp, mu, logvar)
-            loss.backward()
-            optimizer_vae_n.step()
-        loss_all += loss.item()
+            # loss = loss_function(recon_batch, data_tmp, mu, logvar)
+            # loss.backward()
+            # optimizer_vae_n.step()
+        # loss_all += loss.item()
         result_tmp = recon_batch.detach().cpu().numpy()
         result_tmp = result_tmp.reshape(resize)
         data_result = result_tmp[np.newaxis, :]
         result.append(data_result)
     result_t = np.array(result)
     result_r = result_t.reshape(shape_data)
-    loss = loss / number
-    return result_r, loss
+    loss_all = loss_all / number
+    return result_r, loss_all
 
 
 # maml 的网络架构, 需要融合vae模块
@@ -318,7 +317,7 @@ def maml_framwork():
 
                         accs, loss_test = maml.finetunning(x_spt_vae, y_spt, x_qry_vae, y_qry)
 
-                        loss_all_test.append(loss_test)
+                        loss_all_test.append((loss_spt + loss_qry + loss_test).cpu().detach().numpy())
                         accs_all_test.append(accs)
 
                     # [b, update_step+1]

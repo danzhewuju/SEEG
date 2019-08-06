@@ -1,5 +1,5 @@
 import argparse
-import json
+import os
 
 import cv2
 import numpy as np
@@ -7,9 +7,8 @@ import torch
 import torch.nn as nn
 from torch.autograd import Function
 from torch.autograd import Variable
-import os
 
-from util.util_file import matrix_normalization, trans_numpy_cv2, get_all_file_path
+from util.util_file import matrix_normalization, trans_numpy_cv2, get_matrix_max_location
 
 x_ = 8
 y_ = 12
@@ -304,7 +303,11 @@ def get_feature_map(path_data):
     target_index = None
 
     mask = grad_cam(input, target_index)
-    name = path_data.split("/")[-1][:-4]+".jpg"
+    location = get_matrix_max_location(mask, 5)
+    channel_location = "-loc" + ("-{}" * 5).format(location[0][1], location[1][1], location[2][1], location[3][1],
+                                                   location[4][1])
+
+    name = path_data.split("/")[-1][:-4] + channel_location + ".jpg"
     save_path = os.path.join("./examples", name)
 
     show_cam_on_image(img, mask, save_path)  # 将热力图写回到原来的图片
@@ -319,6 +322,3 @@ def get_feature_map(path_data):
     #
     # cam_gb = np.multiply(cam_mask, gb)
     # utils.save_image(torch.from_numpy(cam_gb), './examples/cam_gb.jpg')
-
-
-

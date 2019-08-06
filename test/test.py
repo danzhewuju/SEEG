@@ -4,12 +4,7 @@ import librosa
 import librosa.display
 
 from RelationNet.Seegdata import *
-import cv2
 from util.util_file import *
-import re
-import math
-from tqdm import tqdm
-import time
 
 
 def sigmoid(x):
@@ -270,13 +265,12 @@ def test19():
 
 
 def test20():
-    result = []
-    for i in range(100):
-        d = np.random.randint(0, 100, (1, 130, 200))
-        result.append(d)
-    # print(result)
-    r = np.array(result)
-    print(r.shape)
-    t =  r.reshape((5, 20, 1, 130, 200))
-    print(t.shape)
-    # print(r)
+    data = np.random.randn(200, 130)
+    print(data)
+    d = np.argsort(data)[:-5]
+    print(d)
+    d_f = data.flatten()
+    index_id = d_f.argsort()[-2:]
+    x_index, y_index = np.unravel_index(index_id, data.shape)
+    location = list(zip(x_index, y_index))
+    print(location)
