@@ -22,7 +22,7 @@ from util.util_file import matrix_normalization
 import matplotlib.pyplot as plt
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=8000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
@@ -171,9 +171,9 @@ def loss_function(recon_x, x, mu, logvar):
     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
     # https://arxiv.org/abs/1312.6114
     # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
-    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    # KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
 
-    return BCE + KLD
+    return BCE
 
 
 def trans_data(vae_model, data, shape=(130, 200)):
@@ -193,8 +193,8 @@ def show_eeg(data):
 
 vae_p = VAE().to(device)
 vae_n = VAE().to(device)
-optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.01)
-optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.01)
+optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.005)
+optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.005)
 
 
 # vae 模块
