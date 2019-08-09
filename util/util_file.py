@@ -88,9 +88,8 @@ def get_label_data(path):  # get data include label
 
 
 def get_first_dir_path(path, suffix="jpg"):
-    names = glob.glob(os.path.join(path, '*.' + suffix))
-    result = [os.path.join(path, x) for x in names]
-    return result
+    paths = glob.glob(os.path.join(path, '*.' + suffix))
+    return paths
 
 
 def get_matrix_max_location(mtx_data, k, reverse=False):

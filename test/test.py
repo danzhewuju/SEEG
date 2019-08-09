@@ -5,6 +5,7 @@ import librosa.display
 
 from RelationNet.Seegdata import *
 from util.util_file import *
+import re
 
 
 def sigmoid(x):
@@ -274,3 +275,20 @@ def test20():
     x_index, y_index = np.unravel_index(index_id, data.shape)
     location = list(zip(x_index, y_index))
     print(location)
+
+
+def test_21():
+    path = "./examples/19df46c0-a894-11e9-bc3a-338334ea1429-0-loc-0-7-6-7-0.jpg"
+    channels_str = re.findall('-loc-(.+).jpg', path)[0]
+    channels_number = map(int, channels_str.split('-'))
+    channels_number = list(set(channels_number))
+    channels_number.sort()
+    print(channels_number)
+    d = re.sub('-loc(.+).jpg', '', path)
+    name = d + ".npy"
+    name = re.findall('examples/(.+)', name)[0]
+    print(name)
+
+    path_1 = "'../data/data_slice/split/preseizure/LKKKKKKK/1d61665c-a894-11e9-bc3a-338334ea1429-0.npy'"
+    name = re.findall("/.+/(.+)", path_1)[0]
+    print(name)

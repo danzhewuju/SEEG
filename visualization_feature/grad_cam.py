@@ -7,6 +7,9 @@ import torch
 import torch.nn as nn
 from torch.autograd import Function
 from torch.autograd import Variable
+import sys
+
+sys.path.append('../')
 
 from util.util_file import matrix_normalization, trans_numpy_cv2, get_matrix_max_location
 

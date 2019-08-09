@@ -196,7 +196,7 @@ def eeg_preprocess(fin, fout, seeg_chan_name):
     del specific_chans
 
 
-def seeg_npy_plot(data, channels):
+def seeg_npy_plot(data, channels, save_path):
     '''
 
     :param data: numpy 格式的数据
@@ -205,14 +205,12 @@ def seeg_npy_plot(data, channels):
     '''
     k = len(channels)
     for i in range(k):
-        plt.subplot(k, 1, i+1)
+        plt.subplot(k, 1, i + 1)
         plt.title("channel:{}".format(channels[i]))
         plt.plot(data[channels[i]])
-
-    plt.show()
+    plt.savefig(save_path)
+    # plt.show()
     return True
-
-
 
 
 def split_edf(filename, NEpochs=1):  # 把太大的edf文件分成NEpochs个小edf文件
