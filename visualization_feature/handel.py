@@ -34,6 +34,14 @@ def get_hotmap_dic(path_hotmap, path_b_raw_data):
     dict_raw = dict(zip(path_all_b, path_all_name_raw))
     re1 = dict(sorted(dict_hot.items(), key=lambda x: x[1]))
     re2 = dict(sorted(dict_raw.items(), key=lambda x: x[1]))
+    # test_v_1 = list(re1.values())
+    # test_v_2 = list(re2.values())
+    # print(test_v_2 == test_v_1)
+    # for i in range(len(test_v_1)):
+    #     p1 = test_v_1[i]
+    #     p2 = test_v_2[i]
+    #     if p1 != p2:
+    #         print(p1, p2)
     path_hotmap_r = re1.keys()
     path_raw_r = re2.keys()
     dict_result = dict(zip(path_hotmap_r, path_raw_r))
@@ -62,7 +70,10 @@ def create_raw_data_signal(top_k=100, image_dir="./examples"):
             channels_str = re.findall('-loc-(.+).jpg', path_tmp)[0]
             channels_number = map(int, channels_str.split('-'))
             channels_number = list(set(channels_number))
+            if len(channels_number) > 3:
+                channels_number = channels_number[:3]
             channels_number.sort()
+
             d = re.sub('-loc(.+).jpg', '', path_tmp)
             raw_path = d + ".npy"
             name = re.findall('examples/(.+)', raw_path)[0]
@@ -153,15 +164,16 @@ def image_connection(data_signal_dir, raw_data_dir, save_dir = "./contact_image"
         save_path = os.path.join(save_dir, name)
         path_test_1 = p
         path_test_2 = dict_hot_raw[p]
+        plt.figure(0)
         imag_test = Image.open(path_test_1)
         dst_1 = imag_test.transpose(Image.ROTATE_90)
         dst_2 = Image.open(path_test_2)
 
-        f = plt.figure(figsize=(6, 12))
+        f = plt.figure(figsize=(7, 12))
         ax = f.add_subplot(211)
+        ax.axis('off')
         ax2 = f.add_subplot(212)
         ax.imshow(dst_1)
-        plt.axis('off')
         ax2.imshow(dst_2)
         # plt.subplot(2, 1, 1)
         # plt.imshow(dst_1)
@@ -172,6 +184,8 @@ def image_connection(data_signal_dir, raw_data_dir, save_dir = "./contact_image"
         # plt.axis('off')
         plt.savefig(save_path)
         # plt.show()
+        plt.close(0)
+        # plt.show()
 
 
 if __name__ == '__main__':
@@ -179,3 +193,4 @@ if __name__ == '__main__':
     path_b = "./raw_data_signal"
     create_raw_data_signal(top_k=100)
     image_connection('./examples', './raw_data_signal')
+    # get_hotmap_dic(path_a, path_b)
