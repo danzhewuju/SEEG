@@ -3,7 +3,7 @@
 # @Time    : 2019/8/6 14:59
 # @Author  : Alex
 # @Site    : 
-# @File    : test.py
+# @File    : handel.py
 # @Software: PyCharm
 
 import json
@@ -12,6 +12,32 @@ from util import *
 import re
 from tqdm import tqdm
 from PIL import Image
+import matplotlib.pyplot as plt
+import os
+
+
+def get_hotmap_dic(path_hotmap, path_b_raw_data):
+    path_all_a = get_first_dir_path(path_hotmap)
+    path_all_name_hot = []
+    for p in path_all_a:
+        d = re.sub('-loc(.+).jpg', '', p)
+        raw_path = d + ".npy"
+        name = re.findall('examples/(.+)', raw_path)[0]
+        path_all_name_hot.append(name[:-4])
+    dict_hot = dict(zip(path_all_a, path_all_name_hot))
+    path_all_b = get_first_dir_path(path_b_raw_data)
+    path_all_name_raw = []
+    for p in path_all_b:
+        name = re.findall('raw_data_signal/(.+)', p)[0]
+        path_all_name_raw.append(name[:-4])
+    name_save = [x+".jpg" for x in  path_all_name_raw]
+    dict_raw = dict(zip(path_all_b, path_all_name_raw))
+    re1 = dict(sorted(dict_hot.items(), key=lambda x: x[1]))
+    re2 = dict(sorted(dict_raw.items(), key=lambda x: x[1]))
+    path_hotmap_r = re1.keys()
+    path_raw_r = re2.keys()
+    dict_result = dict(zip(path_hotmap_r, path_raw_r))
+    return dict_result, name_save
 
 
 def create_raw_data_signal(top_k=100, image_dir="./examples"):
@@ -115,5 +141,41 @@ def create_raw_data_signal(top_k=100, image_dir="./examples"):
 #     plt.subplots_adjust(hspace=0.4)
 #     plt.show()
 
+def image_connection(data_signal_dir, raw_data_dir, save_dir = "./contact_image"):
+    if os.path.exists(save_dir) is not True:
+        os.mkdir(save_dir)
+    signal_dir_t = os.listdir(data_signal_dir)
+    signal_dir_path = [os.path.join(data_signal_dir, x) for x in signal_dir_t]
+    dict_hot_raw, save_name = get_hotmap_dic(data_signal_dir, raw_data_dir)
+    for p in tqdm(signal_dir_path):
+        index = signal_dir_path.index(p)
+        name = save_name[index]
+        save_path = os.path.join(save_dir, name)
+        path_test_1 = p
+        path_test_2 = dict_hot_raw[p]
+        imag_test = Image.open(path_test_1)
+        dst_1 = imag_test.transpose(Image.ROTATE_90)
+        dst_2 = Image.open(path_test_2)
 
-create_raw_data_signal(top_k=100)
+        f = plt.figure(figsize=(6, 12))
+        ax = f.add_subplot(211)
+        ax2 = f.add_subplot(212)
+        ax.imshow(dst_1)
+        plt.axis('off')
+        ax2.imshow(dst_2)
+        # plt.subplot(2, 1, 1)
+        # plt.imshow(dst_1)
+        #
+        #
+        # plt.subplot(2, 1, 2)
+        # plt.imshow(dst_2)
+        # plt.axis('off')
+        plt.savefig(save_path)
+        # plt.show()
+
+
+if __name__ == '__main__':
+    path_a = "./examples"
+    path_b = "./raw_data_signal"
+    create_raw_data_signal(top_k=100)
+    image_connection('./examples', './raw_data_signal')

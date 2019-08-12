@@ -204,6 +204,7 @@ def seeg_npy_plot(data, channels, save_path):
     :return:
     '''
     k = len(channels)
+    plt.subplots_adjust(hspace=0.6, wspace=0.6)
     for i in range(k):
         plt.subplot(k, 1, i + 1)
         plt.title("channel:{}".format(channels[i]))
