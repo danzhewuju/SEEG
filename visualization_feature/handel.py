@@ -7,7 +7,8 @@
 # @Software: PyCharm
 
 import json
-
+import sys
+sys.path.append('../')
 from util import *
 import re
 from tqdm import tqdm
@@ -72,6 +73,13 @@ def create_raw_data_signal(top_k=100, image_dir="./examples"):
             channels_number = list(set(channels_number))
             if len(channels_number) > 3:
                 channels_number = channels_number[:3]
+            else:
+                if len(channels_number) == 1:
+                    min_no = channels_number[0] if channels_number[0] > 0 else 1
+                    channels_number.append(min_no-1)
+                    channels_number.append(min_no+1)
+                    channels_number.sort()
+
             channels_number.sort()
 
             d = re.sub('-loc(.+).jpg', '', path_tmp)
@@ -173,6 +181,7 @@ def image_connection(data_signal_dir, raw_data_dir, save_dir = "./contact_image"
         ax = f.add_subplot(211)
         ax.axis('off')
         ax2 = f.add_subplot(212)
+        ax2.axis('off')
         ax.imshow(dst_1)
         ax2.imshow(dst_2)
         # plt.subplot(2, 1, 1)
