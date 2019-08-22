@@ -13,6 +13,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 import sys
+
 sys.path.append('../')
 from util.util_file import matrix_normalization
 import scipy as sp
@@ -62,6 +63,7 @@ def mean_confidence_interval(data, confidence=0.95):
     m, se = np.mean(a), scipy.stats.sem(a)
     h = se * sp.stats.t._ppf((1 + confidence) / 2., n - 1)
     return m, h
+
 
 class CNN(nn.Module):
     def __init__(self):
@@ -170,8 +172,8 @@ def run():
                 correct += (predicted == labels).sum().item()
         acc = correct / total
         total_acc.append(acc)
-        print('Test Accuracy of the model on the {} test seegs of {} epoch: {} %'.format(total, i+1,
-                                                                             100 * correct / total))
+        print('Test Accuracy of the model on the {} test seegs of {} epoch: {} %'.format(total, i + 1,
+                                                                                         100 * correct / total))
     avg_acc, h = mean_confidence_interval(total_acc)
     print("Accuracy:{}, h:{}".format(avg_acc, h))
     end_time = time.time()

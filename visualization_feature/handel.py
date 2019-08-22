@@ -8,6 +8,7 @@
 
 import json
 import sys
+
 sys.path.append('../')
 from util import *
 import re
@@ -31,7 +32,7 @@ def get_hotmap_dic(path_hotmap, path_b_raw_data):
     for p in path_all_b:
         name = re.findall('raw_data_signal/(.+)', p)[0]
         path_all_name_raw.append(name[:-4])
-    name_save = [x+".jpg" for x in  path_all_name_raw]
+    name_save = [x + ".jpg" for x in path_all_name_raw]
     dict_raw = dict(zip(path_all_b, path_all_name_raw))
     re1 = dict(sorted(dict_hot.items(), key=lambda x: x[1]))
     re2 = dict(sorted(dict_raw.items(), key=lambda x: x[1]))
@@ -49,7 +50,7 @@ def get_hotmap_dic(path_hotmap, path_b_raw_data):
     return dict_result, name_save
 
 
-def create_raw_data_signal(top_k=100, image_dir="./examples"):
+def create_raw_data_signal(image_dir="./examples"):
     # hot_map_paths = get_first_dir_path('./examples', suffix='jpg')
     # t = re.findall("loc-(.+).jpg", hot_map_paths[0])[0]
     # print(t)
@@ -76,8 +77,8 @@ def create_raw_data_signal(top_k=100, image_dir="./examples"):
             else:
                 if len(channels_number) == 1:
                     min_no = channels_number[0] if channels_number[0] > 0 else 1
-                    channels_number.append(min_no-1)
-                    channels_number.append(min_no+1)
+                    channels_number.append(min_no - 1)
+                    channels_number.append(min_no + 1)
                     channels_number.sort()
 
             channels_number.sort()
@@ -92,13 +93,8 @@ def create_raw_data_signal(top_k=100, image_dir="./examples"):
             save_path = os.path.join('./raw_data_signal', new_name)
             data_p = dict_name_path[name]
             raw_data = np.load(data_p)
-            # plt.subplot(121)
             seeg_npy_plot(raw_data, channels_number, save_path)
-            # plt.subplot(122)
-            # image = plt.imread(images_path[index])
-            # plt.imshow(image)
-            # plt.savefig(save_path)
-            # # plt.show()
+
         print("All files has been written!")
 
         # 进行路径的转换
@@ -129,38 +125,7 @@ def create_raw_data_signal(top_k=100, image_dir="./examples"):
         # seeg_npy_plot(data, [39, 40, 41])
 
 
-# def test_FFT():
-#     data_path = "../data/data_slice/split/preseizure/LK/17673574-a894-11e9-bc3a-338334ea1429-0.npy"
-#     data = np.load(data_path)
-#     channel_number = 25
-#     data_channel = data[channel_number]
-#     sampling_rate = 100  # 采样频率为100Hz
-#     fft_size = 200  # FFT处理的取样长度
-#     # N点FFT进行精确频谱分析的要求是N个取样点包含整数个取样对象的波形。因此N点FFT能够完美计算频谱对取样对象的要求是n*Fs/N（n*采样频率/FFT长度），
-#     # 因此对8KHZ和512点而言，完美采样对象的周期最小要求是8000/512=15.625HZ,所以156.25的n为10,234.375的n为15。
-#     xs = data_channel  # 从波形数据中取样fft_size个点进行运算
-#     xf = np.fft.rfft(xs) / fft_size  # 利用np.fft.rfft()进行FFT计算，rfft()是为了更方便对实数信号进行变换，由公式可知/fft_size为了正确显示波形能量
-#     # rfft函数的返回值是N/2+1个复数，分别表示从0(Hz)到sampling_rate/2(Hz)的分。
-#     # 于是可以通过下面的np.linspace计算出返回值中每个下标对应的真正的频率：
-#     freqs = np.linspace(0, sampling_rate / 2, fft_size / 2 + 1)
-#     # np.linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None)
-#     # 在指定的间隔内返回均匀间隔的数字
-#     xfp = 20 * np.log10(np.clip(np.abs(xf), 1e-20, 1e100))
-#     # 最后我们计算每个频率分量的幅值，并通过 20*np.log10()将其转换为以db单位的值。为了防止0幅值的成分造成log10无法计算，我们调用np.clip对xf的幅值进行上下限处理
-#
-#     # 绘图显示结果
-#     plt.figure(figsize=(8, 4))
-#     plt.subplot(211)
-#     plt.plot(data_channel[:fft_size], xs)
-#     plt.xlabel(u"Time(S)")
-#     plt.title(u"156.25Hz and 234.375Hz WaveForm And Freq")
-#     plt.subplot(212)
-#     plt.plot(freqs, xfp)
-#     plt.xlabel(u"Freq(Hz)")
-#     plt.subplots_adjust(hspace=0.4)
-#     plt.show()
-
-def image_connection(data_signal_dir, raw_data_dir, save_dir = "./contact_image"):
+def image_connection(data_signal_dir, raw_data_dir, save_dir="./contact_image"):
     if os.path.exists(save_dir) is not True:
         os.mkdir(save_dir)
     signal_dir_t = os.listdir(data_signal_dir)
@@ -200,6 +165,6 @@ def image_connection(data_signal_dir, raw_data_dir, save_dir = "./contact_image"
 if __name__ == '__main__':
     path_a = "./examples"
     path_b = "./raw_data_signal"
-    create_raw_data_signal(top_k=100)
+    create_raw_data_signal()  # 生成原始信号中梯队最高的信道的信号图像
     image_connection('./examples', './raw_data_signal')
     # get_hotmap_dic(path_a, path_b)

@@ -19,6 +19,15 @@ import json
 
 def select_examplea(name="LK", number=1000, path_dir="../data/data_slice/split/preseizure",
                     json_path="./json_path/LK_preseizure_path.json"):
+    '''
+
+    :param name: 患者名称
+    :param number: 选择重采样的样本
+    :param path_dir: 所在的路径
+    :param json_path: json 文件存储的位置
+    :return:
+    :function 重采样，随机选择样本
+    '''
     path_dict = get_all_file_path(path_dir, "npy")
     path_LK = path_dict[name]
     select_data = random.sample(path_LK, number)
@@ -30,6 +39,12 @@ def select_examplea(name="LK", number=1000, path_dir="../data/data_slice/split/p
 
 
 def example_similarity(path_json, json_path="./json_path/LK_preseizure_sorted.json"):
+    '''
+
+    :param path_json:  重采样中的选择的样本数
+    :param json_path:  选择比较有代表性的样本
+    :return:
+    '''
     with open(path_json) as f:
         result_score = []
         json_data = json.load(f)
