@@ -6,6 +6,7 @@ import librosa.display
 from RelationNet.Seegdata import *
 from util.util_file import *
 import re
+import json
 
 
 def sigmoid(x):
@@ -292,3 +293,8 @@ def test_21():
     path_1 = "'../data/data_slice/split/preseizure/LKKKKKKK/1d61665c-a894-11e9-bc3a-338334ea1429-0.npy'"
     name = re.findall("/.+/(.+)", path_1)[0]
     print(name)
+
+
+def test_22():
+    config = json.load(open(os.getcwd() + "/config/fig.json"))
+    print(config["transferdata.save_split_data_test.path_dir"])

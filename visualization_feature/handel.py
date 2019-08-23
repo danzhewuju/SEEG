@@ -11,6 +11,7 @@ import sys
 
 sys.path.append('../')
 from util import *
+from DataProcessing.transferdata import *
 import re
 from tqdm import tqdm
 from PIL import Image
@@ -162,9 +163,51 @@ def image_connection(data_signal_dir, raw_data_dir, save_dir="./contact_image"):
         # plt.show()
 
 
-if __name__ == '__main__':
+def image_contact_process():  # 流程处理函数
     path_a = "./examples"
     path_b = "./raw_data_signal"
     create_raw_data_signal()  # 生成原始信号中梯队最高的信道的信号图像
     image_connection('./examples', './raw_data_signal')
-    # get_hotmap_dic(path_a, path_b)
+
+
+def raw_data_without_filter_process():
+    '''
+    1.医生需要原始的数据，需要未经过切片的原始数据，因此此时需要重写相关函数。不经过滤波
+    :return:
+    '''
+    # 1.癫痫发作前的原始数据的重写
+    path_commom_channel = "../data/data_slice/channels_info/LK_seq.csv"
+    path_dir = "../data/raw_data/LK/LK_Pre_seizure"
+    flag = 0
+    for index, p in enumerate(os.listdir(path_dir)):
+        if index < 1:
+            path_raw = os.path.join(path_dir, p)
+            name = "LK"
+            generate_data(path_raw, flag, name, path_commom_channel, isfilter=False)
+    print("癫痫发作前的睡眠处理完成！！！")
+
+    # 2.正常数据的重写
+    path_commom_channel = "../data/data_slice/channels_info/LK_seq.csv"
+    path_raw_normal_sleep = ["../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif",
+                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-1.fif',
+                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif',
+                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-4-0.fif',
+                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-6-0.fif'
+
+                             ]  # 数据太多，因此只是选取部分的数据进行处理
+    name = "LK"
+    flag = 2  # 正常睡眠时间
+
+    for index, path_raw in enumerate(path_raw_normal_sleep):
+        if index < 1:
+            generate_data(path_raw, flag, name, path_commom_channel, isfilter=False)
+
+    print("{}正常睡眠的数据处理完成！".format(name))
+
+
+if __name__ == '__main__':
+    # 1. 将两个原信号连接在一起
+    # image_contact_process()
+
+    # 2. 生成未滤波数据的切片
+    raw_data_without_filter_process()

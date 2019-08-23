@@ -5,11 +5,16 @@
 '''
 
 from util import *
+import json
 
 time = 2  # 每一帧的持续时间
 resample = 100  # 重采样的频率
 high_pass = 0
 low_pass = 30
+
+config = json.load(open("../DataProcessing/config/fig.json"))
+
+save_split_data_test__path_dir = config["transferdata.save_split_data_test.path_dir"]
 
 
 def save_file(path_lk, path_sgh, save_dir, flag):  # 将数据进行存储转化为切片数据
@@ -40,7 +45,7 @@ def save_split_data_test(raw_data, name, flag, time=time, flag_duration=0):
     :param time: 切片的大小
     :return:
     '''
-    path_dir = "../data/data_slice/split"
+    path_dir = save_split_data_test__path_dir  # 通过配置文件来读取
     if flag == 0:  # 癫痫发作前的状态, 这个状态可以进一步的细分，主要表现为发作前设置的预警时间
         if flag_duration == 0:  # 默认是不进行细分
             dir = 'preseizure'
@@ -73,16 +78,27 @@ def save_split_data_test(raw_data, name, flag, time=time, flag_duration=0):
     return True
 
 
-def data_save(path_read, name, flag, common_channels, flag_duration=0):
+def data_save(path_read, name, flag, common_channels, flag_duration=0, isfilter=True):
+    '''
+
+    :param path_read: 原始数据的路径，用于读取
+    :param name: 文件的名称用于保存切片的数据
+    :param flag: 状态为， 区别:癫痫发作前， 正常睡眠状态
+    :param common_channels: 选取的信道的序列
+    :param flag_duration: 窗口的大小："2s"
+    :param isFilter: 是否滤波，医生希望看到原始数据
+    :return:
+    '''
     raw = read_raw(path_read)
-    raw = filter_hz(raw, high_pass, low_pass)
+    if isfilter:
+        raw = filter_hz(raw, high_pass, low_pass)
     raw.resample(resample, npad="auto")  # resample 100hz
     raw = select_channel_data_mne(raw, common_channels)
     raw.reorder_channels(common_channels)  # 更改信道的顺序
     save_split_data_test(raw, name, flag, time, flag_duration=flag_duration)
 
 
-def generate_data(path, flag, name, path_commom_channel, flag_duration=0):
+def generate_data(path, flag, name, path_commom_channel, flag_duration=0, isfilter=True):
     '''
 
     :param path: 文件的路径
@@ -94,7 +110,7 @@ def generate_data(path, flag, name, path_commom_channel, flag_duration=0):
     data = pd.read_csv(path_commom_channel, sep=',')
     d_list = data['chan_name']
     common_channels = list(d_list)
-    data_save(path, name, flag, common_channels, flag_duration=flag_duration)
+    data_save(path, name, flag, common_channels, flag_duration=flag_duration, isfilter=isfilter)
 
 
 def sleep_normal_handle():
