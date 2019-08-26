@@ -180,15 +180,15 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/LK"):
     heat_map_path = get_first_dir_path(heat_map_dir)
     heat_map_path.sort()
     test_1 = Image.open(heat_map_path[0])
-    dst_1 = test_1.transpose(Image.ROTATE_90)
-    size = dst_1.size
+    # dst_1 = test_1.transpose(Image.ROTATE_90)
+    size = test_1.size
     plt.figure(figsize=(2*count, 3))
-    result = Image.new(dst_1.mode, (size[0] * count, size[1]))
+    result = Image.new(test_1.mode, (size[0] * count, size[1]))
     for i in range(count):
         img = Image.open(heat_map_path[i])
-        img_t = img.transpose(Image.ROTATE_90)
-        result.paste(img_t, box=(i * size[0], 0))
-    # result.save("./60s.png")
+        # img_t = img.transpose(Image.ROTATE_90)
+        result.paste(img, box=(i * size[0], 0))
+    result.save("./60s.png")
     plt.imshow(result)
     plt.show()
 

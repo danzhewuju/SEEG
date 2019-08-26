@@ -16,7 +16,7 @@ from util.util_file import matrix_normalization, trans_numpy_cv2, get_matrix_max
 x_ = 8
 y_ = 12
 NUM_CLASS = 2
-shape = (130, 200)
+shape = (200, 130)
 
 
 # full_connection =

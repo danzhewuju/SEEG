@@ -13,6 +13,11 @@ from util import *
 from VAE.vae import trans_data, VAE
 
 '''
+preseizure: 0
+normal sleep : 1
+'''
+
+'''
 一般CNN模型的训练
 '''
 
