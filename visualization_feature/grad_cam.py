@@ -16,7 +16,7 @@ from util.util_file import matrix_normalization, trans_numpy_cv2, get_matrix_max
 x_ = 8
 y_ = 12
 NUM_CLASS = 2
-shape = (200, 130)
+shape = (200, 130)  # cv2的图片坐标和numpy的坐标并不一致， cv2:(x, y)  PIL:(y,x)
 
 
 # full_connection =
@@ -287,7 +287,7 @@ def get_feature_map(path_data):
     # feature method, and a classifier method,
     # as in the VGG models in torchvision.
     model_cnn = CNN().cuda(0) if args.use_cuda else CNN()
-    model_path = "../RelationNet/models/model-cnn.ckpt"
+    model_path = "./models/model-cnn.ckpt"
     model_cnn.load_state_dict(torch.load(model_path, map_location=lambda storage, loc: storage))
     print("load cnn model success!")
     grad_cam = GradCam(model=model_cnn, target_layer_names=["layer4"], use_cuda=args.use_cuda)

@@ -296,5 +296,7 @@ def data_process_n_1():
 
 if __name__ == '__main__':
     # 两种模式， mixed, 前n-1个人的数据
+    # 1. 混合式的数据划分，等比划分
     # data_process()
+    # 2. zero_data 留一法的数据划分
     data_process_n_1()
