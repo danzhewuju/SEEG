@@ -17,6 +17,7 @@ from tqdm import tqdm
 from PIL import Image
 import matplotlib.pyplot as plt
 import os
+from grad_cam import *
 
 
 def get_hotmap_dic(path_hotmap, path_b_raw_data):
@@ -163,6 +164,35 @@ def image_connection(data_signal_dir, raw_data_dir, save_dir="./contact_image"):
         # plt.show()
 
 
+def time_heat_map(path="./raw_data_time_sequentially/preseizure/LK"):
+    '''
+
+    :return:
+    构造时间序列的热力图
+    '''
+    heat_map_dir = "./examples"
+    path_data = get_first_dir_path(path, 'npy')
+    path_data.sort()  # 根据uuid 按照时间序列进行排序
+    count = 30  # 拼接的时间
+    clean_dir(heat_map_dir)  # 清除文件夹里面所有文件
+    for p in path_data:
+        get_feature_map(p)
+    heat_map_path = get_first_dir_path(heat_map_dir)
+    heat_map_path.sort()
+    test_1 = Image.open(heat_map_path[0])
+    dst_1 = test_1.transpose(Image.ROTATE_90)
+    size = dst_1.size
+    plt.figure(figsize=(2*count, 3))
+    result = Image.new(dst_1.mode, (size[0] * count, size[1]))
+    for i in range(count):
+        img = Image.open(heat_map_path[i])
+        img_t = img.transpose(Image.ROTATE_90)
+        result.paste(img_t, box=(i * size[0], 0))
+    # result.save("./60s.png")
+    plt.imshow(result)
+    plt.show()
+
+
 def image_contact_process():  # 流程处理函数
     path_a = "./examples"
     path_b = "./raw_data_signal"
@@ -210,4 +240,8 @@ if __name__ == '__main__':
     # image_contact_process()
 
     # 2. 生成未滤波数据的切片
-    raw_data_without_filter_process()
+    # raw_data_without_filter_process()
+
+    # 3. 拼接热力图， 将热力图按照时间序列进行拼接
+    time_heat_map()
+

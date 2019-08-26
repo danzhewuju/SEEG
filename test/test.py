@@ -296,5 +296,18 @@ def test_21():
 
 
 def test_22():
-    config = json.load(open(os.getcwd() + "/config/fig.json"))
-    print(config["transferdata.save_split_data_test.path_dir"])
+    uuids = []
+    for i in range(100):
+        str = uuid.uuid1()
+        print(str)
+        uuids.append(str)
+    uuids.reverse()
+    print(uuids)
+    uuids.sort()
+    print(uuids)
+
+
+def test_23():
+    a = "abdaffff"
+    b = "abdaa"
+    print(a < b)
