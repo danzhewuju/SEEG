@@ -227,10 +227,10 @@ def raw_data_without_filter_process():
 
 if __name__ == '__main__':
     # 1. 将两个原信号连接在一起
-    image_contact_process()
+    # image_contact_process()
 
     # 2. 生成未滤波数据的切片
     # raw_data_without_filter_process()
 
     # 3. 拼接热力图， 将热力图按照时间序列进行拼接
-    # time_heat_map()
+    time_heat_map()

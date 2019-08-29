@@ -166,8 +166,20 @@ class GradCam:
         else:
             features, output = self.extractor(input)
 
-        if index == None:
-            index = np.argmax(output.cpu().data.numpy())
+        # if index == None:
+        #     index = np.argmax(output.cpu().data.numpy())
+        index_p = np.argmax(output.cpu().data.numpy())
+        if os.path.exists('./log/') is not True:
+            os.mkdir('./log/')
+        if os.path.exists("./log/heatmap.csv") is not True:
+            f = open("./log/heatmap.csv", 'w')
+            f.writelines("grant truth, prediction\n")
+        else:
+            f = open("./log/heatmap.csv", 'a')
+
+        str = "{},{} \n".format(index, index_p)
+        f.writelines(str)
+        f.close()
 
         one_hot = np.zeros((1, output.size()[-1]), dtype=np.float32)
         one_hot[0][index] = 1
@@ -303,7 +315,7 @@ def get_feature_map(path_data):
 
     # If None, returns the map for the highest scoring category.
     # Otherwise, targets the requested index.
-    target_index = None
+    target_index = 0
 
     mask = grad_cam(input, target_index)
     location = get_matrix_max_location(mask, 5)
