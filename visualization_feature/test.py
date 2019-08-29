@@ -5,7 +5,7 @@ from PIL import Image
 
 
 def test_1():
-    path = "./examples/0f24adba-a894-11e9-bc3a-338334ea1429-0-loc-0-0-1-1-0.jpg"
+    path = "./heatmap/0f24adba-a894-11e9-bc3a-338334ea1429-0-loc-0-0-1-1-0.jpg"
     raw_path = "../data/data_slice/split/preseizure/LK/0f24adba-a894-11e9-bc3a-338334ea1429-0.npy"
     raw_data = np.load(raw_path)
     save_path = "./"
@@ -22,7 +22,7 @@ def test_1():
 
 def test_2():
     # 图像拼接
-    path_dir = "./examples"
+    path_dir = "./heatmap"
     path_dir = get_first_dir_path(path_dir)
     path_1 = path_dir[0]
     path_2 = path_dir[1]

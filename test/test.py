@@ -279,7 +279,7 @@ def test20():
 
 
 def test_21():
-    path = "./examples/19df46c0-a894-11e9-bc3a-338334ea1429-0-loc-0-7-6-7-0.jpg"
+    path = "./heatmap/19df46c0-a894-11e9-bc3a-338334ea1429-0-loc-0-7-6-7-0.jpg"
     channels_str = re.findall('-loc-(.+).jpg', path)[0]
     channels_number = map(int, channels_str.split('-'))
     channels_number = list(set(channels_number))
@@ -287,7 +287,7 @@ def test_21():
     print(channels_number)
     d = re.sub('-loc(.+).jpg', '', path)
     name = d + ".npy"
-    name = re.findall('examples/(.+)', name)[0]
+    name = re.findall('heatmap/(.+)', name)[0]
     print(name)
 
     path_1 = "'../data/data_slice/split/preseizure/LKKKKKKK/1d61665c-a894-11e9-bc3a-338334ea1429-0.npy'"

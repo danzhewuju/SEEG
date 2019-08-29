@@ -307,21 +307,21 @@ def get_feature_map(path_data):
 
     mask = grad_cam(input, target_index)
     location = get_matrix_max_location(mask, 5)
-    channel_location = "-loc" + ("-{}" * 5).format(location[0][1], location[1][1], location[2][1], location[3][1],
-                                                   location[4][1])
+    channel_location = "-loc" + ("-{}" * 5).format(location[0][0], location[1][0], location[2][0], location[3][0],
+                                                   location[4][0])
 
     name = path_data.split("/")[-1][:-4] + channel_location + ".jpg"
-    save_path = os.path.join("./examples", name)
+    save_path = os.path.join("./heatmap", name)
 
     show_cam_on_image(img, mask, save_path)  # 将热力图写回到原来的图片
 
     # gb_model = GuidedBackpropReLUModel(model=models.vgg19(pretrained=True), use_cuda=args.use_cuda)
     # gb = gb_model(input, index=target_index)
-    # utils.save_image(torch.from_numpy(gb), './examples/gb.jpg')
+    # utils.save_image(torch.from_numpy(gb), './heatmap/gb.jpg')
     #
     # cam_mask = np.zeros(gb.shape)
     # for i in range(0, gb.shape[0]):
     #     cam_mask[i, :, :] = mask
     #
     # cam_gb = np.multiply(cam_mask, gb)
-    # utils.save_image(torch.from_numpy(cam_gb), './examples/cam_gb.jpg')
+    # utils.save_image(torch.from_numpy(cam_gb), './heatmap/cam_gb.jpg')

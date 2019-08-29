@@ -127,8 +127,8 @@ class Seegnet(FewShotDataset):
 
 
 class ClassBalancedSampler(Sampler):
-    ''' Samples 'num_inst' examples each from 'num_cl' pools
-        of examples of size 'num_per_class' '''
+    ''' Samples 'num_inst' heatmap each from 'num_cl' pools
+        of heatmap of size 'num_per_class' '''
 
     def __init__(self, num_cl, num_inst, shuffle=True):
 
@@ -156,8 +156,8 @@ class ClassBalancedSampler(Sampler):
 
 
 class ClassBalancedSamplerOld(Sampler):
-    ''' Samples 'num_inst' examples each from 'num_cl' pools
-        of examples of size 'num_per_class' '''
+    ''' Samples 'num_inst' heatmap each from 'num_cl' pools
+        of heatmap of size 'num_per_class' '''
 
     def __init__(self, num_per_class, num_cl, num_inst, shuffle=True):
         self.num_per_class = num_per_class

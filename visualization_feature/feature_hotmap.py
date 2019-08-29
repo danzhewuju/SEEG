@@ -73,7 +73,8 @@ if __name__ == '__main__':
     # example_similarity("./json_path/LK_preseizure_path.json")  # 相似度的计算并排序
 
     f = open('./json_path/LK_preseizure_sorted.json', 'r')
-    clean_dir('./examples')
+    clean_dir('./heatmap')
+    clean_dir('./raw_data_signal')
     count = 100
     data = f.read()
     json_data = json.loads(data)

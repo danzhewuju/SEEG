@@ -26,7 +26,7 @@ def get_hotmap_dic(path_hotmap, path_b_raw_data):
     for p in path_all_a:
         d = re.sub('-loc(.+).jpg', '', p)
         raw_path = d + ".npy"
-        name = re.findall('examples/(.+)', raw_path)[0]
+        name = re.findall('heatmap/(.+)', raw_path)[0]
         path_all_name_hot.append(name[:-4])
     dict_hot = dict(zip(path_all_a, path_all_name_hot))
     path_all_b = get_first_dir_path(path_b_raw_data)
@@ -52,8 +52,8 @@ def get_hotmap_dic(path_hotmap, path_b_raw_data):
     return dict_result, name_save
 
 
-def create_raw_data_signal(image_dir="./examples"):
-    # hot_map_paths = get_first_dir_path('./examples', suffix='jpg')
+def create_raw_data_signal(image_dir="./heatmap"):
+    # hot_map_paths = get_first_dir_path('./heatmap', suffix='jpg')
     # t = re.findall("loc-(.+).jpg", hot_map_paths[0])[0]
     # print(t)
     #
@@ -87,7 +87,7 @@ def create_raw_data_signal(image_dir="./examples"):
 
             d = re.sub('-loc(.+).jpg', '', path_tmp)
             raw_path = d + ".npy"
-            name = re.findall('examples/(.+)', raw_path)[0]
+            name = re.findall('heatmap/(.+)', raw_path)[0]
             selected_raw_path.append((name, channels_number))
 
         for index, (name, channels_number) in tqdm(enumerate(selected_raw_path)):
@@ -141,27 +141,16 @@ def image_connection(data_signal_dir, raw_data_dir, save_dir="./contact_image"):
         path_test_2 = dict_hot_raw[p]
         plt.figure(0)
         imag_test = Image.open(path_test_1)
-        dst_1 = imag_test.transpose(Image.ROTATE_90)
         dst_2 = Image.open(path_test_2)
 
         f = plt.figure(figsize=(7, 12))
         ax = f.add_subplot(211)
-        ax.axis('off')
         ax2 = f.add_subplot(212)
-        ax2.axis('off')
-        ax.imshow(dst_1)
+        ax.imshow(imag_test)
         ax2.imshow(dst_2)
-        # plt.subplot(2, 1, 1)
-        # plt.imshow(dst_1)
-        #
-        #
-        # plt.subplot(2, 1, 2)
-        # plt.imshow(dst_2)
-        # plt.axis('off')
+        plt.axis('off')
         plt.savefig(save_path)
-        # plt.show()
         plt.close(0)
-        # plt.show()
 
 
 def time_heat_map(path="./raw_data_time_sequentially/preseizure/LK"):
@@ -170,7 +159,7 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/LK"):
     :return:
     构造时间序列的热力图
     '''
-    heat_map_dir = "./examples"
+    heat_map_dir = "./heatmap"
     path_data = get_first_dir_path(path, 'npy')
     path_data.sort()  # 根据uuid 按照时间序列进行排序
     count = 30  # 拼接的时间
@@ -182,7 +171,7 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/LK"):
     test_1 = Image.open(heat_map_path[0])
     # dst_1 = test_1.transpose(Image.ROTATE_90)
     size = test_1.size
-    plt.figure(figsize=(2*count, 3))
+    plt.figure(figsize=(2 * count, 3))
     result = Image.new(test_1.mode, (size[0] * count, size[1]))
     for i in range(count):
         img = Image.open(heat_map_path[i])
@@ -194,10 +183,11 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/LK"):
 
 
 def image_contact_process():  # 流程处理函数
-    path_a = "./examples"
+    path_a = "./heatmap"
     path_b = "./raw_data_signal"
+
     create_raw_data_signal()  # 生成原始信号中梯队最高的信道的信号图像
-    image_connection('./examples', './raw_data_signal')
+    image_connection(path_a, path_b)
 
 
 def raw_data_without_filter_process():
@@ -237,11 +227,10 @@ def raw_data_without_filter_process():
 
 if __name__ == '__main__':
     # 1. 将两个原信号连接在一起
-    # image_contact_process()
+    image_contact_process()
 
     # 2. 生成未滤波数据的切片
     # raw_data_without_filter_process()
 
     # 3. 拼接热力图， 将热力图按照时间序列进行拼接
-    time_heat_map()
-
+    # time_heat_map()
