@@ -150,5 +150,31 @@ def trans_numpy_cv2(data):
     result = cv2.merge([result])
     return result
 
+
+def time_add(h, m, s, seconds_add):
+    '''
+
+    :param h: 小时
+    :param m: 分钟
+    :param s: 秒
+    :param seconds_add: 需要增加的时间秒数
+    :return: 返回的是绝对的时间
+    '''
+    s += seconds_add
+    s_m = s // 60
+    s = s % 60
+
+    m += s_m
+    m_h = m // 60
+    m = m % 60
+
+    h += m_h
+
+    return int(h), int(m), s
+
+
 # if __name__ == '__main__':
-#     print(get_label_data("/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/test"))
+#     #     print(get_label_data("/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/test"))
+#     str_a = "10:2:19"
+#     h, m, s = time_add(str_a, 125)
+#     print(h, m, s)

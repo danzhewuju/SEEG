@@ -279,9 +279,6 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--use-cuda', action='store_true', default=False,
                         help='Use NVIDIA GPU acceleration')
-    parser.add_argument('--image-path', type=str,
-                        default='../data/seeg/mixed_data/val/pre_zeizure/4012410c-9bd9-11e9-912c-79975a8821be-0.npy',
-                        help='Input image path')
     args = parser.parse_args()
     args.use_cuda = args.use_cuda and torch.cuda.is_available()
     if args.use_cuda:
@@ -292,7 +289,7 @@ def get_args():
     return args
 
 
-def get_feature_map(path_data):
+def get_feature_map(path_data, location_name):
     args = get_args()
 
     # Can work with any model, but it assumes that the model has a
@@ -318,7 +315,22 @@ def get_feature_map(path_data):
     target_index = 0
 
     mask = grad_cam(input, target_index)
-    location = get_matrix_max_location(mask, 5)
+    location = get_matrix_max_location(mask, 5)  # 获得最大梯度的位置，包含时间位置和物理位置
+
+    location_full_path = os.path.join("./log", location_name)
+    if os.path.exists(location_full_path):
+        fp = open(location_full_path, 'a')
+    else:
+        fp = open(location_full_path, 'w')
+        header = "time_location,spatial_location\n"
+        fp.write(header)  # 头部的信息
+    location_spatial = [str(x[0]) for x in location]
+    location_spatial_str = "-".join(location_spatial)
+    location_time = [str(x[1]) for x in location]
+    location_time_str = "-".join(location_time)
+    fp.write("{},{}\n".format(location_time_str, location_spatial_str))
+    fp.close()
+
     channel_location = "-loc" + ("-{}" * 5).format(location[0][0], location[1][0], location[2][0], location[3][0],
                                                    location[4][0])
 
@@ -326,14 +338,3 @@ def get_feature_map(path_data):
     save_path = os.path.join("./heatmap", name)
 
     show_cam_on_image(img, mask, save_path)  # 将热力图写回到原来的图片
-
-    # gb_model = GuidedBackpropReLUModel(model=models.vgg19(pretrained=True), use_cuda=args.use_cuda)
-    # gb = gb_model(input, index=target_index)
-    # utils.save_image(torch.from_numpy(gb), './heatmap/gb.jpg')
-    #
-    # cam_mask = np.zeros(gb.shape)
-    # for i in range(0, gb.shape[0]):
-    #     cam_mask[i, :, :] = mask
-    #
-    # cam_gb = np.multiply(cam_mask, gb)
-    # utils.save_image(torch.from_numpy(cam_gb), './heatmap/cam_gb.jpg')

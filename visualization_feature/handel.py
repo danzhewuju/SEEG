@@ -99,33 +99,6 @@ def create_raw_data_signal(image_dir="./heatmap"):
 
         print("All files has been written!")
 
-        # 进行路径的转换
-
-        # data_path = "../data/data_slice/split/preseizure/LK/17673574-a894-11e9-bc3a-338334ea1429-0.npy"
-        # data = np.load(data_path)
-        #
-        # seeg_npy_plot(data, [23, 24, 25])
-        #
-        # data_path = "../data/data_slice/split/preseizure/LK/176811ba-a894-11e9-bc3a-338334ea1429-0.npy"
-        # data = np.load(data_path)
-        # seeg_npy_plot(data, [23, 24, 25])
-        #
-        # data_path = "../data/data_slice/split/preseizure/LK/12e74ffc-a894-11e9-bc3a-338334ea1429-0.npy"
-        # data = np.load(data_path)
-        # seeg_npy_plot(data, [23, 24, 25])
-        #
-        # data_path = "../data/data_slice/split/preseizure/LK/06d1da02-a894-11e9-bc3a-338334ea1429-0.npy"
-        # data = np.load(data_path)
-        # seeg_npy_plot(data, [72, 73, 74])
-        #
-        # data_path = "../data/data_slice/split/preseizure/LK/17647370-a894-11e9-bc3a-338334ea1429-0.npy"
-        # data = np.load(data_path)
-        # seeg_npy_plot(data, [3, 4, 5])
-        #
-        # data_path = "../data/data_slice/split/preseizure/LK/176976a4-a894-11e9-bc3a-338334ea1429-0.npy"
-        # data = np.load(data_path)
-        # seeg_npy_plot(data, [39, 40, 41])
-
 
 def image_connection(data_signal_dir, raw_data_dir, save_dir="./contact_image"):
     if os.path.exists(save_dir) is not True:
@@ -159,13 +132,15 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/LK"):
     :return:
     构造时间序列的热力图
     '''
+    file_name = "LK_Sleep_Aug_4th_2am_seeg_raw"  # 指定了这个文件来让医生进行验证
+    file_name = file_name + ".csv"
     heat_map_dir = "./heatmap"
     path_data = get_first_dir_path(path, 'npy')
     path_data.sort()  # 根据uuid 按照时间序列进行排序
     count = 30  # 拼接的时间
     clean_dir(heat_map_dir)  # 清除文件夹里面所有文件
     for p in path_data:
-        get_feature_map(p)
+        get_feature_map(p, file_name)
     heat_map_path = get_first_dir_path(heat_map_dir)
     heat_map_path.sort()
     test_1 = Image.open(heat_map_path[0])
@@ -196,6 +171,7 @@ def raw_data_without_filter_process():
     :return:
     '''
     # 1.癫痫发作前的原始数据的重写
+    clean_dir("./raw_data_time_sequentially")  # 删除文件夹下面已有的旧的文件
     path_commom_channel = "../data/data_slice/channels_info/LK_seq.csv"
     path_dir = "../data/raw_data/LK/LK_Pre_seizure"
     flag = 0
@@ -203,7 +179,7 @@ def raw_data_without_filter_process():
         if index < 1:
             path_raw = os.path.join(path_dir, p)
             name = "LK"
-            generate_data(path_raw, flag, name, path_commom_channel, isfilter=False)
+            generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
     print("癫痫发作前的睡眠处理完成！！！")
 
     # 2.正常数据的重写
@@ -220,17 +196,70 @@ def raw_data_without_filter_process():
 
     for index, path_raw in enumerate(path_raw_normal_sleep):
         if index < 1:
-            generate_data(path_raw, flag, name, path_commom_channel, isfilter=False)
+            generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
 
     print("{}正常睡眠的数据处理完成！".format(name))
 
 
+def sequentially_signal(config="./json_path/config.json"):  # 时间序列的热点分析
+    config_json = json.load(open(config))
+    path = config_json['handel.sequentially__path']
+
+    channel_list_path = config_json['handel.sequentially__path_channel_list']
+    channel_pandas = pd.read_csv(channel_list_path)
+    channel_list = channel_pandas['chan_name']  # 获得与信道对应的index-channel的列表
+
+    start_time = config_json['handel.sequentially__LK_start_time']
+    start_time_list = [int(x) for x in start_time.split(":")]
+
+    save_signal_info = config_json['handel.sequentially__save_dir']
+
+    data = pd.read_csv(path, sep=',')
+    location_time = data['time_location']
+    location_spatial = data['spatial_location']
+
+    channel_time = {}
+    h, m, s = start_time_list[0], start_time_list[1], start_time_list[2]
+    for index in range(len(location_time)):
+        time_loc = int(location_time[index].split('-')[0])
+        second_add = time_loc/100 # 需要累积之前的时间,将时间的换算单位转化为:s
+        second_add = round(second_add, 2)
+        # 进行时间的累积计算
+        h, m, s = time_add(h, m, s, second_add)
+        s = round(s, 2)
+
+        time_point = "{}:{}:{}".format(str(h), str(m), str(s))
+
+        space_loc = int(location_spatial[index].split('-')[0])
+        channel_name = channel_list[space_loc]  # 这个操作只对LK有效，因为其他病人的信道数并不存在相应的对应关系
+
+        if channel_name not in channel_time.keys():
+            channel_time[channel_name] = time_point
+        else:
+            tmp = channel_time[channel_name]
+            result = tmp + ", " + time_point
+            channel_time[channel_name] = result
+
+    # TODO: 写入相关的文件信息, 文件的回写操作
+    fp_signal_info = open(save_signal_info, 'w')
+    fp_signal_info.write("文件路径信息：{} \t 起始时间:{}\n".format(path, start_time))
+    for name, time in channel_time.items():
+        line = name + ":\t" + time + "\n"
+        fp_signal_info.write(line)
+    fp_signal_info.close()
+    print("All information has been written in {}".format(save_signal_info))
+
+
 if __name__ == '__main__':
-    # 1. 将两个原信号连接在一起
+    # TODO: list
+    # 1. 将两个原信号连接在一起,一个是热力信号，一个是原始的波形信号
     # image_contact_process()
 
-    # 2. 生成未滤波数据的切片
+    # 2.1 生成未滤波数据的切片, 可以设置是否选择滤波处理
     # raw_data_without_filter_process()
+    # TODO:
+    # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接
+    # time_heat_map()
 
-    # 3. 拼接热力图， 将热力图按照时间序列进行拼接
-    time_heat_map()
+    # 2.3 按照绝对时间来计算序列
+    sequentially_signal()
