@@ -132,8 +132,8 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/LK"):
     :return:
     构造时间序列的热力图
     '''
-    file_name = "LK_Sleep_Aug_4th_2am_seeg_raw"  # 指定了这个文件来让医生进行验证
-    file_name = file_name + ".csv"
+    file_name = "LK_SZ1_pre_seizure_raw"  # 指定了这个文件来让医生进行验证
+    file_name = file_name + ".fif"
     heat_map_dir = "./heatmap"
     path_data = get_first_dir_path(path, 'npy')
     path_data.sort()  # 根据uuid 按照时间序列进行排序
@@ -261,4 +261,4 @@ if __name__ == '__main__':
     time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
-    # sequentially_signal()
+    sequentially_signal()

@@ -20,9 +20,10 @@ from MAML.Mamlnet import *
 from meta import *
 from util.util_file import matrix_normalization
 import matplotlib.pyplot as plt
+import time
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=8000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=8)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=8)
@@ -84,12 +85,12 @@ class Data_info():
                     sleep_normal.append((full_path, index))
                 data_test.append((full_path, index))
 
-        # t = time.time()
-        # random.seed(t)
-        # random.shuffle(data_train)
-        # t = time.time()
-        # random.seed(t)
-        # random.shuffle(data_test)
+        t = time.time()
+        random.seed(t)
+        random.shuffle(data_train)
+        t = time.time()
+        random.seed(t)
+        random.shuffle(data_test)
 
         self.data_train = data_train
         self.data_test = data_test

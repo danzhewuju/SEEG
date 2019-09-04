@@ -1,6 +1,6 @@
 {
-  "handel.sequentially__path": "./log/LK_Sleep_Aug_4th_2am_seeg_raw.csv",
+  "handel.sequentially__path": "./log/LK_SZ1_pre_seizure_raw.fif",
   "handel.sequentially__path_channel_list": "../data/data_slice/channels_info/LK_seq.csv",
   "handel.sequentially__save_dir": "./log/signal_info.txt",
-  "handel.sequentially__LK_start_time": "2:10:54"
+  "handel.sequentially__LK_start_time": "15:47:28"
 }
