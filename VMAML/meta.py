@@ -149,7 +149,6 @@ class Meta(nn.Module):
         # we finetunning on the copied model instead of self.net
         net = deepcopy(self.net)
 
-
         # 1. run the i-th task and compute loss for k=0
         logits = net(x_spt)
         loss = F.cross_entropy(logits, y_spt)

@@ -147,7 +147,7 @@ def trans_numpy_cv2(data):
     max_data = np.max(data1)
     data1 = data1 / max_data * 255
     result = data1.astype(np.uint8)
-    result = cv2.merge([result])
+    result = cv2.merge([result])  # 将信道进行整合
     return result
 
 
@@ -174,7 +174,7 @@ def time_add(h, m, s, seconds_add):
 
 
 # if __name__ == '__main__':
-#     #     print(get_label_data("/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/test"))
+#     # print(get_label_data("/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/test"))
 #     str_a = "10:2:19"
 #     h, m, s = time_add(str_a, 125)
 #     print(h, m, s)

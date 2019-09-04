@@ -257,9 +257,8 @@ if __name__ == '__main__':
 
     # 2.1 生成未滤波数据的切片, 可以设置是否选择滤波处理
     # raw_data_without_filter_process()
-    # TODO:
     # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接
-    # time_heat_map()
+    time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
-    sequentially_signal()
+    # sequentially_signal()

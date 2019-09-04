@@ -22,15 +22,15 @@ from util.util_file import matrix_normalization
 import matplotlib.pyplot as plt
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=5000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=8000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
-argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
-argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
+argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=8)
+argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=8)
 argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
 argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=1e-3)
-argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
+argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.005)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
 argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
 argparser.add_argument('--dataset_dir', type=str, help="training data set", default="../data/seeg/zero_data")
@@ -193,8 +193,8 @@ def show_eeg(data):
 
 vae_p = VAE().to(device)
 vae_n = VAE().to(device)
-optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.002)
-optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.002)
+optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.005)
+optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.005)
 
 
 # vae 模块
