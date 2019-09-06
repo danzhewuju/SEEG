@@ -25,9 +25,9 @@ def mean_confidence_interval(accs, confidence=0.95):
 
 
 def main():
-    # torch.manual_seed(222)  # 为cpu设置种子，为了使结果是确定的
-    # torch.cuda.manual_seed_all(222)  # 为GPU设置种子，为了使结果是确定的
-    # np.random.seed(222)
+    torch.manual_seed(222)  # 为cpu设置种子，为了使结果是确定的
+    torch.cuda.manual_seed_all(222)  # 为GPU设置种子，为了使结果是确定的
+    np.random.seed(222)
 
     print(args)
 
