@@ -2,6 +2,7 @@ import re
 from util.seeg_utils import *
 from util import *
 from PIL import Image
+from grad_cam import *
 
 
 def test_1():
@@ -37,5 +38,12 @@ def test_2():
     result.paste(dst_2, box=(200, 0))
     plt.imshow(result)
     plt.show()
+
+
+def test_3():
+    path = "./raw_data-without filter/preseizure/LK/b1d480ae-c5a3-11e9-a357-9975cafe06d3-0.npy"
+    get_feature_map(path, location_name="None")
+
+
 
 

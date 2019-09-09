@@ -153,6 +153,7 @@ class Learner(nn.Module):
 
             elif name is 'flatten':
                 # print(x.shape)
+                self.feature_heat_map = x    # 保存全连接层的输出， 用于maml热力图热力图的计算
                 x = x.view(x.size(0), -1)
             elif name is 'reshape':
                 # [b, 8] => [b, 2, 2, 2]
@@ -181,7 +182,7 @@ class Learner(nn.Module):
 
         return x
 
-    def zero_grad(self, vars=None):
+    def zero_grad(self, vars=None):  # 不利用梯度的反向传播
         """
 
         :param vars:

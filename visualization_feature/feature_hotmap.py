@@ -79,4 +79,4 @@ if __name__ == '__main__':
     data = f.read()
     json_data = json.loads(data)
     for i in range(count):
-        get_feature_map(json_data[i])
+        get_feature_map(json_data[i], location_name="None")

@@ -8,6 +8,9 @@ import torch.nn as nn
 from torch.autograd import Function
 from torch.autograd import Variable
 import sys
+from MAML.learner import *
+from meta import Meta
+import json
 
 sys.path.append('../')
 
@@ -18,8 +21,29 @@ y_ = 12
 NUM_CLASS = 2
 shape = (200, 130)  # cv2的图片坐标和numpy的坐标并不一致， cv2:(x, y)  PIL:(y,x)
 
-
-# full_connection =
+'''
+feature extraction by maml model !
+'''
+config_maml = [
+    ('conv2d', [32, 1, 3, 3, 1, 0]),
+    ('relu', [True]),
+    ('bn', [32]),
+    ('max_pool2d', [2, 2, 0]),
+    ('conv2d', [32, 32, 3, 3, 1, 0]),
+    ('relu', [True]),
+    ('bn', [32]),
+    ('max_pool2d', [2, 2, 0]),
+    ('conv2d', [32, 32, 3, 3, 1, 0]),
+    ('relu', [True]),
+    ('bn', [32]),
+    ('max_pool2d', [2, 2, 0]),
+    ('conv2d', [32, 32, 3, 3, 1, 0]),
+    ('relu', [True]),
+    ('bn', [32]),
+    ('max_pool2d', [2, 1, 0]),
+    ('flatten', []),
+    ('linear', [2, 7040])
+]
 
 
 class CNN(nn.Module):
@@ -91,14 +115,23 @@ class FeatureExtractor():
     def __call__(self, x):
         outputs = []
         self.gradients = []
-        for name, module in self.model._modules.items():
-            if name == 'fc1':
-                x = x.reshape(1, -1)
-            x = module(x)
-            if name in self.target_layers:
-                x.register_hook(self.save_gradient)
-                outputs += [x]
+        # MAML MAML 热力图的计算和CNN热力图的计算不太一样
+        for name, module in self.model._modules.items():  # 特定的maml
+            x_r = module(x)
+            x = module.feature_heat_map
+            x.register_hook(self.save_gradient)
+            outputs += [x]
         return outputs, x
+
+        # CNN
+        # for name, module in self.model._modules.items():  # 特定的maml
+        #     if name == 'fc1':
+        #         x = x.reshape(1, -1)
+        #     x = module(x)
+        #     if name in self.target_layers:
+        #         x.register_hook(self.save_gradient)
+        #         outputs += [x]
+        # return outputs, x
 
 
 class ModelOutputs():
@@ -276,10 +309,26 @@ class GuidedBackpropReLUModel:
 
 
 def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--use-cuda', action='store_true', default=False,
-                        help='Use NVIDIA GPU acceleration')
-    args = parser.parse_args()
+    '''
+
+    :return: args parameters setting
+    '''
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument('--epoch', type=int, help='epoch number', default=4000)
+    argparser.add_argument('--n_way', type=int, help='n way', default=2)
+    argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=10)
+    argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=10)
+    argparser.add_argument('--imgsz', type=int, help='imgsz', default=50)
+    argparser.add_argument('--imgc', type=int, help='imgc', default=3)
+    argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
+    argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=1e-3)
+    argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
+    argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
+    argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
+    argparser.add_argument('--dataset_dir', type=str, help="training data set", default="../data/seeg/zero_data")
+    argparser.add_argument('--use-cuda', action='store_true', default=False,
+                           help='Use NVIDIA GPU acceleration')
+    args = argparser.parse_args()
     args.use_cuda = args.use_cuda and torch.cuda.is_available()
     if args.use_cuda:
         print("Using GPU for acceleration")
@@ -290,16 +339,27 @@ def get_args():
 
 
 def get_feature_map(path_data, location_name):
+    '''
+
+    :param path_data: raw data path
+    :param location_name: raw data original file name ex: LK_SZ1_pre_seizure_raw.fif
+    :return:
+    '''
     args = get_args()
+    config = json.load(open('./json_path/config.json'))
+    model_path_maml = config['grad_cam.get_feature_map__model_path_maml']
+    model_path_cnn = config['grad_cam.get_feature_map__model_path_cnn']
 
     # Can work with any model, but it assumes that the model has a
     # feature method, and a classifier method,
     # as in the VGG models in torchvision.
-    model_cnn = CNN().cuda(0) if args.use_cuda else CNN()
-    model_path = "./models/model-cnn.ckpt"
-    model_cnn.load_state_dict(torch.load(model_path, map_location=lambda storage, loc: storage))
+    device = torch.device('cuda')
+    # model = CNN().cuda(device) if args.use_cuda else CNN() # 模型架构的调整， 1.CNN, 2. MAML
+
+    model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
+    model.load_state_dict(torch.load(model_path_maml, map_location=lambda storage, loc: storage))
     print("load cnn model success!")
-    grad_cam = GradCam(model=model_cnn, target_layer_names=["layer4"], use_cuda=args.use_cuda)
+    grad_cam = GradCam(model=model, target_layer_names=["layer4"], use_cuda=args.use_cuda)
 
     # img = cv2.imread(args.image_path, 1)
     data = np.load(path_data)
@@ -336,5 +396,9 @@ def get_feature_map(path_data, location_name):
 
     name = path_data.split("/")[-1][:-4] + channel_location + ".jpg"
     save_path = os.path.join("./heatmap", name)
-
     show_cam_on_image(img, mask, save_path)  # 将热力图写回到原来的图片
+
+
+if __name__ == '__main__':
+    path = "./raw_data-without filter/preseizure/LK/b1d480ae-c5a3-11e9-a357-9975cafe06d3-0.npy"
+    get_feature_map(path, location_name="None")
