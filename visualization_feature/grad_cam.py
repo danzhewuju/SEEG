@@ -16,6 +16,8 @@ sys.path.append('../')
 
 from util.util_file import matrix_normalization, trans_numpy_cv2, get_matrix_max_location
 
+flag = "MAML" # 切换内核，有两种模式：CNN, VMAML
+print("using model:{}".format(flag))
 x_ = 8
 y_ = 12
 NUM_CLASS = 2
@@ -115,23 +117,25 @@ class FeatureExtractor():
     def __call__(self, x):
         outputs = []
         self.gradients = []
-        # MAML MAML 热力图的计算和CNN热力图的计算不太一样
-        # for name, module in self.model._modules.items():  # 特定的maml
-        #     x_r = module(x)
-        #     x = module.feature_heat_map
-        #     x.register_hook(self.save_gradient)
-        #     outputs += [x]
-        # return outputs, x_r
 
         # CNN
-        for name, module in self.model._modules.items():  # 特定的maml
-            if name == 'fc1':
-                x = x.reshape(1, -1)
-            x = module(x)
-            if name in self.target_layers:
+        if flag == "CNN":
+            for name, module in self.model._modules.items():  # 特定的maml
+                if name == 'fc1':
+                    x = x.reshape(1, -1)
+                x = module(x)
+                if name in self.target_layers:
+                    x.register_hook(self.save_gradient)
+                    outputs += [x]
+            return outputs, x
+        else:
+            # MAML MAML 热力图的计算和CNN热力图的计算不太一样
+            for name, module in self.model._modules.items():  # 特定的maml
+                x_r = module(x)
+                x = module.feature_heat_map
                 x.register_hook(self.save_gradient)
                 outputs += [x]
-        return outputs, x
+            return outputs, x_r
 
 
 class ModelOutputs():
@@ -354,10 +358,10 @@ def get_feature_map(path_data, location_name):
     # feature method, and a classifier method,
     # as in the VGG models in torchvision.
     device = torch.device('cuda')
-    model = CNN().cuda(device) if args.use_cuda else CNN()  # 模型架构的调整， 1.CNN, 2. MAML
+    # model = CNN().cuda(device) if args.use_cuda else CNN()  # 模型架构的调整， 1.CNN, 2. MAML
 
-    # model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
-    model.load_state_dict(torch.load(model_path_cnn, map_location=lambda storage, loc: storage))
+    model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
+    model.load_state_dict(torch.load(model_path_maml, map_location=lambda storage, loc: storage))
     print("load cnn model success!")
     grad_cam = GradCam(model=model, target_layer_names=["layer4"], use_cuda=args.use_cuda)
 
@@ -408,18 +412,18 @@ def get_feature_map_dynamic(data, name, key_flag=True):
     '''
     args = get_args()
     config = json.load(open('./json_path/config.json'))
-    model_path_maml = config['grad_cam.get_feature_map__model_path_maml']
-    model_path_cnn = config['grad_cam.get_feature_map__model_path_cnn']
+    model_path = config['grad_cam.get_feature_map__model_path_maml']
+    # model_path = config['grad_cam.get_feature_map__model_path_cnn']
 
     # Can work with any model, but it assumes that the model has a
     # feature method, and a classifier method,
     # as in the VGG models in torchvision.
     device = torch.device('cuda')
-    model = CNN().cuda(device) if args.use_cuda else CNN()  # 模型架构的调整， 1.CNN, 2. MAML
+    # model = CNN().cuda(device) if args.use_cuda else CNN()  # 模型架构的调整， 1.CNN, 2. MAML
 
-    # model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
-    model.load_state_dict(torch.load(model_path_cnn, map_location=lambda storage, loc: storage))
-    print("load cnn model success!")
+    model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
+    model.load_state_dict(torch.load(model_path, map_location=lambda storage, loc: storage))
+    print("load {} model success!".format(model_path))
     grad_cam = GradCam(model=model, target_layer_names=["layer4"], use_cuda=args.use_cuda)
 
     # img = cv2.imread(args.image_path, 1)
