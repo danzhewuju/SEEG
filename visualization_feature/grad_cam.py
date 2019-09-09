@@ -116,22 +116,22 @@ class FeatureExtractor():
         outputs = []
         self.gradients = []
         # MAML MAML 热力图的计算和CNN热力图的计算不太一样
-        for name, module in self.model._modules.items():  # 特定的maml
-            x_r = module(x)
-            x = module.feature_heat_map
-            x.register_hook(self.save_gradient)
-            outputs += [x]
-        return outputs, x
+        # for name, module in self.model._modules.items():  # 特定的maml
+        #     x_r = module(x)
+        #     x = module.feature_heat_map
+        #     x.register_hook(self.save_gradient)
+        #     outputs += [x]
+        # return outputs, x_r
 
         # CNN
-        # for name, module in self.model._modules.items():  # 特定的maml
-        #     if name == 'fc1':
-        #         x = x.reshape(1, -1)
-        #     x = module(x)
-        #     if name in self.target_layers:
-        #         x.register_hook(self.save_gradient)
-        #         outputs += [x]
-        # return outputs, x
+        for name, module in self.model._modules.items():  # 特定的maml
+            if name == 'fc1':
+                x = x.reshape(1, -1)
+            x = module(x)
+            if name in self.target_layers:
+                x.register_hook(self.save_gradient)
+                outputs += [x]
+        return outputs, x
 
 
 class ModelOutputs():
@@ -195,7 +195,7 @@ class GradCam:
 
     def __call__(self, input, index=None):
         if self.cuda:
-            features, output = self.extractor(input.cuda())
+            features, output = self.extractor(input.cuda(0))
         else:
             features, output = self.extractor(input)
 
@@ -206,11 +206,11 @@ class GradCam:
             os.mkdir('./log/')
         if os.path.exists("./log/heatmap.csv") is not True:
             f = open("./log/heatmap.csv", 'w')
-            f.writelines("grant truth, prediction\n")
+            f.writelines("grant truth,prediction\n")
         else:
             f = open("./log/heatmap.csv", 'a')
 
-        str = "{},{} \n".format(index, index_p)
+        str = "{},{}\n".format(index, index_p)
         f.writelines(str)
         f.close()
 
@@ -342,7 +342,7 @@ def get_feature_map(path_data, location_name):
     '''
 
     :param path_data: raw data path
-    :param location_name: raw data original file name ex: LK_SZ1_pre_seizure_raw.fif
+    :param location_name: raw data original file name ex: LK_SZ1_pre_seizure_raw.txt
     :return:
     '''
     args = get_args()
@@ -354,10 +354,10 @@ def get_feature_map(path_data, location_name):
     # feature method, and a classifier method,
     # as in the VGG models in torchvision.
     device = torch.device('cuda')
-    # model = CNN().cuda(device) if args.use_cuda else CNN() # 模型架构的调整， 1.CNN, 2. MAML
+    model = CNN().cuda(device) if args.use_cuda else CNN() # 模型架构的调整， 1.CNN, 2. MAML
 
-    model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
-    model.load_state_dict(torch.load(model_path_maml, map_location=lambda storage, loc: storage))
+    # model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
+    model.load_state_dict(torch.load(model_path_cnn, map_location=lambda storage, loc: storage))
     print("load cnn model success!")
     grad_cam = GradCam(model=model, target_layer_names=["layer4"], use_cuda=args.use_cuda)
 
@@ -398,7 +398,3 @@ def get_feature_map(path_data, location_name):
     save_path = os.path.join("./heatmap", name)
     show_cam_on_image(img, mask, save_path)  # 将热力图写回到原来的图片
 
-
-if __name__ == '__main__':
-    path = "./raw_data-without filter/preseizure/LK/b1d480ae-c5a3-11e9-a357-9975cafe06d3-0.npy"
-    get_feature_map(path, location_name="None")

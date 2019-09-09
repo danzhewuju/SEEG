@@ -79,4 +79,4 @@ if __name__ == '__main__':
     data = f.read()
     json_data = json.loads(data)
     for i in range(count):
-        get_feature_map(json_data[i], location_name="None")
+        get_feature_map(json_data[i], location_name="top_similarity_signal.txt") # 将相关的进行信号进行处理
