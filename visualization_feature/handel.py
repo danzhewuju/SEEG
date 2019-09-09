@@ -306,10 +306,10 @@ if __name__ == '__main__':
     # 2.1 生成未滤波数据的切片, 可以设置是否选择滤波处理
     # raw_data_slice()
     # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接
-    # time_heat_map()
+    time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
-    # sequentially_signal()
+    sequentially_signal()
 
     # 3.1 从整体的文件进行热力分析， 以及热力图分割，读取完整的文件，防止热力图被分割
-    dynamic_detection()
+    # dynamic_detection()
