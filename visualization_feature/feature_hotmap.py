@@ -72,6 +72,7 @@ if __name__ == '__main__':
     # select_examplea()
     # example_similarity("./json_path/LK_preseizure_path.json")  # 相似度的计算并排序
 
+    # 根据计算的相似度来进行热力图热点计算
     f = open('./json_path/LK_preseizure_sorted.json', 'r')
     clean_dir('./heatmap')
     clean_dir('./raw_data_signal')

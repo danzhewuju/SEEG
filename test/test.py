@@ -307,8 +307,3 @@ def test_22():
     print(uuids)
 
 
-def test_23():
-    a = np.random.randn(5, 5)
-    print(a)
-    b = a[:, 1]
-    print(b)

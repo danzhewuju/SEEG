@@ -28,6 +28,10 @@ def get_channels_names(raw):
 
 
 def get_recorder_time(data):
+    '''
+    :param data: raw data
+    :return: 这个文件记录的时间长度
+    '''
     time = data.times[-1]
     return time
 
@@ -123,6 +127,13 @@ def data_split(raw, time_step):  # 数据的切片处理
 
 
 def get_duration_raw_data(raw, start, stop):
+    '''
+
+    :param raw: 原始数据
+    :param start: 开始的时间点
+    :param stop: 终止的时间点
+    :return:
+    '''
     end = max(raw.times)
     if stop > end:
         print("over range!!!")

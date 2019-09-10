@@ -92,22 +92,29 @@ def get_first_dir_path(path, suffix="jpg"):
     return paths
 
 
-def get_matrix_max_location(mtx_data, k, reverse=False):
+def get_matrix_max_location(mtx_data, k, reverse=True):
     '''
 
     :param mtx_data: 矩阵的数据
     :param k: 获取前K 个最大、最小
     :param reverse: True : 最大， False: 最小
-    :return:
+    :return:[(0, 0), (2, 1), (2, 2), (1, 1), (1, 2)] 结果是按照顺序进行排序
     '''
     d_f = mtx_data.flatten()
-    if reverse is not True:
+    if reverse:
         index_id = d_f.argsort()[-k:]
     else:
         index_id = d_f.argsort()[k:]
     x_index, y_index = np.unravel_index(index_id, mtx_data.shape)
-    location = list(zip(x_index, y_index))
-    return location
+    location = list(zip(x_index, y_index))  # 此时只是选取了最大几个，数据之间是没有顺序的
+    location_dic = {}
+    for x, y in location:
+        location_dic[(x, y)] = mtx_data[x][y]
+
+    location_dic = sorted(location_dic.items(), key=lambda x: -x[1]) if reverse else sorted(location_dic.items(),
+                                                                                           key=lambda x: x[1])
+    result = [x[0] for x in location_dic]
+    return result
 
 
 def mtx_similarity(mtx_a, mtx_b):
@@ -173,8 +180,8 @@ def time_add(h, m, s, seconds_add):
     return int(h), int(m), s
 
 
-# if __name__ == '__main__':
-#     # print(get_label_data("/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/test"))
-#     str_a = "10:2:19"
-#     h, m, s = time_add(str_a, 125)
-#     print(h, m, s)
+if __name__ == '__main__':
+    for i in range(10):
+        a = np.random.randint(0, 10, (3, 3))
+        print(a)
+        print(get_matrix_max_location(a, 1))

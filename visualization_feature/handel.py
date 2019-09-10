@@ -222,7 +222,7 @@ def sequentially_signal(config="./json_path/config.json"):  # 时间序列的热
     h, m, s = start_time_list[0], start_time_list[1], start_time_list[2]
     for index in range(len(location_time)):
         time_loc = int(location_time[index].split('-')[0])
-        second_add = time_loc/100 # 需要累积之前的时间,将时间的换算单位转化为:s
+        second_add = time_loc / 100  # 需要累积之前的时间,将时间的换算单位转化为:s
         second_add = round(second_add, 2)
         # 进行时间的累积计算
         h, m, s = time_add(h, m, s, second_add)
@@ -250,15 +250,39 @@ def sequentially_signal(config="./json_path/config.json"):  # 时间序列的热
     print("All information has been written in {}".format(save_signal_info))
 
 
+def dynamic_detection(raw_data_path):
+    '''
+
+    :param raw_data_path: raw data path
+    :return: heat_map
+    动态热力图的检测，实现热点中间对齐的功能，需要包含完整的热点信息
+    '''
+    config_info = json.dump(open("./json_path/config.json"))  # 读取配置文件信息
+    channel_info_path = config_info['handel.dynamic_detection__path_channel_list']  # 信道的排序信息表
+    channel_names = pd.read_csv(channel_info_path, sep=',')
+    raw_data = read_raw(raw_data_path)
+
+    data = filter_hz(raw_data, 0, 30)  # 对数据进行滤波处理
+    data = select_channel_data_mne(data, channel_names)  # 根据信道信息来重新排序信道列表
+
+    start_time = 0  # 开始的时间为0
+    end_time = get_recorder_time(raw_data)  # 这个文件的全部时间
+    time_gap = 2  # 文件的时间间隙
+    flag_head = start_time  # 移动的标尺头部
+    flag_tail = start_time + time_gap  # 移动标尺的尾部
+    while flag_tail <= end_time:
+        data_slice = get_duration_raw_data(data, flag_head, flag_tail)
+
+
 if __name__ == '__main__':
     # TODO: list
     # 1. 将两个原信号连接在一起,一个是热力信号，一个是原始的波形信号
-    # image_contact_process()
+    image_contact_process()
 
     # 2.1 生成未滤波数据的切片, 可以设置是否选择滤波处理
     # raw_data_without_filter_process()
     # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接
-    time_heat_map()
+    # time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
-    sequentially_signal()
+    # sequentially_signal()

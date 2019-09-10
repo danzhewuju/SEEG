@@ -1,4 +1,8 @@
 # SEEG Project
+## introduction 
+
+The focus point of this project is to research the difference between sleep of pre seizure and normal sleep.
+
 
 ## content
 
@@ -6,15 +10,22 @@
 
 **RelationNet**  including CNN coding, few-shot learning coding, and feature visualization methods.
 
-**test** including testing methods
+**test** including testing methods.
 
 **util**  including reading .*edf file methods, and filtering methods.
 
-**MAML** including MAML model
+**MAML** including MAML model.
 
-Project structure
+**VMAML** A new model that combines vae and maml.
 
-![Project structure](project_structure.png)
+**VAE** variational auto encode, coding seeg matrix.
+
+**Visualization**  SEEG heatmap calculation
+
+**Statistical files** Experimental result 
+
+
+
 
 
 
