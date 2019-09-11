@@ -9,14 +9,14 @@ from torch.autograd import Function
 from torch.autograd import Variable
 import sys
 from MAML.learner import *
-from meta import Meta
 import json
+from MAML.meta import Meta
 
 sys.path.append('../')
 
 from util.util_file import matrix_normalization, trans_numpy_cv2, get_matrix_max_location
 
-flag = "MAML" # 切换内核，有两种模式：CNN, VMAML
+flag = "MAML"  # 切换内核，有两种模式：CNN, VMAML
 print("using model:{}".format(flag))
 x_ = 8
 y_ = 12
@@ -351,16 +351,18 @@ def get_feature_map(path_data, location_name):
     '''
     args = get_args()
     config = json.load(open('./json_path/config.json'))
-    model_path = config['grad_cam.get_feature_map__model_path_maml']
-    # model_path = config['grad_cam.get_feature_map__model_path_cnn']
 
     # Can work with any model, but it assumes that the model has a
     # feature method, and a classifier method,
     # as in the VGG models in torchvision.
     device = torch.device('cuda')
-    # model = CNN().cuda(device) if args.use_cuda else CNN()  # 模型架构的调整， 1.CNN, 2. MAML
+    if flag == "CNN":
+        model = CNN().cuda(device) if args.use_cuda else CNN()  # 模型架构的调整， 1.CNN, 2. MAML
+        model_path = config['grad_cam.get_feature_map__model_path_cnn']
+    else:
+        model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
+        model_path = config['grad_cam.get_feature_map__model_path_maml']
 
-    model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
     model.load_state_dict(torch.load(model_path, map_location=lambda storage, loc: storage))
     print("load {} model success!".format(model_path))
     grad_cam = GradCam(model=model, target_layer_names=["layer4"], use_cuda=args.use_cuda)
@@ -412,16 +414,18 @@ def get_feature_map_dynamic(data, name, key_flag=True):
     '''
     args = get_args()
     config = json.load(open('./json_path/config.json'))
-    model_path = config['grad_cam.get_feature_map__model_path_maml']
-    # model_path = config['grad_cam.get_feature_map__model_path_cnn']
 
     # Can work with any model, but it assumes that the model has a
     # feature method, and a classifier method,
     # as in the VGG models in torchvision.
     device = torch.device('cuda')
-    # model = CNN().cuda(device) if args.use_cuda else CNN()  # 模型架构的调整， 1.CNN, 2. MAML
+    if flag == "CNN":
+        model = CNN().cuda(device) if args.use_cuda else CNN()  # 模型架构的调整， 1.CNN, 2. MAML
+        model_path = config['grad_cam.get_feature_map__model_path_cnn']
+    else:
+        model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
+        model_path = config['grad_cam.get_feature_map__model_path_maml']
 
-    model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
     model.load_state_dict(torch.load(model_path, map_location=lambda storage, loc: storage))
     print("load {} model success!".format(model_path))
     grad_cam = GradCam(model=model, target_layer_names=["layer4"], use_cuda=args.use_cuda)
