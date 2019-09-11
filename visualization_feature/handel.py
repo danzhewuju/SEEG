@@ -133,7 +133,7 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/LK"):
     构造时间序列的热力图
     '''
     file_name = "LK_SZ1_pre_seizure_raw"  # 指定了这个文件来让医生进行验证
-    file_name = file_name + ".fif"
+    file_name = file_name + ".txt"
     heat_map_dir = "./heatmap"
     path_data = get_first_dir_path(path, 'npy')
     path_data.sort()  # 根据uuid 按照时间序列进行排序
@@ -144,13 +144,11 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/LK"):
     heat_map_path = get_first_dir_path(heat_map_dir)
     heat_map_path.sort()
     test_1 = Image.open(heat_map_path[0])
-    # dst_1 = test_1.transpose(Image.ROTATE_90)
     size = test_1.size
     plt.figure(figsize=(2 * count, 3))
     result = Image.new(test_1.mode, (size[0] * count, size[1]))
     for i in range(count):
         img = Image.open(heat_map_path[i])
-        # img_t = img.transpose(Image.ROTATE_90)
         result.paste(img, box=(i * size[0], 0))
     result.save("./60s.png")
     plt.imshow(result)
@@ -165,9 +163,9 @@ def image_contact_process():  # 流程处理函数
     image_connection(path_a, path_b)
 
 
-def raw_data_without_filter_process():
+def raw_data_slice():
     '''
-    1.医生需要原始的数据，需要未经过切片的原始数据，因此此时需要重写相关函数。不经过滤波
+    1.医生需要原始的数据，需要未经过切片的原始数据，因此此时需要重写相关函数。不经过滤波,数据是没有按照时间顺序来排序
     :return:
     '''
     # 1.癫痫发作前的原始数据的重写
@@ -179,7 +177,7 @@ def raw_data_without_filter_process():
         if index < 1:
             path_raw = os.path.join(path_dir, p)
             name = "LK"
-            generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
+            generate_data(path_raw, flag, name, path_commom_channel, isfilter=False)
     print("癫痫发作前的睡眠处理完成！！！")
 
     # 2.正常数据的重写
@@ -196,7 +194,7 @@ def raw_data_without_filter_process():
 
     for index, path_raw in enumerate(path_raw_normal_sleep):
         if index < 1:
-            generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
+            generate_data(path_raw, flag, name, path_commom_channel, isfilter=False)
 
     print("{}正常睡眠的数据处理完成！".format(name))
 
@@ -240,7 +238,6 @@ def sequentially_signal(config="./json_path/config.json"):  # 时间序列的热
             result = tmp + ", " + time_point
             channel_time[channel_name] = result
 
-    # TODO: 写入相关的文件信息, 文件的回写操作
     fp_signal_info = open(save_signal_info, 'w')
     fp_signal_info.write("文件路径信息：{} \t 起始时间:{}\n".format(path, start_time))
     for name, time in channel_time.items():
@@ -250,39 +247,69 @@ def sequentially_signal(config="./json_path/config.json"):  # 时间序列的热
     print("All information has been written in {}".format(save_signal_info))
 
 
-def dynamic_detection(raw_data_path):
+def dynamic_detection():
     '''
 
     :param raw_data_path: raw data path
     :return: heat_map
     动态热力图的检测，实现热点中间对齐的功能，需要包含完整的热点信息
     '''
-    config_info = json.dump(open("./json_path/config.json"))  # 读取配置文件信息
+    clean_dir("./heatmap") # 清空heatmap 文件夹下面所有文件
+
+    config_info = json.load(open("./json_path/config.json"))  # 读取配置文件信息
+    raw_data_path = config_info['person_raw_data']
     channel_info_path = config_info['handel.dynamic_detection__path_channel_list']  # 信道的排序信息表
     channel_names = pd.read_csv(channel_info_path, sep=',')
+    channel_list = channel_names['chan_name'].tolist()
     raw_data = read_raw(raw_data_path)
 
     data = filter_hz(raw_data, 0, 30)  # 对数据进行滤波处理
-    data = select_channel_data_mne(data, channel_names)  # 根据信道信息来重新排序信道列表
+    data.resample(resample, npad="auto")  # resample 100hz
+    data = select_channel_data_mne(data, channel_list)  # 选择需要的信道
+    data.reorder_channels(channel_list)  # 更改信道的顺序
 
     start_time = 0  # 开始的时间为0
     end_time = get_recorder_time(raw_data)  # 这个文件的全部时间
     time_gap = 2  # 文件的时间间隙
     flag_head = start_time  # 移动的标尺头部
     flag_tail = start_time + time_gap  # 移动标尺的尾部
+    flag_head_new = flag_head
+    flag_tail_new = flag_tail
+    fz = int(len(raw_data) / end_time)  # 采样频率
     while flag_tail <= end_time:
-        data_slice = get_duration_raw_data(data, flag_head, flag_tail)
+        data_slice, _ = data[:, flag_head*fz:flag_tail*fz]
+        name = "{}-{}.jpg".format(flag_head, flag_tail)
+        if end_time - flag_tail < time_gap / 2 or flag_head - start_time < time_gap / 2:
+            key_flag = False
+        else:
+            key_flag = True
+
+        time = get_feature_map_dynamic(data_slice, name, key_flag)
+
+        if time != -1:
+            flag_head_new = flag_head + time - (time_gap / 2)
+            flag_tail_new = flag_head + time + (time_gap / 2)
+            data_slice, _ = data[:, int(flag_head_new*fz):int(flag_tail_new*fz)]
+            key_flag = False
+            name = "{:.2f}-{:.2f}.jpg".format(flag_head_new, flag_tail_new)
+            get_feature_map_dynamic(data_slice, name, key_flag=key_flag)
+        flag_head += 2
+        flag_tail += 2
 
 
 if __name__ == '__main__':
     # TODO: list
+    # 1.0 需要运行 feature_hotmap.py 文件, 保证文件夹heatmao, raw_data_signal 里面存在照片
     # 1. 将两个原信号连接在一起,一个是热力信号，一个是原始的波形信号
-    image_contact_process()
+    # image_contact_process()
 
     # 2.1 生成未滤波数据的切片, 可以设置是否选择滤波处理
-    # raw_data_without_filter_process()
+    # raw_data_slice()
     # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接
     # time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
     # sequentially_signal()
+
+    # 3.1 从整体的文件进行热力分析， 以及热力图分割，读取完整的文件，防止热力图被分割
+    dynamic_detection()

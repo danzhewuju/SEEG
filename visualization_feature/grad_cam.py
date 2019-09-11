@@ -354,7 +354,7 @@ def get_feature_map(path_data, location_name):
     # feature method, and a classifier method,
     # as in the VGG models in torchvision.
     device = torch.device('cuda')
-    model = CNN().cuda(device) if args.use_cuda else CNN() # 模型架构的调整， 1.CNN, 2. MAML
+    model = CNN().cuda(device) if args.use_cuda else CNN()  # 模型架构的调整， 1.CNN, 2. MAML
 
     # model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
     model.load_state_dict(torch.load(model_path_cnn, map_location=lambda storage, loc: storage))
@@ -398,3 +398,60 @@ def get_feature_map(path_data, location_name):
     save_path = os.path.join("./heatmap", name)
     show_cam_on_image(img, mask, save_path)  # 将热力图写回到原来的图片
 
+
+def get_feature_map_dynamic(data, name, key_flag=True):
+    '''
+
+    :param path_data: raw data path
+    :param location_name: raw data original file name ex: LK_SZ1_pre_seizure_raw.txt
+    :return:
+    '''
+    args = get_args()
+    config = json.load(open('./json_path/config.json'))
+    model_path_maml = config['grad_cam.get_feature_map__model_path_maml']
+    model_path_cnn = config['grad_cam.get_feature_map__model_path_cnn']
+
+    # Can work with any model, but it assumes that the model has a
+    # feature method, and a classifier method,
+    # as in the VGG models in torchvision.
+    device = torch.device('cuda')
+    model = CNN().cuda(device) if args.use_cuda else CNN()  # 模型架构的调整， 1.CNN, 2. MAML
+
+    # model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
+    model.load_state_dict(torch.load(model_path_cnn, map_location=lambda storage, loc: storage))
+    print("load cnn model success!")
+    grad_cam = GradCam(model=model, target_layer_names=["layer4"], use_cuda=args.use_cuda)
+
+    # img = cv2.imread(args.image_path, 1)
+    data_numpy = matrix_normalization(data)
+    img = trans_numpy_cv2(data_numpy)
+
+    img = np.float32(cv2.resize(img, shape)) / 255
+    img = img[:, :, np.newaxis]
+    input = preprocess_image(img)
+
+    # If None, returns the map for the highest scoring category.
+    # Otherwise, targets the requested index.
+    target_index = 0
+
+    mask = grad_cam(input, target_index)
+    location = get_matrix_max_location(mask, 1)  # 获得最大梯度的位置，包含时间位置和物理位置
+    time = location[0][0]
+    if key_flag:
+        if time < 50 or time > 150:
+            # 信号又截断的可能，需要返回重新定位
+            print("Thermal signal is cut off!")
+
+            return time / 100
+        else:
+            # 不在保存相关的信道信息，仅仅只对照片进行保留
+
+            save_path = os.path.join("./heatmap", name)
+            show_cam_on_image(img, mask, save_path)  # 将热力图写回到原来的图片
+            return -1  # 返回安全吗
+    else:
+        # 不在保存相关的信道信息，仅仅只对照片进行保留
+
+        save_path = os.path.join("./heatmap", name)
+        show_cam_on_image(img, mask, save_path)  # 将热力图写回到原来的图片
+        return -1  # 返回安全吗

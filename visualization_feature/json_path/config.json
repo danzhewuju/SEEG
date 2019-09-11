@@ -1,9 +1,10 @@
 {
-  "handel.sequentially__path": "./log/LK_SZ1_pre_seizure_raw.fif",
+  "handel.sequentially__path": "./log/LK_SZ1_pre_seizure_raw.txt",
   "handel.sequentially__path_channel_list": "../data/data_slice/channels_info/LK_seq.csv",
   "handel.sequentially__save_dir": "./log/signal_info.txt",
   "handel.sequentially__LK_start_time": "15:47:28",
   "grad_cam.get_feature_map__model_path_maml": "../VMAML/models/maml2way_8shot.pkl",
   "grad_cam.get_feature_map__model_path_cnn": "./models/model-cnn.ckpt",
-  "handel.dynamic_detection__path_channel_list":"../data/data_slice/channels_info/LK_seq.csv"
+  "handel.dynamic_detection__path_channel_list":"../data/data_slice/channels_info/LK_seq.csv",
+  "person_raw_data": "../data/raw_data/LK/LK_Pre_seizure/LK_SZ1_pre_seizure_raw.fif"
 }
