@@ -52,7 +52,7 @@ def get_hotmap_dic(path_hotmap, path_b_raw_data):
     return dict_result, name_save
 
 
-def create_raw_data_signal(image_dir="./heatmap"):
+def create_raw_data_signal_by_similarity(image_dir="./heatmap"):
     # hot_map_paths = get_first_dir_path('./heatmap', suffix='jpg')
     # t = re.findall("loc-(.+).jpg", hot_map_paths[0])[0]
     # print(t)
@@ -100,7 +100,46 @@ def create_raw_data_signal(image_dir="./heatmap"):
         print("All files has been written!")
 
 
+def create_raw_data_signal_by_time(image_dir="./heatmap"):
+    raw_path_list = get_first_dir_path("./raw_data_time_sequentially/preseizure/LK", "npy")
+    raw_data_name = [re.findall("/.+/(.+)", p)[0] for p in raw_path_list]
+    dict_name_path = dict(zip(raw_data_name, raw_path_list))
+
+    images_path = get_first_dir_path(image_dir)
+    selected_raw_path = []
+    for i_p in images_path:
+        path_tmp = i_p
+        channels_str = re.findall('-loc-(.+).jpg', path_tmp)[0]
+        channels_number = map(int, channels_str.split('-'))
+        channels_number = list(set(channels_number))
+        if len(channels_number) > 3:
+            channels_number = channels_number[:3]
+        else:
+            if len(channels_number) == 1:
+                min_no = channels_number[0] if channels_number[0] > 0 else 1
+                channels_number.append(min_no - 1)
+                channels_number.append(min_no + 1)
+                channels_number.sort()
+
+        channels_number.sort()
+
+        d = re.sub('-loc(.+).jpg', '', path_tmp)
+        raw_path = d + ".npy"
+        name = re.findall('heatmap/(.+)', raw_path)[0]
+        selected_raw_path.append((name, channels_number))
+
+    for index, (name, channels_number) in tqdm(enumerate(selected_raw_path)):
+        new_name = name[:-4] + '.jpg'
+        save_path = os.path.join('./raw_data_signal', new_name)
+        data_p = dict_name_path[name]
+        raw_data = np.load(data_p)
+        seeg_npy_plot(raw_data, channels_number, save_path)
+
+    print("All files has been written!")
+
+
 def image_connection(data_signal_dir, raw_data_dir, save_dir="./contact_image"):
+    clean_dir("./contact_image")
     if os.path.exists(save_dir) is not True:
         os.mkdir(save_dir)
     signal_dir_t = os.listdir(data_signal_dir)
@@ -155,11 +194,19 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/LK"):
     plt.show()
 
 
-def image_contact_process():  # 流程处理函数
+def image_contact_process_by_similarity():  # 流程处理函数
     path_a = "./heatmap"
     path_b = "./raw_data_signal"
 
-    create_raw_data_signal()  # 生成原始信号中梯队最高的信道的信号图像
+    create_raw_data_signal_by_similarity()  # 生成原始信号中梯队最高的信道的信号图像
+    image_connection(path_a, path_b)
+
+
+def image_contact_process_by_time():
+    path_a = "./heatmap"
+    path_b = "./raw_data_signal"
+
+    create_raw_data_signal_by_time()  # 生成原始信号中梯队最高的信道的信号图像
     image_connection(path_a, path_b)
 
 
@@ -254,7 +301,7 @@ def dynamic_detection():
     :return: heat_map
     动态热力图的检测，实现热点中间对齐的功能，需要包含完整的热点信息
     '''
-    clean_dir("./heatmap") # 清空heatmap 文件夹下面所有文件
+    clean_dir("./heatmap")  # 清空heatmap 文件夹下面所有文件
 
     config_info = json.load(open("./json_path/config.json"))  # 读取配置文件信息
     raw_data_path = config_info['person_raw_data']
@@ -277,7 +324,7 @@ def dynamic_detection():
     flag_tail_new = flag_tail
     fz = int(len(raw_data) / end_time)  # 采样频率
     while flag_tail <= end_time:
-        data_slice, _ = data[:, flag_head*fz:flag_tail*fz]
+        data_slice, _ = data[:, flag_head * fz:flag_tail * fz]
         name = "{}-{}.jpg".format(flag_head, flag_tail)
         if end_time - flag_tail < time_gap / 2 or flag_head - start_time < time_gap / 2:
             key_flag = False
@@ -289,7 +336,7 @@ def dynamic_detection():
         if time != -1:
             flag_head_new = flag_head + time - (time_gap / 2)
             flag_tail_new = flag_head + time + (time_gap / 2)
-            data_slice, _ = data[:, int(flag_head_new*fz):int(flag_tail_new*fz)]
+            data_slice, _ = data[:, int(flag_head_new * fz):int(flag_tail_new * fz)]
             key_flag = False
             name = "{:.2f}-{:.2f}.jpg".format(flag_head_new, flag_tail_new)
             get_feature_map_dynamic(data_slice, name, key_flag=key_flag)
@@ -301,15 +348,19 @@ if __name__ == '__main__':
     # TODO: list
     # 1.0 需要运行 feature_hotmap.py 文件, 保证文件夹heatmao, raw_data_signal 里面存在照片
     # 1. 将两个原信号连接在一起,一个是热力信号，一个是原始的波形信号
-    # image_contact_process()
+    # image_contact_process_by_similarity()
 
     # 2.1 生成未滤波数据的切片, 可以设置是否选择滤波处理
     # raw_data_slice()
-    # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接
-    time_heat_map()
+
+    # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接,拼接我60s
+    # time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
-    sequentially_signal()
+    # sequentially_signal()
+
+    # 2.3 将按照时间的片段信号和热力图进行结合
+    image_contact_process_by_time()
 
     # 3.1 从整体的文件进行热力分析， 以及热力图分割，读取完整的文件，防止热力图被分割
     # dynamic_detection()

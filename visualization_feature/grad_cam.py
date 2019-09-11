@@ -351,8 +351,8 @@ def get_feature_map(path_data, location_name):
     '''
     args = get_args()
     config = json.load(open('./json_path/config.json'))
-    model_path_maml = config['grad_cam.get_feature_map__model_path_maml']
-    model_path_cnn = config['grad_cam.get_feature_map__model_path_cnn']
+    model_path = config['grad_cam.get_feature_map__model_path_maml']
+    # model_path = config['grad_cam.get_feature_map__model_path_cnn']
 
     # Can work with any model, but it assumes that the model has a
     # feature method, and a classifier method,
@@ -361,8 +361,8 @@ def get_feature_map(path_data, location_name):
     # model = CNN().cuda(device) if args.use_cuda else CNN()  # 模型架构的调整， 1.CNN, 2. MAML
 
     model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
-    model.load_state_dict(torch.load(model_path_maml, map_location=lambda storage, loc: storage))
-    print("load cnn model success!")
+    model.load_state_dict(torch.load(model_path, map_location=lambda storage, loc: storage))
+    print("load {} model success!".format(model_path))
     grad_cam = GradCam(model=model, target_layer_names=["layer4"], use_cuda=args.use_cuda)
 
     # img = cv2.imread(args.image_path, 1)
