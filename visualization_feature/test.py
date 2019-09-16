@@ -32,18 +32,10 @@ def test_2():
     width, height = dst_1.size
     imag_test = Image.open(path_2)
     dst_2 = imag_test.transpose(Image.ROTATE_90)
-    result = Image.new(dst_1.mode, (width*2, height))
+    result = Image.new(dst_1.mode, (width * 2, height))
 
-    result.paste(dst_1, box=(0,0))
+    result.paste(dst_1, box=(0, 0))
     result.paste(dst_2, box=(200, 0))
     plt.imshow(result)
     plt.show()
-
-
-def test_3():
-    path = "./raw_data-without filter/preseizure/LK/b1d480ae-c5a3-11e9-a357-9975cafe06d3-0.npy"
-    get_feature_map(path, location_name="None")
-
-
-
 

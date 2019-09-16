@@ -168,6 +168,7 @@ def loss_function(recon_x, x, mu, logvar):
 
     return BCE
 
+
 def train_negative(epoch):
     model.train()
     train_loss = 0

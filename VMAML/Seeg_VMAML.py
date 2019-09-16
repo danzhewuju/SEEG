@@ -3,7 +3,7 @@
 # @Time    : 2019/7/31 15:44
 # @Author  : Alex
 # @Site    : 
-# @File    : VMAML.py
+# @File    : Seeg_VMAML.py
 # @Software: PyCharm
 
 from __future__ import print_function
@@ -17,19 +17,19 @@ from torch.utils.data import DataLoader
 sys.path.append('../')
 
 from MAML.Mamlnet import *
-from meta import *
+from MAML.meta import *
 from util.util_file import matrix_normalization
 import matplotlib.pyplot as plt
 import time
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=2000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
-argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=8)
-argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=8)
+argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=10)
+argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=10)
 argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
-argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
+argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=10)
 argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=1e-3)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.005)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
@@ -49,6 +49,26 @@ VAL_PATH = args.val_path
 device = torch.device("cuda" if args.cuda else "cpu")
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
+
+config = [
+    ('conv2d', [32, 1, 3, 3, 1, 0]),
+    ('relu', [True]),
+    ('bn', [32]),
+    ('max_pool2d', [2, 2, 0]),
+    ('conv2d', [32, 32, 3, 3, 1, 0]),
+    ('relu', [True]),
+    ('bn', [32]),
+    ('max_pool2d', [2, 2, 0]),
+    ('conv2d', [32, 32, 3, 3, 1, 0]),
+    ('relu', [True]),
+    ('bn', [32]),
+    ('max_pool2d', [2, 2, 0]),
+    ('conv2d', [32, 32, 3, 3, 1, 0]),
+    ('relu', [True]),
+    ('bn', [32]),
+    ('max_pool2d', [2, 1, 0]),
+    ('flatten', []),
+    ('linear', [args.n_way, 7040])]
 
 resize = (130, 200)
 
@@ -192,10 +212,15 @@ def show_eeg(data):
     plt.show()
 
 
-vae_p = VAE().to(device)
-vae_n = VAE().to(device)
-optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.005)
-optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.005)
+# 构造了两个VAE的编码器
+# vae_p = VAE().to(device)
+# vae_n = VAE().to(device)
+# optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.005)
+# optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.005)
+
+# 仅仅使用一个VAE的编码器
+Vae = VAE().to(device)
+optimizer_vae = optim.Adam(Vae.parameters(), lr=0.005)
 
 
 # vae 模块
@@ -211,26 +236,35 @@ def trans_data_vae(data, label_data):
         data_tmp = data_view[i]
         data_tmp = torch.from_numpy(data_tmp)
         data_tmp = data_tmp.to(device)
-        if label_list[i] == 1:  # positive
-            optimizer_vae_p.zero_grad()
-            recon_batch, mu, logvar = vae_p(data_tmp)
-            loss = loss_function(recon_batch, data_tmp, mu, logvar)
-            loss.backward()
-            optimizer_vae_p.step()
-        else:
-            optimizer_vae_n.zero_grad()
-            recon_batch, mu, logvar = vae_n(data_tmp)
-            loss = loss_function(recon_batch, data_tmp, mu, logvar)
-            loss.backward()
-            optimizer_vae_n.step()
-        loss_all += loss.item()
+        optimizer_vae.zero_grad()
+        recon_batch, mu, logvar = Vae(data_tmp)
+        loss_all += loss_function(recon_batch, data_tmp, mu, logvar)
+
+        # if label_list[i] == 1:  # positive
+        #     optimizer_vae_p.zero_grad()
+        #     recon_batch, mu, logvar = vae_p(data_tmp)
+        #     loss = loss_function(recon_batch, data_tmp, mu, logvar)
+        #     loss.backward()
+        #     optimizer_vae_p.step()
+        # else:
+        #     optimizer_vae_n.zero_grad()
+        #     recon_batch, mu, logvar = vae_n(data_tmp)
+        #     loss = loss_function(recon_batch, data_tmp, mu, logvar)
+        #     loss.backward()
+        #     optimizer_vae_n.step()
+        # loss_all += loss.item()
         result_tmp = recon_batch.detach().cpu().numpy()
         result_tmp = result_tmp.reshape(resize)
         data_result = result_tmp[np.newaxis, :]
         result.append(data_result)
+
+    optimizer_vae.zero_grad()
+    loss_all.backward()
+    optimizer_vae.step()
+
     result_t = np.array(result)
     result_r = result_t.reshape(shape_data)
-    loss_all = loss_all / number
+    loss_all = loss_all.item() / number
     return result_r, loss_all
 
 
@@ -241,26 +275,6 @@ def maml_framwork():
     np.random.seed(222)
 
     print(args)
-
-    config = [
-        ('conv2d', [32, 1, 3, 3, 1, 0]),
-        ('relu', [True]),
-        ('bn', [32]),
-        ('max_pool2d', [2, 2, 0]),
-        ('conv2d', [32, 32, 3, 3, 1, 0]),
-        ('relu', [True]),
-        ('bn', [32]),
-        ('max_pool2d', [2, 2, 0]),
-        ('conv2d', [32, 32, 3, 3, 1, 0]),
-        ('relu', [True]),
-        ('bn', [32]),
-        ('max_pool2d', [2, 2, 0]),
-        ('conv2d', [32, 32, 3, 3, 1, 0]),
-        ('relu', [True]),
-        ('bn', [32]),
-        ('max_pool2d', [2, 1, 0]),
-        ('flatten', []),
-        ('linear', [args.n_way, 7040])]
 
     # 引入vae的模块
     # device = torch.device('cuda')
@@ -339,6 +353,9 @@ def maml_framwork():
                         "./models/maml" + str(args.n_way) + "way_" + str(
                             args.k_spt) + "shot.pkl"))
                     last_accuracy = test_accuracy
+
+                    torch.save(Vae.state_dict(), "./models/Vae.pkl")
+                    print("{} and {} model have saved!!!".format("maml", "vae"))
     plt.figure()
     plt.title("testing info")
     plt.xlabel("episode")

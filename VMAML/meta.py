@@ -125,9 +125,9 @@ class Meta(nn.Module):
 
         # optimize theta parameters
         # 总体的优化器
-        # self.meta_optim.zero_grad()
-        # loss_q.backward()
-        # self.meta_optim.step()
+        self.meta_optim.zero_grad()
+        loss_q.backward()
+        self.meta_optim.step()
         return accs, loss_q
 
     def finetunning(self, x_spt, y_spt, x_qry, y_qry):

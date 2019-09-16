@@ -3,7 +3,7 @@
 # @Time    : 2019/7/16 19:03
 # @Author  : Alex
 # @Site    : 
-# @File    : VMAML_test.py
+# @File    : Seeg_VMAML_test.py
 # @Software: PyCharm
 import argparse
 import os
