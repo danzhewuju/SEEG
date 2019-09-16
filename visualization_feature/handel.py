@@ -354,13 +354,13 @@ if __name__ == '__main__':
     # raw_data_slice()
 
     # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接,拼接我60s
-    # time_heat_map()
+    time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
-    # sequentially_signal()
+    sequentially_signal()
 
     # 2.3 将按照时间的片段信号和热力图进行结合
-    image_contact_process_by_time()
+    # image_contact_process_by_time()
 
     # 3.1 从整体的文件进行热力分析， 以及热力图分割，读取完整的文件，防止热力图被分割
     # dynamic_detection()

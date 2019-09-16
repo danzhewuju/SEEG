@@ -6,5 +6,5 @@
 # @File    : __init__.py
 # @Software: PyCharm
 
-from .learner import *
-from .Mamlnet import *
+from learner import *
+from Mamlnet import *
