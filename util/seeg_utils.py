@@ -44,7 +44,7 @@ def filter_hz(raw, high_pass, low_pass):  # 对数据进行滤波处理 对于�
 def save_numpy_info(data, path):  # 存储numpy的数据
     if os.path.exists(path):
         print("File is exist!!!")
-        return None
+        return False
     else:
         np.save(path, data)
         print("Successfully save!")

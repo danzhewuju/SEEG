@@ -11,6 +11,7 @@ import torch
 
 from util import *
 from vae import trans_data, VAE
+from tqdm import tqdm
 
 train_path = "../data/seeg/zero_data/train"
 test_path = "../data/seeg/zero_data/test"
@@ -57,7 +58,7 @@ def vae_data_val(raw_path, save_path):  # val dataset
     model_path_all = "./models/model-vae.ckpt"
     # model_path_p = "./models/model-vae-positive_preseizure.ckpt"
     # model_path_n = "./models/model-vae-negative_normalsleep.ckpt"
-    for n in names:
+    for n in tqdm(names):
         save_dir = os.path.join(save_path, n)
         if os.path.exists(save_dir) is not True:  # if dir don't exist , create it
             os.mkdir(save_dir)
@@ -92,6 +93,9 @@ def vae_data_val(raw_path, save_path):  # val dataset
 
 if __name__ == '__main__':
     # clean_dir(save_val_dir)
-    vae_data(train_path, save_train_dir)  # positive/negative
-    vae_data(test_path, save_test_dir)  # positive/negative
+    # 1. 训练集的vae编码
+    # vae_data(train_path, save_train_dir)  # positive/negative
+    # 2. 测试集的vae编码
+    # vae_data(test_path, save_test_dir)  # positive/negative
+    # 3. 验证集的vae编码
     vae_data_val(val_path, save_val_dir)  # validation dataset

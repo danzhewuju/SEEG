@@ -14,7 +14,7 @@ class Meta(nn.Module):
     Meta Learner
     """
 
-    def __init__(self, args, config, Vae_parameters):
+    def __init__(self, args, config):
         """
 
         :param args:
@@ -31,7 +31,7 @@ class Meta(nn.Module):
         self.update_step_test = args.update_step_test
 
         self.net = Learner(config)
-        self.meta_optim = optim.Adam([{'params': Vae_parameters, 'lr':1e-2 }, {'params': self.net.parameters()}], lr=self.meta_lr)
+        self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
 
     def clip_grad_by_norm_(self, grad, max_norm):
         """
@@ -56,7 +56,7 @@ class Meta(nn.Module):
 
         return total_norm / counter
 
-    def forward(self, x_spt, y_spt, x_qry, y_qry):
+    def forward(self, x_spt, y_spt, x_qry, y_qry, flag):
         """
 
         :param x_spt:   [b, setsz, c_, h, w]
@@ -125,12 +125,10 @@ class Meta(nn.Module):
         loss_q = losses_q[-1] / task_num
 
         # optimize theta parameters
-        # self.meta_optim.zero_grad()
-        # loss_q.backward()
-        # print('meta update')
-        # for p in self.net.parameters()[:5]:
-        # 	print(torch.norm(p).item())
-        # self.meta_optim.step()
+        if flag:  # 设置交替训练的条件格式
+            self.meta_optim.zero_grad()
+            loss_q.backward()
+            self.meta_optim.step()
 
         accs = np.array(corrects) / (querysz * task_num)
 

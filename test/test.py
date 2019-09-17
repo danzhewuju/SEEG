@@ -307,3 +307,10 @@ def test_22():
     print(uuids)
 
 
+def test_23():
+    flag = True
+    print(
+        flag
+    )
+    flag = not flag
+    print(flag)

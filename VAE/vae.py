@@ -12,6 +12,7 @@ from torch.nn import functional as F
 from torch.utils.data import Dataset
 
 from util.util_file import matrix_normalization
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser(description='VAE MNIST Example')
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
@@ -214,12 +215,12 @@ def train_positive(epoch):
 
     print('====> Epoch: {} Average loss: {:.4f}'.format(
         epoch, train_loss / datas.train_length))
-    name = str("./models/model-vae-positive-preseizure.ckpt")
+    name = str("./models/model-vae-positive_preseizure.ckpt")
     torch.save(model.state_dict(), name)
     print("model has been saved!")
 
 
-def train_all_data():
+def train_all_data(epoch):
     model.train()
     train_loss = 0
     for batch_idx, (data, _) in enumerate(all_loader):
@@ -260,6 +261,10 @@ def show_eeg(data):
 
 
 if __name__ == "__main__":
-    for epoch in range(1, args.epochs + 1):
+    for epoch in tqdm(range(1, args.epochs + 1)):
+        # 1.训练正态编码器
         # train_positive(epoch)
-        train_negative(epoch)
+        # 2. 训练负态编码器
+        # train_negative(epoch)
+        # 3.用全部数据训练编码器， 暂未使用
+        train_all_data(epoch)

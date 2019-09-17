@@ -25,13 +25,13 @@ import time
 argparser = argparse.ArgumentParser()
 argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
-argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=10)
-argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=10)
+argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=8)
+argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=8)
 argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
-argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=1e-3)
-argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.005)
+argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.05)
+argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
 argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
 argparser.add_argument('--dataset_dir', type=str, help="training data set", default="../data/seeg/zero_data")
@@ -220,11 +220,11 @@ def show_eeg(data):
 
 # 仅仅使用一个VAE的编码器
 Vae = VAE().to(device)
-optimizer_vae = optim.Adam(Vae.parameters(), lr=0.005)
+optimizer_vae = optim.Adam(Vae.parameters(), lr=0.001)
 
 
 # vae 模块
-def trans_data_vae(data, label_data):
+def trans_data_vae(data, label_data, flag):
     shape_data = data.shape
     data_view = data.reshape((-1, resize[0], resize[1]))
     shape_label = label_data.shape
@@ -236,7 +236,6 @@ def trans_data_vae(data, label_data):
         data_tmp = data_view[i]
         data_tmp = torch.from_numpy(data_tmp)
         data_tmp = data_tmp.to(device)
-        optimizer_vae.zero_grad()
         recon_batch, mu, logvar = Vae(data_tmp)
         loss_all += loss_function(recon_batch, data_tmp, mu, logvar)
 
@@ -253,18 +252,23 @@ def trans_data_vae(data, label_data):
         #     loss.backward()
         #     optimizer_vae_n.step()
         # loss_all += loss.item()
+        # optimizer_vae.zero_grad()
+        # loss_all.backward()
+        # optimizer_vae.step()
+
         result_tmp = recon_batch.detach().cpu().numpy()
         result_tmp = result_tmp.reshape(resize)
         data_result = result_tmp[np.newaxis, :]
         result.append(data_result)
 
-    optimizer_vae.zero_grad()
-    loss_all.backward()
-    optimizer_vae.step()
+    if flag:  # 交替训练的控制条件
+        optimizer_vae.zero_grad()
+        loss_all.backward()
+        optimizer_vae.step()
 
     result_t = np.array(result)
     result_r = result_t.reshape(shape_data)
-    loss_all = loss_all.item() / number
+    loss_all = loss_all / number
     return result_r, loss_all
 
 
@@ -278,7 +282,7 @@ def maml_framwork():
 
     # 引入vae的模块
     # device = torch.device('cuda')
-    maml = Meta(args, config, Vae.parameters()).to(device)
+    maml = Meta(args, config).to(device)
     tmp = filter(lambda x: x.requires_grad, maml.parameters())
     num = sum(map(lambda x: np.prod(x.shape), tmp))
     print(maml)
@@ -297,25 +301,32 @@ def maml_framwork():
 
     plt_test_loss = []
     plt_test_acc = []
+
+    flag_vae = True  # 设置梯度反向传播的标志位，vae
+    flag_maml = False  # 设置梯度反向传播的薄志伟，maml
     for epoch in range(args.epoch // args.epoch):
         # fetch meta_batchsz num of episode each time
         db = DataLoader(mini, args.task_num, shuffle=True, num_workers=1, pin_memory=True)
+        # 需要设计交替训练的模块
 
         for step, (x_spt, y_spt, x_qry, y_qry) in enumerate(db):
 
             # 插入vae模块
-            x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt)
-            x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry)
+            if step == 100:
+                flag_vae = not flag_vae
+                flag_maml = not flag_maml
+            x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt, flag_vae)
+            x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry, flag_vae)
             x_spt_vae = torch.from_numpy(x_spt_vae)
             x_qry_vae = torch.from_numpy(x_qry_vae)
             x_spt_vae, y_spt, x_qry_vae, y_qry = x_spt_vae.to(device), y_spt.to(device), x_qry_vae.to(device), y_qry.to(
                 device)
 
-            accs, loss_q = maml(x_spt_vae, y_spt, x_qry_vae, y_qry)
-            maml.meta_optim.zero_grad()
-            loss = loss_spt + loss_qry + loss_q
-            loss.backward()
-            maml.meta_optim.step()
+            accs, loss_q = maml(x_spt_vae, y_spt, x_qry_vae, y_qry, flag_maml)
+            # maml.meta_optim.zero_grad()
+            # loss = loss_spt + loss_qry + loss_q
+            # loss.backward()
+            # maml.meta_optim.step()
 
             if step % 20 == 0:
                 d = loss_q.cpu()
@@ -330,8 +341,8 @@ def maml_framwork():
                     loss_all_test = []
 
                     for x_spt, y_spt, x_qry, y_qry in db_test:
-                        x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt)
-                        x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry)
+                        x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt, flag_vae)
+                        x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry, flag_vae)
                         x_spt_vae = torch.from_numpy(x_spt_vae)
                         x_qry_vae = torch.from_numpy(x_qry_vae)
                         x_spt_vae, y_spt, x_qry_vae, y_qry = x_spt_vae.squeeze(0).to(device), y_spt.squeeze(0).to(
@@ -339,7 +350,7 @@ def maml_framwork():
 
                         accs, loss_test = maml.finetunning(x_spt_vae, y_spt, x_qry_vae, y_qry)
 
-                        loss_all_test.append(loss_spt + loss_qry + loss_test)
+                        loss_all_test.append(loss_spt.item() + loss_qry.item() + loss_test.item())
                         accs_all_test.append(accs)
 
                     # [b, update_step+1]
