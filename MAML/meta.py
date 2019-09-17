@@ -1,12 +1,10 @@
-from copy import deepcopy
-
 import numpy as np
 import torch
 from torch import nn
-from torch import optim
 from torch.nn import functional as F
-
-from learner import Learner
+from copy import deepcopy
+from MAML import *
+import torch.optim as optim
 
 
 class Meta(nn.Module):
@@ -14,7 +12,7 @@ class Meta(nn.Module):
     Meta Learner
     """
 
-    def __init__(self, args, config, Vae_parameters):
+    def __init__(self, args, config):
         """
 
         :param args:
@@ -30,8 +28,8 @@ class Meta(nn.Module):
         self.update_step = args.update_step
         self.update_step_test = args.update_step_test
 
-        self.net = Learner(config)
-        self.meta_optim = optim.Adam([{'params': Vae_parameters, 'lr':1e-2 }, {'params': self.net.parameters()}], lr=self.meta_lr)
+        self.net = Learner(config)  # 生成一个构造的网络
+        self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
 
     def clip_grad_by_norm_(self, grad, max_norm):
         """
@@ -123,17 +121,13 @@ class Meta(nn.Module):
         # end of all tasks
         # sum over all losses on query set across all tasks
         loss_q = losses_q[-1] / task_num
-
-        # optimize theta parameters
-        # self.meta_optim.zero_grad()
-        # loss_q.backward()
-        # print('meta update')
-        # for p in self.net.parameters()[:5]:
-        # 	print(torch.norm(p).item())
-        # self.meta_optim.step()
-
         accs = np.array(corrects) / (querysz * task_num)
 
+        # optimize theta parameters
+        # 总体的优化器
+        self.meta_optim.zero_grad()
+        loss_q.backward()
+        self.meta_optim.step()
         return accs, loss_q
 
     def finetunning(self, x_spt, y_spt, x_qry, y_qry):

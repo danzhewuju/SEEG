@@ -28,22 +28,22 @@ def data_process():
     function： 混合式的数据划分，
     :return:
     '''
-    train_folder = "./seeg/mixed_data/train"
-    test_folder = "./seeg/mixed_data/test"
-    val_folder = './seeg/mixed_data/val'
+    train_folder = "../data/seeg/mixed_data/train"
+    test_folder = "../data/seeg/mixed_data/test"
+    val_folder = '../data/seeg/mixed_data/val'
 
     if os.path.exists(train_folder) is not True:
         os.makedirs(train_folder)
     else:
-        os.system("rm -r ./seeg/mixed_data/train/*")
+        os.system("rm -r ../data/seeg/mixed_data/train/*")
     if os.path.exists(test_folder) is not True:
         os.makedirs(test_folder)
     else:
-        os.system("rm -r ./seeg/mixed_data/test/*")
+        os.system("rm -r ../data/seeg/mixed_data/test/*")
     if os.path.exists(val_folder) is not True:
         os.makedirs(val_folder)
     else:
-        os.system("rm -r ./seeg/mixed_data/val/*")
+        os.system("rm -r ../data/seeg/mixed_data/val/*")
 
     path_normal = "sleep_normal"
     path_pre_seizure = "pre_zeizure"
@@ -164,7 +164,7 @@ def data_process_n_1():
     TEST_RATIO = 0.3
 
     resampling_base_size = 3000
-    dataset_dir = './seeg/zero_data'  # 当前所在的数据集, 不同的方法会在不同的数据集上
+    dataset_dir = '../data/seeg/zero_data'  # 当前所在的数据集, 不同的方法会在不同的数据集上
     train_folder = os.path.join(dataset_dir, 'train')
     test_folder = os.path.join(dataset_dir, 'test')
     val_folder = os.path.join(dataset_dir, 'val')

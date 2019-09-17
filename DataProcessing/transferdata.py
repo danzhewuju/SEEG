@@ -9,12 +9,13 @@ import json
 
 time = 2  # 每一帧的持续时间
 resample = 100  # 重采样的频率
-high_pass = 0
-low_pass = 30
+high_pass = 0   # 滤波范围
+low_pass = 200
 
 config = json.load(open("../DataProcessing/config/fig.json"))
 
-save_split_data_test__path_dir = config["transferdata.save_split_data_test.path_dir"]
+save_split_data_test__path_dir = config["transferdata.save_split_data_test__path_dir_2"]  # 设置配置的文件夹
+print("All files will be saved in {}".format(save_split_data_test__path_dir))
 
 
 def save_file(path_lk, path_sgh, save_dir, flag):  # 将数据进行存储转化为切片数据
@@ -135,46 +136,46 @@ def sleep_normal_handle():
     print("{}正常睡眠的数据处理完成！".format(name))
 
     # BDP data
-    # path_commom_channel = "../data/data_slice/channels_info/BDP_seq.csv"
-    # path_raw_normal_sleep = ['../data/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif']
-    # name = "BDP"
-    # flag = 2
-    # for path_raw in path_raw_normal_sleep:
-    #     generate_data(path_raw, flag, name, path_commom_channel)
-    # print("{}正常睡眠的数据处理完成！".format(name))
-    #
-    # path_commom_channel = "../data/data_slice/channels_info/SYF_seq.csv"
-    # path_raw_normal_sleep = ['../data/raw_data/SYF/SYF_SLEEP/SYF_Sleep_raw.fif']
-    # name = "SYF"
-    # flag = 2
-    # for path_raw in path_raw_normal_sleep:
-    #     generate_data(path_raw, flag, name, path_commom_channel)
-    # print("{}正常睡眠的数据处理完成！".format(name))
-    #
-    # path_commom_channel = "../data/data_slice/channels_info/WSH_seq.csv"
-    # path_raw_normal_sleep = ['../data/raw_data/WSH/WSH_SLEEP/WSH_Sleep_raw.fif']
-    # name = "WSH"
-    # flag = 2
-    # for path_raw in path_raw_normal_sleep:
-    #     generate_data(path_raw, flag, name, path_commom_channel)
-    # print("{}正常睡眠的数据处理完成！".format(name))
-    #
-    # path_commom_channel = "../data/data_slice/channels_info/ZK_seq.csv"
-    # path_raw_normal_sleep = ['../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw.fif',
-    #                          '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-11.fif',
-    #                          '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-22.fif',
-    #                          '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-33.fif',
-    #                          '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-44.fif',
-    #                          '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-55.fif',
-    #                          '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-66.fif',
-    #                          '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-77.fif',
-    #                          '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-88.fif'
-    #                          ]
-    # name = "ZK"
-    # flag = 2
-    # for path_raw in path_raw_normal_sleep:
-    #     generate_data(path_raw, flag, name, path_commom_channel)
-    # print("{}正常睡眠的数据处理完成！".format(name))
+    path_commom_channel = "../data/data_slice/channels_info/BDP_seq.csv"
+    path_raw_normal_sleep = ['../data/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif']
+    name = "BDP"
+    flag = 2
+    for path_raw in path_raw_normal_sleep:
+        generate_data(path_raw, flag, name, path_commom_channel)
+    print("{}正常睡眠的数据处理完成！".format(name))
+
+    path_commom_channel = "../data/data_slice/channels_info/SYF_seq.csv"
+    path_raw_normal_sleep = ['../data/raw_data/SYF/SYF_SLEEP/SYF_Sleep_raw.fif']
+    name = "SYF"
+    flag = 2
+    for path_raw in path_raw_normal_sleep:
+        generate_data(path_raw, flag, name, path_commom_channel)
+    print("{}正常睡眠的数据处理完成！".format(name))
+
+    path_commom_channel = "../data/data_slice/channels_info/WSH_seq.csv"
+    path_raw_normal_sleep = ['../data/raw_data/WSH/WSH_SLEEP/WSH_Sleep_raw.fif']
+    name = "WSH"
+    flag = 2
+    for path_raw in path_raw_normal_sleep:
+        generate_data(path_raw, flag, name, path_commom_channel)
+    print("{}正常睡眠的数据处理完成！".format(name))
+
+    path_commom_channel = "../data/data_slice/channels_info/ZK_seq.csv"
+    path_raw_normal_sleep = ['../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-11.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-22.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-33.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-44.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-55.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-66.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-77.fif',
+                             '../data/raw_data/ZK/ZK_SLEEP/ZK_Sleep_raw-88.fif'
+                             ]
+    name = "ZK"
+    flag = 2
+    for path_raw in path_raw_normal_sleep:
+        generate_data(path_raw, flag, name, path_commom_channel)
+    print("{}正常睡眠的数据处理完成！".format(name))
 
     return True
 
@@ -186,23 +187,24 @@ def pre_seizure_biclass_handle():
     处理流程过的函数，主要是处理癫痫发作前的是睡眠状态
 
     '''
-    # path_commom_channel = "../data/data_slice/channels_info/LK_seq.csv"
-    #
-    # path_dir = "../data/raw_data/LK/LK_Pre_seizure"
-    # flag = 0
-    # for p in os.listdir(path_dir):
-    #     path_raw = os.path.join(path_dir, p)
-    #     name = "LK"
-    #     generate_data(path_raw, flag, name, path_commom_channel)
-    # print("癫痫发作前的睡眠处理完成！！！")
-    #
-    # path_commom_channel = "../data/data_slice/channels_info/ZK_seq.csv"
-    # path_dir = "../data/raw_data/ZK/ZK_Pre_seizure"
-    # flag = 0
-    # for p in os.listdir(path_dir):
-    #     path_raw = os.path.join(path_dir, p)
-    #     name = "ZK"
-    #     generate_data(path_raw, flag, name, path_commom_channel)
+    # clean_dir("../data/data_slice/split/preseizure") #
+    path_commom_channel = "../data/data_slice/channels_info/LK_seq.csv"
+
+    path_dir = "../data/raw_data/LK/LK_Pre_seizure"
+    flag = 0
+    for p in os.listdir(path_dir):
+        path_raw = os.path.join(path_dir, p)
+        name = "LK"
+        generate_data(path_raw, flag, name, path_commom_channel)
+    print("癫痫发作前的睡眠处理完成！！！")
+
+    path_commom_channel = "../data/data_slice/channels_info/ZK_seq.csv"
+    path_dir = "../data/raw_data/ZK/ZK_Pre_seizure"
+    flag = 0
+    for p in os.listdir(path_dir):
+        path_raw = os.path.join(path_dir, p)
+        name = "ZK"
+        generate_data(path_raw, flag, name, path_commom_channel)
 
     path_commom_channel = "../data/data_slice/channels_info/WSH_seq.csv"
     path_dir = "../data/raw_data/WSH/WSH_Pre_seizure"
@@ -212,30 +214,30 @@ def pre_seizure_biclass_handle():
         name = "WSH"
         generate_data(path_raw, flag, name, path_commom_channel)
 
-    # path_commom_channel = "../data/data_slice/channels_info_back/SYF_seq.csv"
-    # path_dir = "../data/raw_data/SYF/SYF_Pre_seizure"
-    # flag = 0
-    # for p in os.listdir(path_dir):
-    #     if "-" not in p:
-    #         path_raw = os.path.join(path_dir, p)
-    #         name = "SYF"
-    #         generate_data(path_raw, flag, name, path_commom_channel)
-    #
-    # path_commom_channel = "../data/data_slice/channels_info/BDP_seq.csv"
-    # path_dir = "../data/raw_data/BDP/BDP_Pre_seizure"
-    # flag = 0  # 指明了存储位置
-    # for p in os.listdir(path_dir):
-    #     path_raw = os.path.join(path_dir, p)
-    #     name = "BDP"
-    #     generate_data(path_raw, flag, name, path_commom_channel)
+    path_commom_channel = "../data/data_slice/channels_info_back/SYF_seq.csv"
+    path_dir = "../data/raw_data/SYF/SYF_Pre_seizure"
+    flag = 0
+    for p in os.listdir(path_dir):
+        if "-" not in p:
+            path_raw = os.path.join(path_dir, p)
+            name = "SYF"
+            generate_data(path_raw, flag, name, path_commom_channel)
 
-    # path_commom_channel = "../data/data_slice/channels_info/JWJ_seq.csv"
-    # path_dir = "../data/raw_data/JWJ/JWJ_Pre_seizure"
-    # flag = 0
-    # for p in os.listdir(path_dir):
-    #     path_raw = os.path.join(path_dir, p)
-    #     name = "JWJ"
-    #     generate_data(path_raw, flag, name, path_commom_channel)
+    path_commom_channel = "../data/data_slice/channels_info/BDP_seq.csv"
+    path_dir = "../data/raw_data/BDP/BDP_Pre_seizure"
+    flag = 0  # 指明了存储位置
+    for p in os.listdir(path_dir):
+        path_raw = os.path.join(path_dir, p)
+        name = "BDP"
+        generate_data(path_raw, flag, name, path_commom_channel)
+
+    path_commom_channel = "../data/data_slice/channels_info/JWJ_seq.csv"
+    path_dir = "../data/raw_data/JWJ/JWJ_Pre_seizure"
+    flag = 0
+    for p in os.listdir(path_dir):
+        path_raw = os.path.join(path_dir, p)
+        name = "JWJ"
+        generate_data(path_raw, flag, name, path_commom_channel)
 
     # SJ data is missed
     # path_commom_channel = "../data/data_slice/channels_info/SJ_seq.csv"
@@ -289,8 +291,9 @@ def pre_seizure_multiclass_handle(path_commom_channel):
 
 
 if __name__ == '__main__':
-    # 正常的睡眠时间
-    # sleep_normal_handle()
+    # 1.正常的睡眠时间
+    sleep_normal_handle()
+    # 2.癫痫发作前睡眠
     pre_seizure_biclass_handle()
     # data = read_raw("../data/raw_data/SYF/SYF_Pre_seizure/SYF_SZ1_pre_seizure_raw.fif")
     # sleep_normal_handle()

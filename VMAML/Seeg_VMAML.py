@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader
 sys.path.append('../')
 
 from MAML.Mamlnet import *
-from MAML.meta import *
+from VMAML.meta import *
 from util.util_file import matrix_normalization
 import matplotlib.pyplot as plt
 import time

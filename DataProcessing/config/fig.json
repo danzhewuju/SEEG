@@ -1,1 +1,3 @@
-{"transferdata.save_split_data_test.path_dir": "../visualization_feature/raw_data_time_sequentially"}
+{"transferdata.save_split_data_test__path_dir_1": "../visualization_feature/raw_data_time_sequentially",
+"transferdata.save_split_data_test__path_dir_2": "../data/data_slice/split"
+}

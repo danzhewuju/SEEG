@@ -91,7 +91,7 @@ def vae_data_val(raw_path, save_path):  # val dataset
 
 
 if __name__ == '__main__':
-    clean_dir(save_val_dir)
-    # vae_data(train_path, save_train_dir) # positive/negative
-    # vae_data(test_path, save_test_dir)   # positive/negative
+    # clean_dir(save_val_dir)
+    vae_data(train_path, save_train_dir)  # positive/negative
+    vae_data(test_path, save_test_dir)  # positive/negative
     vae_data_val(val_path, save_val_dir)  # validation dataset
