@@ -23,14 +23,14 @@ import matplotlib.pyplot as plt
 import time
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=20000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=8)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=8)
 argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
-argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.05)
+argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.005)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
 argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
@@ -220,7 +220,7 @@ def show_eeg(data):
 
 # 仅仅使用一个VAE的编码器
 Vae = VAE().to(device)
-optimizer_vae = optim.Adam(Vae.parameters(), lr=0.001)
+optimizer_vae = optim.Adam(Vae.parameters(), lr=0.005)
 
 
 # vae 模块
@@ -232,12 +232,14 @@ def trans_data_vae(data, label_data, flag):
     number = shape_label[0] * shape_label[1]
     result = []
     loss_all = 0.0
+
     for i in range(number):
         data_tmp = data_view[i]
         data_tmp = torch.from_numpy(data_tmp)
         data_tmp = data_tmp.to(device)
         recon_batch, mu, logvar = Vae(data_tmp)
         loss_all += loss_function(recon_batch, data_tmp, mu, logvar)
+
 
         # if label_list[i] == 1:  # positive
         #     optimizer_vae_p.zero_grad()
@@ -265,7 +267,6 @@ def trans_data_vae(data, label_data, flag):
         optimizer_vae.zero_grad()
         loss_all.backward()
         optimizer_vae.step()
-
     result_t = np.array(result)
     result_r = result_t.reshape(shape_data)
     loss_all = loss_all / number
@@ -303,16 +304,16 @@ def maml_framwork():
     plt_test_acc = []
 
     flag_vae = True  # 设置梯度反向传播的标志位，vae
-    flag_maml = False  # 设置梯度反向传播的薄志伟，maml
-    for epoch in range(args.epoch // args.epoch):
+    flag_maml = not flag_vae  # 设置梯度反向传播的薄志伟，maml
+    for epoch in range(10):
         # fetch meta_batchsz num of episode each time
         db = DataLoader(mini, args.task_num, shuffle=True, num_workers=1, pin_memory=True)
-        # 需要设计交替训练的模块
 
         for step, (x_spt, y_spt, x_qry, y_qry) in enumerate(db):
 
             # 插入vae模块
-            if step == 100:
+            # 需要设计交替训练的模块
+            if step % 100 == 0:
                 flag_vae = not flag_vae
                 flag_maml = not flag_maml
             x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt, flag_vae)
