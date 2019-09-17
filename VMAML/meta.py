@@ -6,7 +6,7 @@ from torch import nn
 from torch import optim
 from torch.nn import functional as F
 
-from learner import Learner
+from MAML.learner import Learner
 
 
 class Meta(nn.Module):
