@@ -222,6 +222,10 @@ def show_eeg(data):
 Vae = VAE().to(device)
 optimizer_vae = optim.Adam(Vae.parameters(), lr=0.005)
 
+if os.path.exists("./models/Vae.pkl"):
+    Vae.load_state_dict(torch.load("./models/Vae.pkl"))
+    print("loading VAE model success!")
+
 
 # vae 模块
 def trans_data_vae(data, label_data, flag):
@@ -284,6 +288,12 @@ def maml_framwork():
     # 引入vae的模块
     # device = torch.device('cuda')
     maml = Meta(args, config).to(device)
+    if os.path.exists(str(
+                        "./models/maml" + str(args.n_way) + "way_" + str(
+                            args.k_spt) + "shot.pkl")):
+        path = str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")
+        maml.load_state_dict(torch.load(path))
+        print("loading MAML model success!")
     tmp = filter(lambda x: x.requires_grad, maml.parameters())
     num = sum(map(lambda x: np.prod(x.shape), tmp))
     print(maml)

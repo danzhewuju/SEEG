@@ -10,7 +10,7 @@ import json
 time = 2  # 每一帧的持续时间
 resample = 100  # 重采样的频率
 high_pass = 0   # 滤波范围
-low_pass = 200
+low_pass = 30
 
 config = json.load(open("../DataProcessing/config/fig.json"))
 
@@ -120,6 +120,7 @@ def sleep_normal_handle():
     :return:
     流程操作， 将正常的睡眠进行切片划分
     '''
+    clean_dir("../data/seeg")
     path_commom_channel = "../data/data_slice/channels_info/LK_seq.csv"
     path_raw_normal_sleep = ["../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif",
                              '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-1.fif',
