@@ -8,3 +8,4 @@
 """
 
 from VMAML.meta import *
+from VMAML.Seeg_VMAML import *

@@ -1,10 +1,11 @@
-#!/usr/bin/Python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2019/7/16 19:03
+# @Time    : 2019/9/20 8:03
 # @Author  : Alex
 # @Site    : 
-# @File    : Seeg_VMAML_test.py
+# @File    : Seeg_VMAML_Double_Vae_test.py
 # @Software: PyCharm
+
 import argparse
 import os
 import sys
@@ -116,8 +117,8 @@ def main():
         maml.load_state_dict(path)
         print("load model success")
 
-    if os.path.exists("./models/Vae.pkl"):
-        path_vae = str("./models/Vae.pkl")
+    if os.path.exists("./models/model-vae.ckpt"):
+        path_vae = str("./models/model-vae.ckpt")
         Vae.load_state_dict(torch.load(path_vae))
         print("loading VAE model successfully!")
 
