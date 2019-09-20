@@ -306,13 +306,10 @@ def test_22():
     uuids.sort()
     print(uuids)
 
-if __name__ == '__main__':
-    test_22()
 
 def test_23():
-    flag = True
-    print(
-        flag
-    )
-    flag = not flag
-    print(flag)
+    clean_dir("../data/seeg/")
+
+
+if __name__ == '__main__':
+    test_23()

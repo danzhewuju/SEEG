@@ -24,15 +24,15 @@ normal sleep : 1
 parser = argparse.ArgumentParser(description="CNN parameter setting!")
 parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
 parser.add_argument('-s', '--sample', default=100)  # 对其进行重采样
-parser.add_argument('-train_p', '--train_path', default='../data/seeg/mixed_data/train')
-parser.add_argument('-test_p', '--test_path', default='../data/seeg/mixed_data/test')
-parser.add_argument('-val_p', '--val_path', default='../data/seeg/mixed_data/val')
+parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/train_vae')
+parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/test_vae')
+parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/val')
 parser.add_argument('--model_path', default="./models/cnn_model/model-cnn.ckpt")
 parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
 parser.add_argument('-b', '--batch_size', type=int, default=32)
 parser.add_argument('-l', '--learning_rate', type=float, default=0.001)
-parser.add_argument('-e', '--epoch', type=int, default=10)
+parser.add_argument('-e', '--epoch', type=int, default=1)
 args = parser.parse_args()
 
 # hyper parameter setting

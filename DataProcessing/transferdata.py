@@ -120,7 +120,7 @@ def sleep_normal_handle():
     :return:
     流程操作， 将正常的睡眠进行切片划分
     '''
-    clean_dir("../data/seeg")
+    clean_dir("../data/data_slice/split/sleep/")
     path_commom_channel = "../data/data_slice/channels_info/LK_seq.csv"
     path_raw_normal_sleep = ["../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif",
                              '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-1.fif',
@@ -188,6 +188,7 @@ def pre_seizure_biclass_handle():
     处理流程过的函数，主要是处理癫痫发作前的是睡眠状态
 
     '''
+    clean_dir("../data/data_slice/split/preseizure/")
     # clean_dir("../data/data_slice/split/preseizure") #
     path_commom_channel = "../data/data_slice/channels_info/LK_seq.csv"
 

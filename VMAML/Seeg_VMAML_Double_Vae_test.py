@@ -63,6 +63,19 @@ Vae = VAE().to(device)
 maml = Meta(args, config).to(device)
 
 
+# 构建两个编码器
+vae_p = VAE().to(device)
+vae_n = VAE().to(device)
+model_vae_p_path = "./models/Vae_negative.pkl"
+model_vae_n_path = "./model/Vae_positive.pkl"
+if os.path.exists(model_vae_n_path) and os.path.exists(model_vae_p_path):
+    vae_p.load_state_dict(torch.load(model_vae_p_path))
+    vae_n.load_state_dict(torch.load(model_vae_n_path))
+    print("loading VAE model successfully!")
+else:
+    print("VAE model doesn't exist!")
+
+
 def mean_confidence_interval(accs, confidence=0.95):
     n = accs.shape[0]
     m, se = np.mean(accs), scipy.stats.sem(accs)
@@ -70,7 +83,7 @@ def mean_confidence_interval(accs, confidence=0.95):
     return m, h
 
 
-def trans_data_vae(data, label_data):
+def trans_data_vae(data, label_data):  # 经过了VAE编码
     shape_data = data.shape
     data_view = data.reshape((-1, resize[0], resize[1]))
     shape_label = label_data.shape
@@ -81,7 +94,8 @@ def trans_data_vae(data, label_data):
         data_tmp = data_view[i]
         data_tmp = torch.from_numpy(data_tmp)
         data_tmp = data_tmp.to(device)
-        recon_batch, mu, logvar = Vae(data_tmp)
+        recon_batch_p, mu_p, logvar_p = vae_p(data_tmp)
+        recon_batch_n, mu_n, logvar_n = vae_n(data_tmp)
 
         # if label_list[i] == 1:  # positive
         #     optimizer_vae_p.zero_grad()
@@ -95,7 +109,9 @@ def trans_data_vae(data, label_data):
         #     loss = loss_function(recon_batch, data_tmp, mu, logvar)
         #     loss.backward()
         #     optimizer_vae_n.step()
-        result_tmp = recon_batch.detach().cpu().numpy()
+        result_tmp_n = recon_batch_n.detach().cpu().numpy()
+        result_tmp_p = recon_batch_p.detach().cpu().numpy()
+        result_tmp = (result_tmp_p+result_tmp_n)/2
         result_tmp = result_tmp.reshape(resize)
         data_result = result_tmp[np.newaxis, :]
         result.append(data_result)

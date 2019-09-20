@@ -184,9 +184,9 @@ def loss_function(recon_x, x, mu, logvar):
     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
     # https://arxiv.org/abs/1312.6114
     # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
-    # KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
 
-    return BCE
+    return BCE+KLD
 
 
 def trans_data(vae_model, data, shape=(130, 200)):
@@ -216,7 +216,7 @@ optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.005)
 # optimizer_vae = optim.Adam(Vae.parameters(), lr=0.005)
 
 # vae 模块
-def trans_data_vae(data, label_data, flag):
+def trans_data_vae(data, label_data):
     shape_data = data.shape
     data_view = data.reshape((-1, resize[0], resize[1]))
     shape_label = label_data.shape
@@ -289,8 +289,8 @@ def maml_framwork():
     plt_test_loss = []
     plt_test_acc = []
 
-    flag_vae = True  # 设置梯度反向传播的标志位，vae
-    flag_maml = not flag_vae  # 设置梯度反向传播的薄志伟，maml
+    # flag_vae = True  # 设置梯度反向传播的标志位，vae
+    # flag_maml = not flag_vae  # 设置梯度反向传播的薄志伟，maml
     for epoch in range(10):
         # fetch meta_batchsz num of episode each time
         db = DataLoader(mini, args.task_num, shuffle=True, num_workers=1, pin_memory=True)
@@ -299,14 +299,14 @@ def maml_framwork():
 
             # 插入vae模块
             # 需要设计交替训练的模块
-            x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt, flag_vae)
-            x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry, flag_vae)
+            x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt)
+            x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry)
             x_spt_vae = torch.from_numpy(x_spt_vae)
             x_qry_vae = torch.from_numpy(x_qry_vae)
             x_spt_vae, y_spt, x_qry_vae, y_qry = x_spt_vae.to(device), y_spt.to(device), x_qry_vae.to(device), y_qry.to(
                 device)
 
-            accs, loss_q = maml(x_spt_vae, y_spt, x_qry_vae, y_qry, flag_maml)
+            accs, loss_q = maml(x_spt_vae, y_spt, x_qry_vae, y_qry, True)
             # maml.meta_optim.zero_grad()
             # loss = loss_spt + loss_qry + loss_q
             # loss.backward()
@@ -325,8 +325,8 @@ def maml_framwork():
                     loss_all_test = []
 
                     for x_spt, y_spt, x_qry, y_qry in db_test:
-                        x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt, flag_vae)
-                        x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry, flag_vae)
+                        x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt)
+                        x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry)
                         x_spt_vae = torch.from_numpy(x_spt_vae)
                         x_qry_vae = torch.from_numpy(x_qry_vae)
                         x_spt_vae, y_spt, x_qry_vae, y_qry = x_spt_vae.squeeze(0).to(device), y_spt.squeeze(0).to(
@@ -334,7 +334,7 @@ def maml_framwork():
 
                         accs, loss_test = maml.finetunning(x_spt_vae, y_spt, x_qry_vae, y_qry)
 
-                        loss_all_test.append(loss_spt.item() + loss_qry.item() + loss_test.item())
+                        loss_all_test.append(loss_test.item())
                         accs_all_test.append(accs)
 
                     # [b, update_step+1]
