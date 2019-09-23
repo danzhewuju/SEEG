@@ -134,6 +134,99 @@ class Meta(nn.Module):
 
         return accs, loss_q
 
+    def finetunning_double_vae(self, x_spt_p, x_spt_n, y_spt, x_qry_p, x_qry_n, y_qry):
+        """
+
+        :param x_spt_p: 经过VAE_p编码器
+        :param x_spt_n: 经过VAE_n编码器
+        :param y_spt:
+        :param x_qry_p:
+        :param x_qry_n:
+        :param y_qry:
+        :return:
+        """
+        assert len(x_spt_p.shape) == 4  # 用来检查数据类型的断言
+        assert len(x_spt_n.shape) == 4
+
+        querysz = x_qry_p.size(0)
+
+        corrects = [0 for _ in range(self.update_step_test + 1)]
+
+        # in order to not ruin the state of running_mean/variance and bn_weight/bias
+        # we finetunning on the copied model instead of self.net
+        net = deepcopy(self.net)
+
+        # 1. run the i-th task and compute loss for k=0
+        logits_p = net(x_spt_p)
+        lohits_n = net(x_spt_n)
+        loss = min(F.cross_entropy(logits_p, y_spt) ,F.cross_entropy(lohits_n, y_spt))
+        grad = torch.autograd.grad(loss, net.parameters())  # 自动求导机制
+        fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, net.parameters())))
+
+        # this is the loss and accuracy before first update
+        with torch.no_grad():
+            # [setsz, nway]
+            logits_q_p = net(x_qry_p, net.parameters(), bn_training=True)
+            logits_q_n = net(x_qry_n, net.parameters(), bn_training=True)
+
+            # [setsz]
+            pred_q_p = F.softmax(logits_q_p, dim=1)
+            pred_q_n = F.softmax(logits_q_n, dim=1)
+            pred_q = (pred_q_n + pred_q_p) / 2
+            pred_q = pred_q.argmax(dim=1)
+            # scalar
+            correct = torch.eq(pred_q, y_qry).sum().item()
+            corrects[0] = corrects[0] + correct
+
+        # this is the loss and accuracy after the first update
+        with torch.no_grad():
+            # [setsz, nway]
+            logits_q_p = net(x_qry_p, net.parameters(), bn_training=True)
+            logits_q_n = net(x_qry_n, net.parameters(), bn_training=True)
+
+            # [setsz]
+            pred_q_p = F.softmax(logits_q_p, dim=1)
+            pred_q_n = F.softmax(logits_q_n, dim=1)
+            pred_q = (pred_q_n + pred_q_p) / 2
+            pred_q = pred_q.argmax(dim=1)
+            # scalar
+            correct = torch.eq(pred_q, y_qry).sum().item()
+            corrects[1] = corrects[1] + correct
+        loss_all = 0
+        for k in range(1, self.update_step_test):
+            # 1. run the i-th task and compute loss for k=1~K-1
+            logits_q_p = net(x_qry_p, fast_weights, bn_training=True)
+            logits_q_n = net(x_qry_n, fast_weights, bn_training=True)
+
+            loss = min(F.cross_entropy(logits_q_n, y_spt) , F.cross_entropy(logits_q_p, y_spt))
+            # 2. compute grad on theta_pi
+            grad = torch.autograd.grad(loss, fast_weights)
+            # 3. theta_pi = theta_pi - train_lr * grad
+            fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, fast_weights)))
+
+            logits_q_p = net(x_qry_p, fast_weights, bn_training=True)
+            logits_q_n = net(x_qry_n, fast_weights, bn_training=True)
+            # loss_q will be overwritten and just keep the loss_q on last update step.
+            loss_q = min(F.cross_entropy(logits_q_n, y_spt), F.cross_entropy(logits_q_p, y_spt))
+            loss_all += loss_q.cpu().detach().numpy()
+
+            with torch.no_grad():
+                logits_q = (logits_q_n+logits_q_p)/2
+                # pred_q_p = F.softmax(logits_q_p, dim=1)
+                # pred_q_n = F.softmax(logits_q_n, dim=1)
+                # pred_q = (pred_q_n + pred_q_p) / 2
+                pred_q = F.softmax(logits_q, dim=1)
+                pred_q = pred_q.argmax(dim=1)
+                correct = torch.eq(pred_q, y_qry).sum().item()  # convert to numpy
+                corrects[k + 1] = corrects[k + 1] + correct
+
+        del net
+        loss_all /= self.update_step_test - 1
+
+        accs = np.array(corrects) / querysz
+
+        return accs, loss_all
+
     def finetunning(self, x_spt, y_spt, x_qry, y_qry):
         """
 
@@ -143,7 +236,7 @@ class Meta(nn.Module):
         :param y_qry:   [querysz]
         :return:
         """
-        assert len(x_spt.shape) == 4
+        assert len(x_spt.shape) == 4  # 用来检查数据类型的断言
 
         querysz = x_qry.size(0)
 

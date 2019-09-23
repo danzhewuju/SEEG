@@ -23,7 +23,11 @@ save_val_dir = "../data/seeg/zero_data/val_vae"
 
 
 def vae_data(raw_path, save_path):  # train-test dataset and positive/negative
+    clean_dir(save_path)
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
     names = os.listdir(raw_path)
+    # clean_dir(save_path)
     for n in names:
         if n == "pre_zeizure":
             model_path = "./models/model-vae-positive_preseizure.ckpt"
@@ -54,6 +58,9 @@ def vae_data(raw_path, save_path):  # train-test dataset and positive/negative
 
 
 def vae_data_val(raw_path, save_path):  # val dataset
+    clean_dir(save_path)
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
     names = os.listdir(raw_path)
     model_path_all = "./models/model-vae.ckpt"
     # model_path_p = "./models/model-vae-positive_preseizure.ckpt"
@@ -95,7 +102,7 @@ if __name__ == '__main__':
     # clean_dir(save_val_dir)
     # 1. 训练集的vae编码
     # vae_data(train_path, save_train_dir)  # positive/negative
-    # 2. 测试集的vae编码
-    # vae_data(test_path, save_test_dir)  # positive/negative
-    # 3. 验证集的vae编码
+    # # 2. 测试集的vae编码
+    vae_data(test_path, save_test_dir)  # positive/negative
+    # # 3. 验证集的vae编码
     vae_data_val(val_path, save_val_dir)  # validation dataset

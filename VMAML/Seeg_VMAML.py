@@ -30,7 +30,7 @@ argparser.add_argument('--k_qry', type=int, help='k shot for query set', default
 argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
-argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.005)
+argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.001)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
 argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
@@ -192,9 +192,9 @@ def loss_function(recon_x, x, mu, logvar):
     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
     # https://arxiv.org/abs/1312.6114
     # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
-    # KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
 
-    return BCE
+    return BCE+KLD
 
 
 def trans_data(vae_model, data, shape=(130, 200)):
@@ -220,7 +220,7 @@ def show_eeg(data):
 
 # 仅仅使用一个VAE的编码器
 Vae = VAE().to(device)
-optimizer_vae = optim.Adam(Vae.parameters(), lr=0.005)
+optimizer_vae = optim.Adam(Vae.parameters(), lr=0.001)
 
 if os.path.exists("./models/Vae.pkl"):
     Vae.load_state_dict(torch.load("./models/Vae.pkl"))
@@ -323,7 +323,7 @@ def maml_framwork():
 
             # 插入vae模块
             # 需要设计交替训练的模块
-            if step % 100 == 0:
+            if step % 10 == 0:
                 flag_vae = not flag_vae
                 flag_maml = not flag_maml
             x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt, flag_vae)

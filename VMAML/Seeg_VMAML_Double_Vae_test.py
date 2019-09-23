@@ -21,7 +21,7 @@ from MAML.Mamlnet import Seegnet
 from VMAML.meta import *
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=2000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=8)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=8)
@@ -62,7 +62,6 @@ device = torch.device('cuda')
 Vae = VAE().to(device)
 maml = Meta(args, config).to(device)
 
-
 # 构建两个编码器
 vae_p = VAE().to(device)
 vae_n = VAE().to(device)
@@ -90,10 +89,14 @@ def trans_data_vae(data, label_data):  # 经过了VAE编码
     label_list = label_data.flatten()
     number = shape_label[0] * shape_label[1]
     result = []
+    result_p = []
+    result_n = []
     for i in range(number):
         data_tmp = data_view[i]
         data_tmp = torch.from_numpy(data_tmp)
         data_tmp = data_tmp.to(device)
+
+        # 1. 经过编码器，并行结构
         recon_batch_p, mu_p, logvar_p = vae_p(data_tmp)
         recon_batch_n, mu_n, logvar_n = vae_n(data_tmp)
 
@@ -111,13 +114,30 @@ def trans_data_vae(data, label_data):  # 经过了VAE编码
         #     optimizer_vae_n.step()
         result_tmp_n = recon_batch_n.detach().cpu().numpy()
         result_tmp_p = recon_batch_p.detach().cpu().numpy()
-        result_tmp = (result_tmp_p+result_tmp_n)/2
-        result_tmp = result_tmp.reshape(resize)
-        data_result = result_tmp[np.newaxis, :]
-        result.append(data_result)
-    result_t = np.array(result)
-    result_r = result_t.reshape(shape_data)
-    return result_r
+        # result_tmp = (result_tmp_p+result_tmp_n)/2
+        # result_tmp = result_tmp_p.reshape(resize)
+        data_result_p = result_tmp_p.reshape(resize)[np.newaxis, :]
+        data_result_n = result_tmp_n.reshape(resize)[np.newaxis, :]
+        result_p.append(data_result_p)
+        result_n.append(data_result_n)
+
+        # 2.同时经过两个编码器 串行结构
+        # recon_batch_p, mu_p, logvar_p = vae_p(data_tmp)
+        # recon_batch, _, _ = vae_n(recon_batch_p)
+        # recon_batch = recon_batch.detach().cpu().numpy()
+        # data_result = recon_batch.reshape(resize)[np.newaxis, :]
+        # result.append(data_result)
+
+    result_t_p = np.array(result_p)
+    result_t_n = np.array(result_n)
+    result_r_p = result_t_p.reshape(shape_data)
+    result_r_n = result_t_n.reshape(shape_data)
+
+    # result_t = np.array(result)
+    # result_t = result_t.reshape(shape_data)
+
+    return result_r_p, result_r_n
+    # return result_t
 
 
 def main():
@@ -132,11 +152,6 @@ def main():
         path = "./models/" + str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")
         maml.load_state_dict(path)
         print("load model success")
-
-    if os.path.exists("./models/model-vae.ckpt"):
-        path_vae = str("./models/model-vae.ckpt")
-        Vae.load_state_dict(torch.load(path_vae))
-        print("loading VAE model successfully!")
 
     tmp = filter(lambda x: x.requires_grad, maml.parameters())
     num = sum(map(lambda x: np.prod(x.shape), tmp))
@@ -157,14 +172,36 @@ def main():
         accs_all_test = []
 
         for x_spt, y_spt, x_qry, y_qry in db_test:
-            x_spt = trans_data_vae(x_spt.numpy(), y_spt)
-            x_qry = trans_data_vae(x_qry.numpy(), y_qry)
-            x_spt = torch.from_numpy(x_spt)
-            x_qry = torch.from_numpy(x_qry)
+            # 2.需要引入VAE编码
+            # x_spt_p, x_spt_n = trans_data_vae(x_spt.numpy(), y_spt)
+            # x_qry_p, x_qry_n = trans_data_vae(x_qry.numpy(), y_qry)
+            # x_spt_p = torch.from_numpy(x_spt_p)
+            # x_spt_n = torch.from_numpy(x_spt_n)
+            # x_qry_p = torch.from_numpy(x_qry_p)
+            # x_qry_n = torch.from_numpy(x_qry_n)
+            #
+            # x_spt_p, x_spt_n, y_spt, x_qry_p, x_qry_n, y_qry = x_spt_p.squeeze(0).to(device), x_spt_n.squeeze(0).to(
+            #     device), y_spt.squeeze(0).to(device), \
+            #                                                    x_qry_p.squeeze(0).to(device), x_qry_n.squeeze(0).to(
+            #     device), y_qry.squeeze(0).to(device)
+            #
+            # accs, loss_t = maml.finetunning_double_vae(x_spt_p, x_spt_n, y_spt, x_qry_p, x_qry_n, y_qry)
+
+            # 1.未引入VAE模块
             x_spt, y_spt, x_qry, y_qry = x_spt.squeeze(0).to(device), y_spt.squeeze(0).to(device), \
                                          x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
-
             accs, loss_t = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
+
+            # 3. 引入VAE 但是同时经过两个编码器
+            # x_spt = trans_data_vae(x_spt.numpy(), y_spt)
+            # x_qry = trans_data_vae(x_qry.numpy(), y_qry)
+            # x_spt = torch.from_numpy(x_spt)
+            # x_qry = torch.from_numpy(x_qry)
+            #
+            # x_spt, y_spt, x_qry, y_qry = x_spt.squeeze(0).to(device), y_spt.squeeze(0).to(device), \
+            #                              x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
+            # accs, loss_t = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
+
             accs_all_test.append(accs)
 
         # [b, update_step+1]

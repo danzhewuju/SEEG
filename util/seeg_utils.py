@@ -125,6 +125,13 @@ def data_split(raw, time_step):  # 数据的切片处理
         data_split.append(data)
     return data_split
 
+def get_sampling_hz(raw):  # 返回采样的频率
+    end = max(raw.times)
+    fz = int(len(raw) / end)  # 采样频率
+    return fz
+
+
+
 
 def get_duration_raw_data(raw, start, stop):
     '''

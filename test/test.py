@@ -2,11 +2,13 @@
 
 import librosa
 import librosa.display
+import torch
 
 from RelationNet.Seegdata import *
 from util.util_file import *
 import re
 import json
+from torch.nn import functional as F
 
 
 def sigmoid(x):
@@ -312,4 +314,12 @@ def test_23():
 
 
 if __name__ == '__main__':
-    test_23()
+    # a = np.array([[-0.2998,  0.3695],[0.5, 0.5]])
+    # a = torch.from_numpy(a)
+    # print(a)
+    # b = np.array([0, 1])
+    # print(b)
+    # pre_q = F.softmax(a, dim=1)
+    # print(pre_q)
+    a= 1
+    print(3^2)

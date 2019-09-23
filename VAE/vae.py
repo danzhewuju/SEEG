@@ -167,7 +167,7 @@ def loss_function(recon_x, x, mu, logvar):
     # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
 
-    return BCE
+    return BCE+KLD
 
 
 def train_negative(epoch):
@@ -265,6 +265,6 @@ if __name__ == "__main__":
         # 1.训练正态编码器
         # train_positive(epoch)
         # 2. 训练负态编码器
-        # train_negative(epoch)
+        train_negative(epoch)
         # 3.用全部数据训练编码器， 暂未使用
         train_all_data(epoch)
