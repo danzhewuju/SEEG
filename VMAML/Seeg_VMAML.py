@@ -159,14 +159,14 @@ class VAE(nn.Module):
     def __init__(self):
         super(VAE, self).__init__()
 
-        self.fc1 = nn.Linear(resize[0] * resize[1], 200)
-        self.fc21 = nn.Linear(200, 20)
-        self.fc22 = nn.Linear(200, 20)
-        self.fc3 = nn.Linear(20, 200)
-        self.fc4 = nn.Linear(200, resize[0] * resize[1])
+        self.fc1 = nn.Linear(resize[0] * resize[1], 400)
+        self.fc21 = nn.Linear(400, 20)
+        self.fc22 = nn.Linear(400, 20)
+        self.fc3 = nn.Linear(20, 400)
+        self.fc4 = nn.Linear(400, resize[0] * resize[1])
 
     def encode(self, x):
-        h1 = F.relu(self.fc1(x))
+        h1 = F.softmax(self.fc1(x))
         return self.fc21(h1), self.fc22(h1)
 
     def reparameterize(self, mu, logvar):
@@ -175,7 +175,7 @@ class VAE(nn.Module):
         return mu + eps * std
 
     def decode(self, z):
-        h3 = F.relu(self.fc3(z))
+        h3 = F.softmax(self.fc3(z))
         return torch.sigmoid(self.fc4(h3))
 
     def forward(self, x):
