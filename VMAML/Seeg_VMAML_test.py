@@ -13,11 +13,12 @@ import numpy as np
 import scipy.stats
 import torch
 from torch.utils.data import DataLoader
-from Seeg_VMAML import VAE
-
+# from Seeg_VMAML import VAE
+from VAE.ConVae import VAE
 sys.path.append('../')
 from MAML.Mamlnet import Seegnet
 from VMAML.meta import *
+from util.util_file import matrix_normalization
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
@@ -80,7 +81,7 @@ def trans_data_vae(data, label_data):
         data_tmp = data_view[i]
         data_tmp = torch.from_numpy(data_tmp)
         data_tmp = data_tmp.to(device)
-        recon_batch, mu, logvar = Vae(data_tmp)
+        recon_batch = Vae(data_tmp)
 
         # if label_list[i] == 1:  # positive
         #     optimizer_vae_p.zero_grad()
@@ -94,8 +95,10 @@ def trans_data_vae(data, label_data):
         #     loss = loss_function(recon_batch, data_tmp, mu, logvar)
         #     loss.backward()
         #     optimizer_vae_n.step()
+        recon_batch = recon_batch.reshape(recon_batch.shape[-2], recon_batch.shape[-1])
         result_tmp = recon_batch.detach().cpu().numpy()
-        result_tmp = result_tmp.reshape(resize)
+        result_tmp = matrix_normalization(result_tmp)
+        # result_tmp = result_tmp.reshape(resize)
         data_result = result_tmp[np.newaxis, :]
         result.append(data_result)
     result_t = np.array(result)

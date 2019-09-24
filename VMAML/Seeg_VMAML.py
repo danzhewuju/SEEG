@@ -18,6 +18,7 @@ sys.path.append('../')
 
 from MAML.Mamlnet import *
 from VMAML.meta import *
+from VAE.ConVae import VAE
 from util.util_file import matrix_normalization
 import matplotlib.pyplot as plt
 import time
@@ -155,46 +156,46 @@ all_loader = MyDataset(all_data)
 #     batch_size=args.batch_size, shuffle=True, **kwargs)
 
 
-class VAE(nn.Module):
-    def __init__(self):
-        super(VAE, self).__init__()
-
-        self.fc1 = nn.Linear(resize[0] * resize[1], 200)
-        self.fc21 = nn.Linear(200, 20)
-        self.fc22 = nn.Linear(200, 20)
-        self.fc3 = nn.Linear(20, 200)
-        self.fc4 = nn.Linear(200, resize[0] * resize[1])
-
-    def encode(self, x):
-        h1 = F.relu(self.fc1(x))
-        return self.fc21(h1), self.fc22(h1)
-
-    def reparameterize(self, mu, logvar):
-        std = torch.exp(0.5 * logvar)
-        eps = torch.randn_like(std)
-        return mu + eps * std
-
-    def decode(self, z):
-        h3 = F.relu(self.fc3(z))
-        return torch.sigmoid(self.fc4(h3))
-
-    def forward(self, x):
-        mu, logvar = self.encode(x.view(-1, resize[0] * resize[1]))
-        z = self.reparameterize(mu, logvar)
-        return self.decode(z), mu, logvar
+# class VAE(nn.Module):
+#     def __init__(self):
+#         super(VAE, self).__init__()
+#
+#         self.fc1 = nn.Linear(resize[0] * resize[1], 200)
+#         self.fc21 = nn.Linear(200, 20)
+#         self.fc22 = nn.Linear(200, 20)
+#         self.fc3 = nn.Linear(20, 200)
+#         self.fc4 = nn.Linear(200, resize[0] * resize[1])
+#
+#     def encode(self, x):
+#         h1 = F.relu(self.fc1(x))
+#         return self.fc21(h1), self.fc22(h1)
+#
+#     def reparameterize(self, mu, logvar):
+#         std = torch.exp(0.5 * logvar)
+#         eps = torch.randn_like(std)
+#         return mu + eps * std
+#
+#     def decode(self, z):
+#         h3 = F.relu(self.fc3(z))
+#         return torch.sigmoid(self.fc4(h3))
+#
+#     def forward(self, x):
+#         mu, logvar = self.encode(x.view(-1, resize[0] * resize[1]))
+#         z = self.reparameterize(mu, logvar)
+#         return self.decode(z), mu, logvar
 
 
 # Reconstruction + KL divergence losses summed over all elements and batch
-def loss_function(recon_x, x, mu, logvar):
-    BCE = F.binary_cross_entropy(recon_x, x.view(-1, resize[0] * resize[1]), reduction='sum')
-
-    # see Appendix B from VAE paper:
-    # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
-    # https://arxiv.org/abs/1312.6114
-    # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
-    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-
-    return BCE+KLD
+# def loss_function(recon_x, x, mu, logvar):
+#     BCE = F.binary_cross_entropy(recon_x, x.view(-1, resize[0] * resize[1]), reduction='sum')
+#
+#     # see Appendix B from VAE paper:
+#     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
+#     # https://arxiv.org/abs/1312.6114
+#     # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
+#     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+#
+#     return BCE+KLD
 
 
 def trans_data(vae_model, data, shape=(130, 200)):
@@ -220,11 +221,13 @@ def show_eeg(data):
 
 # 仅仅使用一个VAE的编码器
 Vae = VAE().to(device)
-optimizer_vae = optim.Adam(Vae.parameters(), lr=0.01)
+criterion = nn.MSELoss()
+optimizer_vae = optim.Adam(Vae.parameters(), lr=0.001)
 
-if os.path.exists("./models/Vae.pkl"):
-    Vae.load_state_dict(torch.load("./models/Vae.pkl"))
-    print("loading VAE model success!")
+
+# if os.path.exists("./models/Vae.pkl"):
+#     Vae.load_state_dict(torch.load("./models/Vae.pkl"))
+#     print("loading VAE model success!")
 
 
 # vae 模块
@@ -239,11 +242,12 @@ def trans_data_vae(data, label_data, flag):
 
     for i in range(number):
         data_tmp = data_view[i]
+        data_tmp = matrix_normalization(data_tmp, (128, 200))
+        data_tmp = data_tmp[np.newaxis, np.newaxis, :]
         data_tmp = torch.from_numpy(data_tmp)
         data_tmp = data_tmp.to(device)
-        recon_batch, mu, logvar = Vae(data_tmp)
-        loss_all += loss_function(recon_batch, data_tmp, mu, logvar)
-
+        recon_batch = Vae(data_tmp)
+        loss_all += criterion(recon_batch, data_tmp)
 
         # if label_list[i] == 1:  # positive
         #     optimizer_vae_p.zero_grad()
@@ -263,7 +267,8 @@ def trans_data_vae(data, label_data, flag):
         # optimizer_vae.step()
 
         result_tmp = recon_batch.detach().cpu().numpy()
-        result_tmp = result_tmp.reshape(resize)
+        result_tmp = result_tmp.reshape((128, 200))
+        result_tmp = matrix_normalization(result_tmp, resize)
         data_result = result_tmp[np.newaxis, :]
         result.append(data_result)
 
@@ -289,8 +294,8 @@ def maml_framwork():
     # device = torch.device('cuda')
     maml = Meta(args, config).to(device)
     if os.path.exists(str(
-                        "./models/maml" + str(args.n_way) + "way_" + str(
-                            args.k_spt) + "shot.pkl")):
+            "./models/maml" + str(args.n_way) + "way_" + str(
+                args.k_spt) + "shot.pkl")):
         path = str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")
         maml.load_state_dict(torch.load(path))
         print("loading MAML model success!")
