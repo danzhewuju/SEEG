@@ -3,6 +3,12 @@
 
 The focus point of this project is to research the difference between sleep of pre seizure and normal sleep.
 
+## How to run this project
+
+MNE: pip3 install -U https://api.github.com/repos/mne-tools/mne-python/zipball/master
+
+Python : pip install python 
+
 
 ## content
 

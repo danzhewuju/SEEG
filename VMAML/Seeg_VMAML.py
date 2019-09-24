@@ -30,7 +30,7 @@ argparser.add_argument('--k_qry', type=int, help='k shot for query set', default
 argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
-argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.001)
+argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.005)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
 argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
@@ -159,14 +159,14 @@ class VAE(nn.Module):
     def __init__(self):
         super(VAE, self).__init__()
 
-        self.fc1 = nn.Linear(resize[0] * resize[1], 400)
-        self.fc21 = nn.Linear(400, 20)
-        self.fc22 = nn.Linear(400, 20)
-        self.fc3 = nn.Linear(20, 400)
-        self.fc4 = nn.Linear(400, resize[0] * resize[1])
+        self.fc1 = nn.Linear(resize[0] * resize[1], 200)
+        self.fc21 = nn.Linear(200, 20)
+        self.fc22 = nn.Linear(200, 20)
+        self.fc3 = nn.Linear(20, 200)
+        self.fc4 = nn.Linear(200, resize[0] * resize[1])
 
     def encode(self, x):
-        h1 = F.softmax(self.fc1(x))
+        h1 = F.relu(self.fc1(x))
         return self.fc21(h1), self.fc22(h1)
 
     def reparameterize(self, mu, logvar):
@@ -175,7 +175,7 @@ class VAE(nn.Module):
         return mu + eps * std
 
     def decode(self, z):
-        h3 = F.softmax(self.fc3(z))
+        h3 = F.relu(self.fc3(z))
         return torch.sigmoid(self.fc4(h3))
 
     def forward(self, x):
@@ -220,7 +220,7 @@ def show_eeg(data):
 
 # 仅仅使用一个VAE的编码器
 Vae = VAE().to(device)
-optimizer_vae = optim.Adam(Vae.parameters(), lr=0.001)
+optimizer_vae = optim.Adam(Vae.parameters(), lr=0.01)
 
 if os.path.exists("./models/Vae.pkl"):
     Vae.load_state_dict(torch.load("./models/Vae.pkl"))
@@ -314,7 +314,7 @@ def maml_framwork():
     plt_test_acc = []
 
     flag_vae = True  # 设置梯度反向传播的标志位，vae
-    flag_maml = not flag_vae  # 设置梯度反向传播的薄志伟，maml
+    flag_maml = not flag_vae  # 设置梯度反向传播的标致，maml
     for epoch in range(10):
         # fetch meta_batchsz num of episode each time
         db = DataLoader(mini, args.task_num, shuffle=True, num_workers=1, pin_memory=True)
@@ -323,7 +323,7 @@ def maml_framwork():
 
             # 插入vae模块
             # 需要设计交替训练的模块
-            if step % 10 == 0:
+            if step % 200 == 0:
                 flag_vae = not flag_vae
                 flag_maml = not flag_maml
             x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt, flag_vae)

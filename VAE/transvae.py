@@ -10,7 +10,7 @@
 import torch
 
 from util import *
-from vae import trans_data, VAE
+from ConVae import trans_data, VAE
 from tqdm import tqdm
 
 train_path = "../data/seeg/zero_data/train"
@@ -49,9 +49,9 @@ def vae_data(raw_path, save_path):  # train-test dataset and positive/negative
             save_data_path = os.path.join(save_dir, name_tmp)  # saving data path
             data_path = os.path.join(path_new, p)
             data = np.load(data_path)
-            result = matrix_normalization(data, (130, 200))
+            result = matrix_normalization(data, (128, 200))
             result = result.astype('float32')
-            result = result[np.newaxis, :]
+            result = result[np.newaxis, np.newaxis, :]
             result = trans_data(vae_model, result)
             save_numpy_info(result, save_data_path)
         print("all files:{} had been saved!".format(len(file_names)))
@@ -90,7 +90,7 @@ def vae_data_val(raw_path, save_path):  # val dataset
             save_data_path = os.path.join(save_dir, name_tmp)  # saving data path
             data_path = os.path.join(path_new, p)
             data = np.load(data_path)
-            result = matrix_normalization(data, (130, 200))
+            result = matrix_normalization(data, (128, 200))
             result = result.astype('float32')
             result = result[np.newaxis, :]
             result = trans_data(vae_model_all, result)
@@ -101,8 +101,8 @@ def vae_data_val(raw_path, save_path):  # val dataset
 if __name__ == '__main__':
     # clean_dir(save_val_dir)
     # 1. 训练集的vae编码
-    # vae_data(train_path, save_train_dir)  # positive/negative
+    vae_data(train_path, save_train_dir)  # positive/negative
     # # 2. 测试集的vae编码
     vae_data(test_path, save_test_dir)  # positive/negative
     # # 3. 验证集的vae编码
-    vae_data_val(val_path, save_val_dir)  # validation dataset
+    # vae_data_val(val_path, save_val_dir)  # validation dataset
