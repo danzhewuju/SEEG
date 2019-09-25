@@ -21,7 +21,7 @@ from VMAML.meta import *
 from util.util_file import matrix_normalization
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=50000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=8)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=8)
@@ -79,6 +79,7 @@ def trans_data_vae(data, label_data):
     result = []
     for i in range(number):
         data_tmp = data_view[i]
+        data_tmp = data_tmp[np.newaxis, np.newaxis,:]
         data_tmp = torch.from_numpy(data_tmp)
         data_tmp = data_tmp.to(device)
         recon_batch = Vae(data_tmp)

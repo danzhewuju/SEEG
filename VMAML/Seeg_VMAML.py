@@ -24,14 +24,14 @@ import matplotlib.pyplot as plt
 import time
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=20000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=4000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=8)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=8)
 argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
-argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.005)
+argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.001)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
 argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
@@ -319,8 +319,9 @@ def maml_framwork():
     plt_test_acc = []
 
     flag_vae = True  # 设置梯度反向传播的标志位，vae
-    flag_maml = not flag_vae  # 设置梯度反向传播的标致，maml
-    for epoch in range(10):
+    # flag_maml = not flag_vae  # 设置梯度反向传播的标致，maml
+    flag_maml = True
+    for epoch in range(2):
         # fetch meta_batchsz num of episode each time
         db = DataLoader(mini, args.task_num, shuffle=True, num_workers=1, pin_memory=True)
 
@@ -328,9 +329,9 @@ def maml_framwork():
 
             # 插入vae模块
             # 需要设计交替训练的模块
-            if step % 200 == 0:
-                flag_vae = not flag_vae
-                flag_maml = not flag_maml
+            # if step % 200 == 0:
+            #     flag_vae = not flag_vae
+            #     flag_maml = not flag_maml
             x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt, flag_vae)
             x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry, flag_vae)
             x_spt_vae = torch.from_numpy(x_spt_vae)

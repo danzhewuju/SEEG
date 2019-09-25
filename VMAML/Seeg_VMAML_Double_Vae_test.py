@@ -172,7 +172,14 @@ def main():
         accs_all_test = []
 
         for x_spt, y_spt, x_qry, y_qry in db_test:
-            # 2.需要引入VAE编码
+
+
+            # 1.未引入VAE模块
+            x_spt, y_spt, x_qry, y_qry = x_spt.squeeze(0).to(device), y_spt.squeeze(0).to(device), \
+                                         x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
+            accs, loss_t = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
+
+            # # 2.需要引入VAE编码
             # x_spt_p, x_spt_n = trans_data_vae(x_spt.numpy(), y_spt)
             # x_qry_p, x_qry_n = trans_data_vae(x_qry.numpy(), y_qry)
             # x_spt_p = torch.from_numpy(x_spt_p)
@@ -186,11 +193,6 @@ def main():
             #     device), y_qry.squeeze(0).to(device)
             #
             # accs, loss_t = maml.finetunning_double_vae(x_spt_p, x_spt_n, y_spt, x_qry_p, x_qry_n, y_qry)
-
-            # 1.未引入VAE模块
-            x_spt, y_spt, x_qry, y_qry = x_spt.squeeze(0).to(device), y_spt.squeeze(0).to(device), \
-                                         x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
-            accs, loss_t = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
 
             # 3. 引入VAE 但是同时经过两个编码器
             # x_spt = trans_data_vae(x_spt.numpy(), y_spt)
