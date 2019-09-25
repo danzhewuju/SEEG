@@ -23,19 +23,11 @@ def test_1():
 
 def test_2():
     # 图像拼接
-    path_dir = "./heatmap"
-    path_dir = get_first_dir_path(path_dir)
-    path_1 = path_dir[0]
-    path_2 = path_dir[1]
-    imag_test = Image.open(path_1)
-    dst_1 = imag_test.transpose(Image.ROTATE_90)
-    width, height = dst_1.size
-    imag_test = Image.open(path_2)
-    dst_2 = imag_test.transpose(Image.ROTATE_90)
-    result = Image.new(dst_1.mode, (width * 2, height))
+    path_dir = "./log/heatmap.csv"
+    data = pd.read_csv(path_dir, sep=',')
+    print(data.loc[1]["grant truth"])
 
-    result.paste(dst_1, box=(0, 0))
-    result.paste(dst_2, box=(200, 0))
-    plt.imshow(result)
-    plt.show()
+
+if __name__ == '__main__':
+    test_2()
 

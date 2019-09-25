@@ -9,12 +9,12 @@ import json
 
 time = 2  # 每一帧的持续时间
 resample = 100  # 重采样的频率
-high_pass = 0   # 滤波范围
+high_pass = 1   # 滤波范围
 low_pass = 30
 
 config = json.load(open("../DataProcessing/config/fig.json"))
 
-save_split_data_test__path_dir = config["transferdata.save_split_data_test__path_dir_2"]  # 设置配置的文件夹
+save_split_data_test__path_dir = config["transferdata.save_split_data_test__path_dir_1"]  # 设置配置的文件夹
 print("All files will be saved in {}".format(save_split_data_test__path_dir))
 
 
@@ -86,7 +86,7 @@ def data_save(path_read, name, flag, common_channels, flag_duration=0, isfilter=
     :param name: 文件的名称用于保存切片的数据
     :param flag: 状态为， 区别:癫痫发作前， 正常睡眠状态
     :param common_channels: 选取的信道的序列
-    :param flag_duration: 窗口的大小："2s"
+    :param flag_duration:
     :param isFilter: 是否滤波，医生希望看到原始数据
     :return:
     '''

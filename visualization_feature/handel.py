@@ -62,7 +62,7 @@ def create_raw_data_signal_by_similarity(image_dir="./heatmap"):
     # channels.sort()
     # print(channels)
 
-    with open('./json_path/LK_preseizure_sorted.json') as f:
+    with open('./json_path/BDP_preseizure_sorted.json') as f:
         json_path = json.load(f)
 
         raw_data_name = [re.findall("/.+/(.+)", p)[0] for p in json_path]
@@ -101,7 +101,7 @@ def create_raw_data_signal_by_similarity(image_dir="./heatmap"):
 
 
 def create_raw_data_signal_by_time(image_dir="./heatmap"):
-    raw_path_list = get_first_dir_path("./raw_data_time_sequentially/preseizure/LK", "npy")
+    raw_path_list = get_first_dir_path("./raw_data_time_sequentially/preseizure/BDP", "npy")
     raw_data_name = [re.findall("/.+/(.+)", p)[0] for p in raw_path_list]
     dict_name_path = dict(zip(raw_data_name, raw_path_list))
 
@@ -128,11 +128,14 @@ def create_raw_data_signal_by_time(image_dir="./heatmap"):
         name = re.findall('heatmap/(.+)', raw_path)[0]
         selected_raw_path.append((name, channels_number))
 
+
     for index, (name, channels_number) in tqdm(enumerate(selected_raw_path)):
         new_name = name[:-4] + '.jpg'
         save_path = os.path.join('./raw_data_signal', new_name)
         data_p = dict_name_path[name]
-        raw_data = np.load(data_p)
+        raw_data = np.load(data_p)   # 此时相当于原始数据，信道数已经不一致了
+        # 需要重新映射channel number 的序号
+
         seeg_npy_plot(raw_data, channels_number, save_path)
 
     print("All files has been written!")
@@ -165,13 +168,14 @@ def image_connection(data_signal_dir, raw_data_dir, save_dir="./contact_image"):
         plt.close(0)
 
 
-def time_heat_map(path="./raw_data_time_sequentially/preseizure/LK"):
+def time_heat_map(path="./raw_data_time_sequentially/preseizure/BDP"):
     '''
 
     :return:
     构造时间序列的热力图
     '''
-    file_name = "LK_SZ1_pre_seizure_raw"  # 指定了这个文件来让医生进行验证
+    clean_dir("./log/")
+    file_name = "BDP_SZ1_pre_seizure_raw"  # 指定了这个文件来让医生进行验证
     file_name = file_name + ".txt"
     heat_map_dir = "./heatmap"
     path_data = get_first_dir_path(path, 'npy')
@@ -186,8 +190,12 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/LK"):
     size = test_1.size
     plt.figure(figsize=(2 * count, 3))
     result = Image.new(test_1.mode, (size[0] * count, size[1]))
+    prediction = pd.read_csv("./log/heatmap.csv", sep=',')
     for i in range(count):
-        img = Image.open(heat_map_path[i])
+        if prediction.loc[i]["ground truth"] != prediction.loc[i]["prediction"]:
+            img = Image.new('RGBA', (int(200), int(130)), color=(100, 100, 100, 255))
+        else:
+            img = Image.open(heat_map_path[i])
         result.paste(img, box=(i * size[0], 0))
     result.save("./60s.png")
     plt.imshow(result)
@@ -217,32 +225,24 @@ def raw_data_slice():
     '''
     # 1.癫痫发作前的原始数据的重写
     clean_dir("./raw_data_time_sequentially")  # 删除文件夹下面已有的旧的文件
-    path_commom_channel = "../data/data_slice/channels_info/LK_seq.csv"
-    path_dir = "../data/raw_data/LK/LK_Pre_seizure"
+    path_commom_channel = "../data/data_slice/channels_info/BDP_seq.csv"
+    path_dir = "../data/raw_data/BDP/BDP_Pre_seizure"
     flag = 0
     for index, p in enumerate(os.listdir(path_dir)):
         if index < 1:
             path_raw = os.path.join(path_dir, p)
-            name = "LK"
-            generate_data(path_raw, flag, name, path_commom_channel, isfilter=False)
+            name = "BDP"
+            generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
     print("癫痫发作前的睡眠处理完成！！！")
 
     # 2.正常数据的重写
-    path_commom_channel = "../data/data_slice/channels_info/LK_seq.csv"
-    path_raw_normal_sleep = ["../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif",
-                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-1.fif',
-                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif',
-                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-4-0.fif',
-                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-6-0.fif'
-
-                             ]  # 数据太多，因此只是选取部分的数据进行处理
-    name = "LK"
-    flag = 2  # 正常睡眠时间
-
-    for index, path_raw in enumerate(path_raw_normal_sleep):
-        if index < 1:
-            generate_data(path_raw, flag, name, path_commom_channel, isfilter=False)
-
+    # BDP data
+    path_commom_channel = "../data/data_slice/channels_info/BDP_seq.csv"
+    path_raw_normal_sleep = ['../data/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif']
+    name = "BDP"
+    flag = 2
+    for path_raw in path_raw_normal_sleep:
+        generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
     print("{}正常睡眠的数据处理完成！".format(name))
 
 
@@ -254,7 +254,7 @@ def sequentially_signal(config="./json_path/config.json"):  # 时间序列的热
     channel_pandas = pd.read_csv(channel_list_path)
     channel_list = channel_pandas['chan_name']  # 获得与信道对应的index-channel的列表
 
-    start_time = config_json['handel.sequentially__LK_start_time']
+    start_time = config_json['handel.sequentially__BDP_start_time']
     start_time_list = [int(x) for x in start_time.split(":")]
 
     save_signal_info = config_json['handel.sequentially__save_dir']
@@ -354,7 +354,7 @@ if __name__ == '__main__':
     # raw_data_slice()
 
     # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接,拼接我60s
-    time_heat_map()
+    # time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
     sequentially_signal()

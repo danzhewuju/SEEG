@@ -68,6 +68,45 @@ def matrix_normalization(data, resize_shape=(130, 200)):
     return data
 
 
+def matrix_normalization_recorder(data, resize_shape=(130, 200)):  # 这个是矩阵初始化的记录版
+    '''
+        矩阵的归一化，主要是讲不通形状的矩阵变换为特定形状的矩阵, 矩阵的归一化主要是更改序列
+        也就是主要更改行
+        eg:(188, 200)->(130, 200)   归一化的表示
+        :param data:
+        :param resize_shape:
+        :return:
+        '''
+    recoder = []  # [-1/1, 10, 11, 12, 14]  第一位为标识位， -1 标识删除了的信道， +1 标识增加了的信道， 后面对应的是增加或者删除的信道
+    recoder.append(0)
+    data_shape = data.shape  # 这个必须要求的是numpy的文件格式
+    if data_shape[0] != resize_shape[0]:
+        if resize_shape[0] > data_shape[0]:  # 做插入处理
+            '''
+            扩大原来的矩阵
+            '''
+            d = resize_shape[0] - data_shape[0]
+            channels_add = random.sample(range(1, data_shape[0] - 1), d)
+            recoder[0] = 1
+            recoder += channels_add
+            fake_channel = []  # 添加信道列表的值
+            for c in channels_add:
+                tmp = (data[c - 1] + data[c]) * 1.0 / 2
+                fake_channel.append(tmp)
+            data = np.insert(data, channels_add, fake_channel, axis=0)
+        else:
+            if resize_shape[0] < data_shape[0]:  # 做删除处理
+                '''
+                删除掉原来的矩阵
+                '''
+                d = data_shape[0] - resize_shape[0]
+                channels_del = random.sample(range(1, data_shape[0] - 1), d)
+                recoder[0] = -1
+                recoder += channels_del
+                data = np.delete(data, channels_del, axis=0)
+    return data, recoder
+
+
 def get_label_data(path):  # get data include label
     '''
 
@@ -112,7 +151,7 @@ def get_matrix_max_location(mtx_data, k, reverse=True):
         location_dic[(x, y)] = mtx_data[x][y]
 
     location_dic = sorted(location_dic.items(), key=lambda x: -x[1]) if reverse else sorted(location_dic.items(),
-                                                                                           key=lambda x: x[1])
+                                                                                            key=lambda x: x[1])
     result = [x[0] for x in location_dic]
     return result
 

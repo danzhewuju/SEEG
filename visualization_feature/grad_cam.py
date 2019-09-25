@@ -11,13 +11,14 @@ import sys
 from MAML.learner import *
 import json
 from MAML.meta import Meta
+from util import matrix_normalization_recorder
 
 sys.path.append('../')
 
 from util.util_file import matrix_normalization, trans_numpy_cv2, get_matrix_max_location
 
-flag = "MAML"  # 切换内核，有两种模式：CNN, VMAML
-print("using model:{}".format(flag))
+flag_model = "MAML"  # 切换内核，有两种模式：CNN, VMAML
+print("using model:{}".format(flag_model))
 x_ = 8
 y_ = 12
 NUM_CLASS = 2
@@ -119,7 +120,7 @@ class FeatureExtractor():
         self.gradients = []
 
         # CNN
-        if flag == "CNN":
+        if flag_model == "CNN":
             for name, module in self.model._modules.items():  # 特定的maml
                 if name == 'fc1':
                     x = x.reshape(1, -1)
@@ -210,7 +211,7 @@ class GradCam:
             os.mkdir('./log/')
         if os.path.exists("./log/heatmap.csv") is not True:
             f = open("./log/heatmap.csv", 'w')
-            f.writelines("grant truth,prediction\n")
+            f.writelines("ground truth,prediction\n")
         else:
             f = open("./log/heatmap.csv", 'a')
 
@@ -356,7 +357,7 @@ def get_feature_map(path_data, location_name):
     # feature method, and a classifier method,
     # as in the VGG models in torchvision.
     device = torch.device('cuda')
-    if flag == "CNN":
+    if flag_model == "CNN":
         model = CNN().cuda(device) if args.use_cuda else CNN()  # 模型架构的调整， 1.CNN, 2. MAML
         model_path = config['grad_cam.get_feature_map__model_path_cnn']
     else:
@@ -369,7 +370,17 @@ def get_feature_map(path_data, location_name):
 
     # img = cv2.imread(args.image_path, 1)
     data = np.load(path_data)
-    data_numpy = matrix_normalization(data)
+    # if os.path.exists("./log/random_operate_channel_record.csv"):
+    #     f = open("./log/random_operate_channel_record.csv", 'a')
+    # else:
+    #     f = open("./log/random_operate_channel_record.csv", 'w')
+    #     f.write("id,operate,channel\n")
+    data_numpy, recoder = matrix_normalization_recorder(data)  # 需要记录出随机初始化的过程
+    # operate = "add" if recoder[0] == 1 else "del"
+    # content = path_data + "," + operate + "," + "-".join(recoder) + "\n"
+    # f.write(content)
+    # f.close()
+
     img = trans_numpy_cv2(data_numpy)
 
     img = np.float32(cv2.resize(img, shape)) / 255
@@ -382,6 +393,23 @@ def get_feature_map(path_data, location_name):
 
     mask = grad_cam(input, target_index)
     location = get_matrix_max_location(mask, 5)  # 获得最大梯度的位置，包含时间位置和物理位置
+    # 记录随机化过程操作删除的信道信息
+    channel_number = []
+    for i in range(5):
+        channel_number.append(location[i][0])  # 计算的出来的经过采样后的数据
+    recorder_old_channel_index = []
+    flag_op_channel = recoder[0]
+    recoder = recoder[1:]
+    if flag_op_channel != 0:
+        for p in channel_number:
+            count = 0
+            for t in recoder:
+                if t <= p:
+                    count += 1
+            if flag_op_channel == -1:
+                recorder_old_channel_index.append(p + count)  # 原来的随机过程进行了删除，现在需要复原
+            if flag_op_channel == 1:
+                recorder_old_channel_index.append(p - count)  # 原来的随机过程进行了采样
 
     location_full_path = os.path.join("./log", location_name)
     if os.path.exists(location_full_path):
@@ -390,15 +418,16 @@ def get_feature_map(path_data, location_name):
         fp = open(location_full_path, 'w')
         header = "time_location,spatial_location\n"
         fp.write(header)  # 头部的信息
-    location_spatial = [str(x[0]) for x in location]
+    location_spatial = [str(x) for x in recorder_old_channel_index]  # 记录的物理信道的位置不再是随机采样处理后的位置，而是之前的位置
     location_spatial_str = "-".join(location_spatial)
     location_time = [str(x[1]) for x in location]
     location_time_str = "-".join(location_time)
     fp.write("{},{}\n".format(location_time_str, location_spatial_str))
     fp.close()
 
-    channel_location = "-loc" + ("-{}" * 5).format(location[0][0], location[1][0], location[2][0], location[3][0],
-                                                   location[4][0])
+    channel_location = "-loc" + ("-{}" * 5).format(recorder_old_channel_index[0], recorder_old_channel_index[1],
+                                                   recorder_old_channel_index[2], recorder_old_channel_index[3],
+                                                   recorder_old_channel_index[4])
 
     name = path_data.split("/")[-1][:-4] + channel_location + ".jpg"
     save_path = os.path.join("./heatmap", name)
@@ -419,7 +448,7 @@ def get_feature_map_dynamic(data, name, key_flag=True):
     # feature method, and a classifier method,
     # as in the VGG models in torchvision.
     device = torch.device('cuda')
-    if flag == "CNN":
+    if flag_model == "CNN":
         model = CNN().cuda(device) if args.use_cuda else CNN()  # 模型架构的调整， 1.CNN, 2. MAML
         model_path = config['grad_cam.get_feature_map__model_path_cnn']
     else:
