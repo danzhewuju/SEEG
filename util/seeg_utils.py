@@ -37,7 +37,7 @@ def get_recorder_time(data):
 
 
 def filter_hz(raw, high_pass, low_pass):  # 对数据进行滤波处理 对于（high_pass, low_pass）范围波形进行选择
-    raw.filter(high_pass, low_pass)
+    raw.filter(high_pass, low_pass, fir_design='firwin')
     return raw
 
 
@@ -125,12 +125,11 @@ def data_split(raw, time_step):  # 数据的切片处理
         data_split.append(data)
     return data_split
 
+
 def get_sampling_hz(raw):  # 返回采样的频率
     end = max(raw.times)
     fz = int(len(raw) / end)  # 采样频率
     return fz
-
-
 
 
 def get_duration_raw_data(raw, start, stop):

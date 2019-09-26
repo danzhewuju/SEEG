@@ -5,7 +5,7 @@ The focus point of this project is to research the difference between sleep of p
 
 ## How to run this project
 
-MNE: pip3 install -U https://api.github.com/repos/mne-tools/mne-python/zipball/master
+MNE: pip install -U https://api.github.com/repos/mne-tools/mne-python/zipball/master
 
 Python : pip install python 
 

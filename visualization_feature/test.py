@@ -1,4 +1,7 @@
 import re
+import sys
+
+sys.path.append("../")
 from util.seeg_utils import *
 from util import *
 from PIL import Image
@@ -28,6 +31,13 @@ def test_2():
     print(data.loc[1]["grant truth"])
 
 
-if __name__ == '__main__':
-    test_2()
+def test_3():
+    path = "../data/raw_data/LK/LK_Pre_seizure/LK_SZ1_pre_seizure_raw.fif"
+    data = read_raw(path)
+    data.filter(0, 30)
+    print("Hello")
+    # data_1 = filter_hz(data, 0, 30)
 
+
+if __name__ == '__main__':
+    test_3()
