@@ -8,9 +8,10 @@
 # @Software: PyCharm
 
 import torch
-
+import sys
+sys.path.append("../")
 from util import *
-from ConVae import trans_data, VAE
+from vae import trans_data, VAE
 from tqdm import tqdm
 
 train_path = "../data/seeg/zero_data/train"
@@ -49,7 +50,7 @@ def vae_data(raw_path, save_path):  # train-test dataset and positive/negative
             save_data_path = os.path.join(save_dir, name_tmp)  # saving data path
             data_path = os.path.join(path_new, p)
             data = np.load(data_path)
-            result = matrix_normalization(data, (128, 200))
+            result = matrix_normalization(data, (130, 200))
             result = result.astype('float32')
             result = result[np.newaxis, np.newaxis, :]
             result = trans_data(vae_model, result)
@@ -90,7 +91,7 @@ def vae_data_val(raw_path, save_path):  # val dataset
             save_data_path = os.path.join(save_dir, name_tmp)  # saving data path
             data_path = os.path.join(path_new, p)
             data = np.load(data_path)
-            result = matrix_normalization(data, (128, 200))
+            result = matrix_normalization(data, (130, 200))
             result = result.astype('float32')
             result = result[np.newaxis, :]
             result = trans_data(vae_model_all, result)

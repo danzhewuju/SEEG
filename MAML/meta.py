@@ -147,7 +147,7 @@ class Meta(nn.Module):
 
         # in order to not ruin the state of running_mean/variance and bn_weight/bias
         # we finetunning on the copied model instead of self.net
-        net = deepcopy(self.net)
+        net = self.net
 
         # 1. run the i-th task and compute loss for k=0
         logits = net(x_spt)

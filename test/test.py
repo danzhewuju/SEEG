@@ -7,6 +7,8 @@
 from RelationNet.Seegdata import *
 from util.util_file import *
 import re
+import torch
+from torch.nn import functional as F
 import json
 
 
@@ -323,5 +325,8 @@ if __name__ == '__main__':
     # print(b)
     # pre_q = F.softmax(a, dim=1)
     # print(pre_q)
-    a = [[1, 2], [3, 4]]
-    print(a[0][:])
+    a = np.random.randint(-10, 10, (2, 2))
+    a = torch.from_numpy(a)
+    b = F.relu(a)
+    print(a)
+    print(b)

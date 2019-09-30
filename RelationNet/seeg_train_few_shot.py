@@ -273,9 +273,9 @@ def main():
                 total_rewards = 0
                 task = tg.MiniDataTask(metatest_folders, CLASS_NUM, SAMPLE_NUM_PER_CLASS, 15)
                 sample_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=SAMPLE_NUM_PER_CLASS,
-                                                                     split="train", shuffle=False)
+                                                                     split="train_vae", shuffle=False)
                 num_per_class = 20
-                test_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=num_per_class, split="test",
+                test_dataloader = tg.get_mini_imagenet_data_loader(task, num_per_class=num_per_class, split="test_vae",
                                                                    shuffle=False)
 
                 sample_images, sample_labels = sample_dataloader.__iter__().next()

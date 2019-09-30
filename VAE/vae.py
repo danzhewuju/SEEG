@@ -10,7 +10,8 @@ import torch.utils.data
 from torch import nn, optim
 from torch.nn import functional as F
 from torch.utils.data import Dataset
-
+import sys
+sys.path.append("../")
 from util.util_file import matrix_normalization
 from tqdm import tqdm
 
@@ -128,15 +129,23 @@ class VAE(nn.Module):
     def __init__(self):
         super(VAE, self).__init__()
 
-        self.fc1 = nn.Linear(resize[0] * resize[1], 400)
-        self.fc21 = nn.Linear(400, 20)
-        self.fc22 = nn.Linear(400, 20)
-        self.fc3 = nn.Linear(20, 400)
-        self.fc4 = nn.Linear(400, resize[0] * resize[1])
+        # self.fc1 = nn.Linear(resize[0] * resize[1], 400)
+        self.fc1 = nn.Linear(resize[0]*resize[1], 2000)
+        self.fc12 = nn.Linear(2000, 200)
+        self.fc21 = nn.Linear(200, 20)
+        self.fc22 = nn.Linear(200, 20)
+        self.fc3 = nn.Linear(20, 200)
+        self.fc4 = nn.Linear(200, resize[0] * resize[1])
 
     def encode(self, x):
         h1 = F.relu(self.fc1(x))
+        h1 = F.relu(self.fc12(h1))
         return self.fc21(h1), self.fc22(h1)
+
+    def encode_same_size(self, x):
+        h = F.relu(self.fc1(x))
+        output = h.reshape(resize[0], resize[1])
+        return output
 
     def reparameterize(self, mu, logvar):
         std = torch.exp(0.5 * logvar)
@@ -167,7 +176,7 @@ def loss_function(recon_x, x, mu, logvar):
     # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
 
-    return BCE+KLD
+    return abs(BCE+KLD)
 
 
 def train_negative(epoch):
@@ -267,4 +276,4 @@ if __name__ == "__main__":
         # 2. 训练负态编码器
         train_negative(epoch)
         # 3.用全部数据训练编码器， 暂未使用
-        train_all_data(epoch)
+        # train_all_data(epoch)
