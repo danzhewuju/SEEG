@@ -21,6 +21,7 @@ args = parser.parse_args()
 
 TRAIN_RATIO = args.ratio
 VAL_RATIO = args.val
+patient_test = "ZK"
 
 
 def data_process():
@@ -222,11 +223,11 @@ def data_process_n_1():
     tmp_normal = seeg.get_all_path_by_keyword('sleep')
     val_normal = []  # 将这个人的数据最为一个验证的数据集
     sleep_normal = []  # 正常人的睡眠时间
-    test_persons_normal_sleep = ['BDP']
+    test_persons_normal_sleep = [patient_test]
     sleep_pre = seeg.get_all_path_by_keyword('preseizure')
     sleep_pre_seizure = []
     val_pre_seizure = []
-    test_persons_pre_seizure = ['BDP']  # 用于测试的病人的数据
+    test_persons_pre_seizure = [patient_test]  # 用于测试的病人的数据
 
     m_normal = len(tmp_normal) - 1
     n_preseizure = len(sleep_pre) - 1

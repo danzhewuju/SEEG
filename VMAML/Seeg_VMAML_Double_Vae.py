@@ -186,7 +186,7 @@ def loss_function(recon_x, x, mu, logvar):
     # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
 
-    return BCE
+    return BCE + KLD
 
 
 def trans_data(vae_model, data, shape=(130, 200)):
@@ -207,8 +207,8 @@ def show_eeg(data):
 # 构造了两个VAE的编码器
 vae_p = VAE().to(device)
 vae_n = VAE().to(device)
-optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.0001)
-optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.0001)
+optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.001)
+optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.001)
 
 
 # 仅仅使用一个VAE的编码器
@@ -291,7 +291,7 @@ def maml_framwork():
 
     # flag_vae = True  # 设置梯度反向传播的标志位，vae
     # flag_maml = not flag_vae  # 设置梯度反向传播的薄志伟，maml
-    for epoch in range(5):
+    for epoch in range(1):
         # fetch meta_batchsz num of episode each time
         db = DataLoader(mini, args.task_num, shuffle=True, num_workers=1, pin_memory=True)
 
