@@ -22,9 +22,10 @@ from VMAML.meta import *
 from util.util_file import matrix_normalization
 import matplotlib.pyplot as plt
 import time
+from tqdm import tqdm
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=4000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
@@ -295,7 +296,7 @@ def maml_framwork():
         # fetch meta_batchsz num of episode each time
         db = DataLoader(mini, args.task_num, shuffle=True, num_workers=1, pin_memory=True)
 
-        for step, (x_spt, y_spt, x_qry, y_qry) in enumerate(db):
+        for step, (x_spt, y_spt, x_qry, y_qry) in tqdm(enumerate(db)):
 
             x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt)
             x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry)
@@ -318,7 +319,7 @@ def maml_framwork():
                 print('step:', step, '\ttraining acc:', accs)
 
                 if step % 50 == 0:  # evaluation
-                    db_test = DataLoader(mini_test, 1, shuffle=True, num_workers=1, pin_memory=True)
+                    db_test = DataLoader(mini_test, batch_size=1, shuffle=True, num_workers=1, pin_memory=True)
                     accs_all_test = []
                     loss_all_test = []
 
@@ -363,7 +364,7 @@ def maml_framwork():
     plt.plot(plt_test_acc, label='Acc')
     plt.legend(loc='upper right')
     plt.savefig('./drawing/test.png')
-    plt.show()
+    # plt.show()
 
     plt.figure()
     plt.title("training info")
@@ -373,7 +374,7 @@ def maml_framwork():
     plt.plot(plt_train_acc, label='Acc')
     plt.legend(loc='upper right')
     plt.savefig('./drawing/train.png')
-    plt.show()
+    # plt.show()
 
 
 if __name__ == "__main__":

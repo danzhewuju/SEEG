@@ -144,6 +144,7 @@ class Meta(nn.Module):
         :param x_qry_n:
         :param y_qry:
         :return:
+        验证集经过双VAE
         """
         assert len(x_spt_p.shape) == 4  # 用来检查数据类型的断言
         assert len(x_spt_n.shape) == 4
