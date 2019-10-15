@@ -19,6 +19,7 @@ from util.util_file import matrix_normalization
 import scipy as sp
 import scipy.stats
 from VAE.vae import trans_data, VAE
+from util.util_file import IndicatorCalculation
 
 parser = argparse.ArgumentParser(description="CNN parameter setting!")
 parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
@@ -158,10 +159,18 @@ def run():
     correct = 0
 
     # Test the model
+    cal = IndicatorCalculation()
     model.eval()  # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance) 对于单个图片的测试
-    total_acc = []
+    total_accuracy = []
+    total_precision = []
+    total_recall = []
+    total_f1_score = []
     for i in range(10):
         correct = 0
+        accuracies = []
+        precisions = []
+        recalls = []
+        f1scores = []
         with torch.no_grad():
             for (data, labels) in val_loader:
                 data = data.cuda(GPU)
@@ -169,13 +178,30 @@ def run():
 
                 outputs = model(data)  # 直接获得模型的结果
                 _, predicted = torch.max(outputs.data, 1)
-                correct += (predicted == labels).sum().item()
-        acc = correct / total
-        total_acc.append(acc)
+                cal.set_values(predicted, labels)
+                accuracies.append(cal.get_accuracy())
+                precisions.append(cal.get_precision())
+                recalls.append(cal.get_recall())
+                f1scores.append(cal.get_f1score())
+        acc_avg = np.array(accuracies).mean()
+        precisions_avg = np.array(precisions).mean()
+        recall_avg = np.array(recalls).mean()
+        f1score_avg = np.array(f1scores).mean()
+
+        total_accuracy.append(acc_avg)
+        total_precision.append(precisions_avg)
+        total_recall.append(recall_avg)
+        total_f1_score.append(f1score_avg)
+
         print('Test Accuracy of the model on the {} test seegs of {} epoch: {} %'.format(total, i + 1,
-                                                                                         100 * correct / total))
-    avg_acc, h = mean_confidence_interval(total_acc)
-    print("Accuracy:{}, h:{}".format(avg_acc, h))
+                                                                                         100 * acc_avg))
+    average_accuracy, h_a = mean_confidence_interval(total_accuracy)
+    average_precision, h_p = mean_confidence_interval(np.array(total_precision))
+    average_recall, h_r = mean_confidence_interval(np.array(total_recall))
+    average_f1score, h_f = mean_confidence_interval(np.array(total_f1_score))
+    print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n "
+          "average f1score :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p, average_recall, h_r,
+                                               average_f1score, h_f))
     end_time = time.time()
     run_time = end_time - start_time
     print("Running Time {:.4f}".format(run_time))

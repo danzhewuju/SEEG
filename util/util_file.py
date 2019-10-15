@@ -219,10 +219,11 @@ def time_add(h, m, s, seconds_add):
     return int(h), int(m), s
 
 
-class IndicatorCalculation():  # 包含二分类中长江的指标
-    def __init__(self, prediction, ground_truth):
-        self.prediction = prediction  # [0, 1, 0, 1, 1, 0]
-        self.ground_truth = ground_truth  # [0, 1, 0, 0, 1 ]
+class IndicatorCalculation():  # 包含二分类中各种指标
+    def __init__(self, prediction=None, ground_truth=None):
+        if prediction is not None and ground_truth is not None:
+            self.prediction = prediction  # [0, 1, 0, 1, 1, 0]
+            self.ground_truth = ground_truth  # [0, 1, 0, 0, 1 ]
 
     def __tp(self):
         TP = 0
@@ -247,6 +248,10 @@ class IndicatorCalculation():  # 包含二分类中长江的指标
         for i in range(len(self.prediction)):
             TN += 1 if self.prediction[i] == 0 and self.ground_truth[i] == 0 else 0
         return TN
+
+    def set_values(self, prediction, ground_truth):
+        self.prediction = prediction
+        self.ground_truth = ground_truth
 
     def get_accuracy(self):
         return (self.__tp() + self.__tn()) / (self.__tn() + self.__tp() + self.__fn() + self.__fp())

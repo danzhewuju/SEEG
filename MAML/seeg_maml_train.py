@@ -56,10 +56,10 @@ def main():
     print('Total trainable tensors:', num)
 
     # batchsz here means total episode number
-    mini = Seegnet(args.dataset_dir, mode='train', n_way=args.n_way, k_shot=args.k_spt,
+    mini = Seegnet(args.dataset_dir, mode='train_vae', n_way=args.n_way, k_shot=args.k_spt,
                    k_query=args.k_qry,
                    batchsz=args.epoch)
-    mini_test = Seegnet(args.dataset_dir, mode='test', n_way=args.n_way, k_shot=args.k_spt,
+    mini_test = Seegnet(args.dataset_dir, mode='test_vae', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
                         batchsz=100)
     last_accuracy = 0.0

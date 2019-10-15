@@ -7,6 +7,7 @@ from torch import optim
 from torch.nn import functional as F
 
 from MAML.learner import Learner
+from util.util_file import IndicatorCalculation
 
 
 class Meta(nn.Module):
@@ -160,7 +161,7 @@ class Meta(nn.Module):
         # 1. run the i-th task and compute loss for k=0
         logits_p = net(x_spt_p)
         lohits_n = net(x_spt_n)
-        loss = min(F.cross_entropy(logits_p, y_spt) ,F.cross_entropy(lohits_n, y_spt))
+        loss = min(F.cross_entropy(logits_p, y_spt), F.cross_entropy(lohits_n, y_spt))
         grad = torch.autograd.grad(loss, net.parameters())  # 自动求导机制
         fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, net.parameters())))
 
@@ -199,7 +200,7 @@ class Meta(nn.Module):
             logits_q_p = net(x_qry_p, fast_weights, bn_training=True)
             logits_q_n = net(x_qry_n, fast_weights, bn_training=True)
 
-            loss = min(F.cross_entropy(logits_q_n, y_spt) , F.cross_entropy(logits_q_p, y_spt))
+            loss = min(F.cross_entropy(logits_q_n, y_spt), F.cross_entropy(logits_q_p, y_spt))
             # 2. compute grad on theta_pi
             grad = torch.autograd.grad(loss, fast_weights)
             # 3. theta_pi = theta_pi - train_lr * grad
@@ -212,7 +213,7 @@ class Meta(nn.Module):
             loss_all += loss_q.cpu().detach().numpy()
 
             with torch.no_grad():
-                logits_q = (logits_q_n+logits_q_p)/2
+                logits_q = (logits_q_n + logits_q_p) / 2
                 # pred_q_p = F.softmax(logits_q_p, dim=1)
                 # pred_q_n = F.softmax(logits_q_n, dim=1)
                 # pred_q = (pred_q_n + pred_q_p) / 2
@@ -242,6 +243,10 @@ class Meta(nn.Module):
         querysz = x_qry.size(0)
 
         corrects = [0 for _ in range(self.update_step_test + 1)]
+        precisions = [0 for _ in range(self.update_step_test + 1)]  # precision
+        recalls = [0 for _ in range(self.update_step_test + 1)]  # recalls
+        f1scores = [0 for _ in range(self.update_step_test + 1)]  # F_1 score
+        cal = IndicatorCalculation()
 
         # in order to not ruin the state of running_mean/variance and bn_weight/bias
         # we finetunning on the copied model instead of self.net
@@ -255,24 +260,33 @@ class Meta(nn.Module):
         fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, net.parameters())))
 
         # this is the loss and accuracy before first update
-        with torch.no_grad():
-            # [setsz, nway]
-            logits_q = net(x_qry, net.parameters(), bn_training=True)
-            # [setsz]
-            pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-            # scalar
-            correct = torch.eq(pred_q, y_qry).sum().item()
-            corrects[0] = corrects[0] + correct
+        # with torch.no_grad():
+        #     # [setsz, nway]
+        #     logits_q = net(x_qry, net.parameters(), bn_training=True)
+        #     # [setsz]
+        #     pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
+        #     # scalar
+        #     # correct = torch.eq(pred_q, y_qry).sum().item()
+        #     cal.set_values(pred_q, y_qry)
+        #     corrects[0] += cal.get_accuracy()  # 指标构建
+        #     precisions[0] += cal.get_precision()
+        #     recalls[0] += cal.get_recall()
+        #     f1scores[0] += cal.get_f1score()
+        #
+        # # this is the loss and accuracy after the first update
+        # with torch.no_grad():
+        #     # [setsz, nway]
+        #     logits_q = net(x_qry, fast_weights, bn_training=True)
+        #     # [setsz]
+        #     pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
+        #     # scalar
+        #     # correct = torch.eq(pred_q, y_qry).sum().item()
+        #     cal.set_values(pred_q, y_qry)
+        #     corrects[1] += cal.get_accuracy()
+        #     precisions[1] += cal.get_precision()
+        #     recalls[1] += cal.get_recall()
+        #     f1scores[1] += cal.get_f1score()
 
-        # this is the loss and accuracy after the first update
-        with torch.no_grad():
-            # [setsz, nway]
-            logits_q = net(x_qry, fast_weights, bn_training=True)
-            # [setsz]
-            pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-            # scalar
-            correct = torch.eq(pred_q, y_qry).sum().item()
-            corrects[1] = corrects[1] + correct
         loss_all = 0
         for k in range(1, self.update_step_test):
             # 1. run the i-th task and compute loss for k=1~K-1
@@ -288,17 +302,22 @@ class Meta(nn.Module):
             loss_q = F.cross_entropy(logits_q, y_qry)
             loss_all += loss_q.cpu().detach().numpy()
 
-            with torch.no_grad():
-                pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-                correct = torch.eq(pred_q, y_qry).sum().item()  # convert to numpy
-                corrects[k + 1] = corrects[k + 1] + correct
+            if k == self.update_step_test - 1:
+                with torch.no_grad():
+                    pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
+                    # correct = torch.eq(pred_q, y_qry).sum().item()  # convert to numpy
+                    cal.set_values(pred_q, y_qry)
+                    corrects[k + 1] += cal.get_accuracy()
+                    precisions[k + 1] += cal.get_precision()
+                    recalls[k + 1] += cal.get_recall()
+                    f1scores[k + 1] += cal.get_f1score()
 
-        del net
+        # del net
         loss_all /= self.update_step_test - 1
 
-        accs = np.array(corrects) / querysz
+        # accs = np.array(corrects) / querysz
 
-        return accs, loss_all
+        return corrects[-1], precisions[-1], recalls[-1], f1scores[-1], loss_all
 
 
 def main():

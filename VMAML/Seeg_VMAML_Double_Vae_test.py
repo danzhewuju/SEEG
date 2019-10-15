@@ -166,18 +166,22 @@ def main():
                         k_query=args.k_qry,
                         batchsz=50)
     test_accuracy = []
+    test_precision = []
+    test_recall = []
+    test_f1score = []
     for epoch in range(10):
         # fetch meta_batchsz num of episode each time
         db_test = DataLoader(mini_test, 1, shuffle=True, num_workers=1, pin_memory=True)
-        accs_all_test = []
+        accs = []
+        precisions = []
+        recalls = []
+        f1scores = []
 
         for x_spt, y_spt, x_qry, y_qry in db_test:
-
-
             # 1.未引入VAE模块
             x_spt, y_spt, x_qry, y_qry = x_spt.squeeze(0).to(device), y_spt.squeeze(0).to(device), \
                                          x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
-            accs, loss_t = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
+            acc, precision, recall, f1score, loss_t = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
 
             # # 2.需要引入VAE编码
             # x_spt_p, x_spt_n = trans_data_vae(x_spt.numpy(), y_spt)
@@ -204,14 +208,29 @@ def main():
             #                              x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
             # accs, loss_t = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
 
-            accs_all_test.append(accs)
+            accs.append(acc)
+            precisions.append(precision)
+            recalls.append(recall)
+            f1scores.append(f1score)
 
         # [b, update_step+1]
-        accs = np.array(accs_all_test).mean(axis=0).astype(np.float16)
-        print('Test acc:', accs)
-        test_accuracy.append(accs[-1])
+        acc_avg = np.array(accs).mean()
+        precision_avg = np.array(precisions).mean()
+        recall_avg = np.array(recalls).mean()
+        f1score_avg = np.array(f1scores).mean()
+        print('Test Accuracy:{:.5f}, Test Precision:{:.5f}, Test Recall:{:.5f}, Test F1 score:{:.5f}'.
+              format(acc_avg, precision_avg, recall_avg, f1score_avg))
+
+        test_accuracy.append(acc_avg)
+        test_precision.append(precision_avg)
+        test_recall.append(recall_avg)
+        test_f1score.append(f1score_avg)
     acc_mean, h = mean_confidence_interval(np.array(test_accuracy))
-    print("average accuracy :{}, h:{}".format(acc_mean, h))
+    pre_mean, h_p = mean_confidence_interval(np.array(test_precision))
+    recall_mean, h_r = mean_confidence_interval(np.array(test_recall))
+    f1_mean, h_f1 = mean_confidence_interval(np.array(test_f1score))
+    print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}"
+          "\n average f1score :{}, h:{}\n".format(acc_mean, h, pre_mean, h_p, recall_mean, h_r, f1_mean, h_f1))
 
 
 if __name__ == '__main__':

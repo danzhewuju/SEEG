@@ -20,6 +20,7 @@ from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 
 import task_generator_test as tg
+from util.util_file import IndicatorCalculation
 
 parser = argparse.ArgumentParser(description="One Shot Visual Recognition")
 parser.add_argument("-f", "--feature_dim", type=int, default=64)
@@ -177,12 +178,19 @@ def main():
         print("load relation network success")
 
     total_accuracy = []
+    total_precision = []
+    total_recall = []
+    total_f1_score = []
+    cal = IndicatorCalculation()
     for episode in range(EPISODE):
 
         # test
         print("Testing...")
 
         accuracies = []
+        precisions = []
+        recalls = []
+        f1scores = []
         for i in range(TEST_EPISODE):
             total_rewards = 0
             task = tg.SeegnetTask(metatest_folders, CLASS_NUM, SAMPLE_NUM_PER_CLASS, 15)
@@ -222,17 +230,35 @@ def main():
                 total_rewards += np.sum(rewards)
                 test_num += batch_size
 
-            accuracy = total_rewards / 1.0 / test_num
-            accuracies.append(accuracy)
+                cal.set_values(predict_labels, test_labels)
+                acc = cal.get_accuracy()
+                precision = cal.get_accuracy()
+                recall = cal.get_recall()
+                f1_score = cal.get_f1score()
+                accuracies.append(acc)
+                precisions.append(precision)
+                recalls.append(recall)
+                f1scores.append(f1_score)
 
-        test_accuracy, h = mean_confidence_interval(accuracies)
+        test_accuracy, h = mean_confidence_interval(np.array(accuracies))
+        test_precision, h = mean_confidence_interval(np.array(precisions))
+        test_recall, h = mean_confidence_interval(np.array(recalls))
+        test_f1score, h = mean_confidence_interval(np.array(f1scores))
 
         print("test accuracy:", test_accuracy, "h:", h)
 
         total_accuracy.append(test_accuracy)
-    average_accuracy, h = mean_confidence_interval(total_accuracy)
+        total_precision.append(test_precision)
+        total_recall.append(test_recall)
+        total_f1_score.append(test_f1score)
+    average_accuracy, h_a = mean_confidence_interval(total_accuracy)
+    average_precision, h_p = mean_confidence_interval(np.array(total_precision))
+    average_recall, h_r = mean_confidence_interval(np.array(total_recall))
+    average_f1score, h_f = mean_confidence_interval(np.array(total_f1_score))
 
-    print("aver_accuracy:{}, h:{}".format(average_accuracy, h))
+    print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n "
+          "average f1score :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p, average_recall, h_r,
+                                               average_f1score, h_f))
 
 
 if __name__ == '__main__':
