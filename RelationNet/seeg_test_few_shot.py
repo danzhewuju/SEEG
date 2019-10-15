@@ -244,6 +244,8 @@ def main():
         test_precision, h = mean_confidence_interval(np.array(precisions))
         test_recall, h = mean_confidence_interval(np.array(recalls))
         test_f1score, h = mean_confidence_interval(np.array(f1scores))
+        print('Test Accuracy:{:.5f}, Test Precision:{:.5f}, Test Recall:{:.5f}, Test F1 score:{:.5f}'.
+              format(test_accuracy, test_precision, test_recall, test_f1score))
 
         print("test accuracy:", test_accuracy, "h:", h)
 

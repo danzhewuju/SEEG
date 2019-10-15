@@ -193,8 +193,8 @@ def run():
         total_recall.append(recall_avg)
         total_f1_score.append(f1score_avg)
 
-        print('Test Accuracy of the model on the {} test seegs of {} epoch: {} %'.format(total, i + 1,
-                                                                                         100 * acc_avg))
+        print('Test Accuracy:{:.5f}, Test Precision:{:.5f}, Test Recall:{:.5f}, Test F1 score:{:.5f}'.
+              format(acc_avg, precisions_avg, recall_avg, f1score_avg))
     average_accuracy, h_a = mean_confidence_interval(total_accuracy)
     average_precision, h_p = mean_confidence_interval(np.array(total_precision))
     average_recall, h_r = mean_confidence_interval(np.array(total_recall))
