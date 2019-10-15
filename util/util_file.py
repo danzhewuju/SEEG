@@ -219,6 +219,48 @@ def time_add(h, m, s, seconds_add):
     return int(h), int(m), s
 
 
+class IndicatorCalculation():  # 包含二分类中长江的指标
+    def __init__(self, prediction, ground_truth):
+        self.prediction = prediction  # [0, 1, 0, 1, 1, 0]
+        self.ground_truth = ground_truth  # [0, 1, 0, 0, 1 ]
+
+    def __tp(self):
+        TP = 0
+        for i in range(len(self.prediction)):
+            TP += 1 if self.prediction[i] == 1 and self.ground_truth[i] == 1 else 0
+        return TP
+
+    def __fp(self):
+        FP = 0
+        for i in range(len(self.prediction)):
+            FP += 1 if self.prediction[i] == 0 and self.ground_truth[i] == 1 else 0
+        return FP
+
+    def __fn(self):
+        FN = 0
+        for i in range(len(self.prediction)):
+            FN += 1 if self.prediction[i] == 1 and self.ground_truth[i] == 0 else 0
+        return FN
+
+    def __tn(self):
+        TN = 0
+        for i in range(len(self.prediction)):
+            TN += 1 if self.prediction[i] == 0 and self.ground_truth[i] == 0 else 0
+        return TN
+
+    def get_accuracy(self):
+        return (self.__tp() + self.__tn()) / (self.__tn() + self.__tp() + self.__fn() + self.__fp())
+
+    def get_recall(self):
+        return self.__tp() / (self.__tp() + self.__fp())
+
+    def get_precision(self):
+        return self.__tp() / (self.__tp() + self.__fn())
+
+    def get_f1score(self):
+        return (2 * self.get_recall() * self.get_precision()) / (self.get_recall() + self.get_precision())
+
+
 if __name__ == '__main__':
     for i in range(10):
         a = np.random.randint(0, 10, (3, 3))

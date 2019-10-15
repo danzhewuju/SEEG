@@ -9,12 +9,15 @@ import json
 
 time = 2  # 每一帧的持续时间
 resample = 100  # 重采样的频率
-high_pass = 1   # 滤波范围
+high_pass = 0  # 滤波范围
 low_pass = 30
 
 config = json.load(open("../DataProcessing/config/fig.json"))
 
-save_split_data_test__path_dir = config["transferdata.save_split_data_test__path_dir_1"]  # 设置配置的文件夹
+save_split_data_test__path_dir = config[
+    "transferdata.save_split_data_test__path_dir_1"]  # 设置配置的文件夹   visualization_feature
+# save_split_data_test__path_dir = config["transferdata.save_split_data_test__path_dir_2"]  # 设置配置的文件夹  原始数据的生成
+
 print("All files will be saved in {}".format(save_split_data_test__path_dir))
 
 

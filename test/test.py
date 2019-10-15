@@ -7,6 +7,8 @@
 from RelationNet.Seegdata import *
 from util.util_file import *
 import re
+from functools import reduce
+from util.util_file import IndicatorCalculation
 import torch
 from torch.nn import functional as F
 import json
@@ -317,16 +319,14 @@ def test_23():
     clean_dir("../data/seeg/")
 
 
-if __name__ == '__main__':
-    # a = np.array([[-0.2998,  0.3695],[0.5, 0.5]])
-    # a = torch.from_numpy(a)
-    # print(a)
-    # b = np.array([0, 1])
-    # print(b)
-    # pre_q = F.softmax(a, dim=1)
-    # print(pre_q)
-    a = np.random.randint(-10, 10, (2, 2))
-    a = torch.from_numpy(a)
-    b = F.relu(a)
+def test_24():
+    a = np.random.randint(0, 2, 10)
+    b = np.random.randint(0, 2, 10)
+    cal = IndicatorCalculation(a, b)
     print(a)
     print(b)
+    print("Accuracy:{} Precision:{}, Recall:{}, F1_score:{}".format(cal.get_accuracy(), cal.get_precision(), cal.get_recall(), cal.get_f1score()))
+
+
+if __name__ == '__main__':
+    test_24()

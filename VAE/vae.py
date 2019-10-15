@@ -130,7 +130,7 @@ class VAE(nn.Module):
         super(VAE, self).__init__()
 
         # self.fc1 = nn.Linear(resize[0] * resize[1], 400)
-        self.fc1 = nn.Linear(resize[0]*resize[1], resize[0]*resize[1] )
+        self.fc1 = nn.Linear(resize[0]*resize[1], 2000)
         self.fc12 = nn.Linear(2000, 200)
         self.fc21 = nn.Linear(200, 20)
         self.fc22 = nn.Linear(200, 20)
@@ -274,6 +274,6 @@ if __name__ == "__main__":
         # 1.训练正态编码器
         train_positive(epoch)
         # 2. 训练负态编码器
-        # train_negative(epoch)
+        train_negative(epoch)
         # 3.用全部数据训练编码器， 暂未使用
         # train_all_data(epoch)
