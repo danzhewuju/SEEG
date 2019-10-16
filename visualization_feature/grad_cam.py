@@ -469,7 +469,7 @@ def get_feature_map_dynamic(data, name, key_flag=True):
 
     # If None, returns the map for the highest scoring category.
     # Otherwise, targets the requested index.
-    target_index = 0
+    target_index = 0  # 癫痫发作前
 
     mask = grad_cam(input, target_index)
     location = get_matrix_max_location(mask, 1)  # 获得最大梯度的位置，包含时间位置和物理位置

@@ -128,12 +128,11 @@ def create_raw_data_signal_by_time(image_dir="./heatmap"):
         name = re.findall('heatmap/(.+)', raw_path)[0]
         selected_raw_path.append((name, channels_number))
 
-
     for index, (name, channels_number) in tqdm(enumerate(selected_raw_path)):
         new_name = name[:-4] + '.jpg'
         save_path = os.path.join('./raw_data_signal', new_name)
         data_p = dict_name_path[name]
-        raw_data = np.load(data_p)   # 此时相当于原始数据，信道数已经不一致了
+        raw_data = np.load(data_p)  # 此时相当于原始数据，信道数已经不一致了
         # 需要重新映射channel number 的序号
 
         seeg_npy_plot(raw_data, channels_number, save_path)
@@ -180,7 +179,7 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/BDP"):
     heat_map_dir = "./heatmap"
     path_data = get_first_dir_path(path, 'npy')
     path_data.sort()  # 根据uuid 按照时间序列进行排序
-    count = 30  # 拼接的时间
+    count = 100  # 拼接的时间
     clean_dir(heat_map_dir)  # 清除文件夹里面所有文件
     for p in path_data:
         get_feature_map(p, file_name)
@@ -229,7 +228,8 @@ def raw_data_slice():
     path_dir = "../data/raw_data/BDP/BDP_Pre_seizure"
     flag = 0
     for index, p in enumerate(os.listdir(path_dir)):
-        if index < 1:
+        if index == 0:
+            print("processing data from {}".format(p))
             path_raw = os.path.join(path_dir, p)
             name = "BDP"
             generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
@@ -351,7 +351,7 @@ if __name__ == '__main__':
     # image_contact_process_by_similarity()
 
     # 2.1 生成未滤波数据的切片, 可以设置是否选择滤波处理
-    raw_data_slice()
+    # raw_data_slice()
 
     # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接,拼接我60s
     # time_heat_map()
@@ -360,7 +360,7 @@ if __name__ == '__main__':
     # sequentially_signal()
 
     # 2.3 将按照时间的片段信号和热力图进行结合
-    # image_contact_process_by_time()
+    image_contact_process_by_time()
 
     # 3.1 从整体的文件进行热力分析， 以及热力图分割，读取完整的文件，防止热力图被分割
     # dynamic_detection()
