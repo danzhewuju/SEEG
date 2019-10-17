@@ -320,17 +320,10 @@ def test_23():
 
 
 def test_24():
-    a = np.random.randint(0, 2, 10)
-    b = np.random.randint(0, 2, 10)
-    cal = IndicatorCalculation()
-    cal.set_values(a, b)
-    print(a)
-    print(b)
-    print("Accuracy:{} Precision:{}, Recall:{}, F1_score:{}".format(cal.get_accuracy(), cal.get_precision(),
-                                                                    cal.get_recall(), cal.get_f1score()))
-
-    c = [1, 2, 3, 4]
-    d = np.array(c).mean()
+    a = [0, 0, 0, 0, 0]
+    b = [1, 1, 1, 1, 1]
+    cal = IndicatorCalculation(b, a)
+    print(cal.get_f1score(), cal.get_accuracy(), cal.get_precision(), cal.get_f1score())
 
 
 if __name__ == '__main__':

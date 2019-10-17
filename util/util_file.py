@@ -220,10 +220,20 @@ def time_add(h, m, s, seconds_add):
 
 
 class IndicatorCalculation():  # 包含二分类中各种指标
+    '''
+    tp, fp
+    fn, tn
+
+    '''
+
     def __init__(self, prediction=None, ground_truth=None):
         if prediction is not None and ground_truth is not None:
             self.prediction = prediction  # [0, 1, 0, 1, 1, 0]
             self.ground_truth = ground_truth  # [0, 1, 0, 0, 1 ]
+
+    @staticmethod
+    def __division_detection(number):  # division detection
+        return 0 if number == 0 else number
 
     def __tp(self):
         TP = 0
@@ -234,13 +244,13 @@ class IndicatorCalculation():  # 包含二分类中各种指标
     def __fp(self):
         FP = 0
         for i in range(len(self.prediction)):
-            FP += 1 if self.prediction[i] == 0 and self.ground_truth[i] == 1 else 0
+            FP += 1 if self.prediction[i] == 1 and self.ground_truth[i] == 0 else 0
         return FP
 
     def __fn(self):
         FN = 0
         for i in range(len(self.prediction)):
-            FN += 1 if self.prediction[i] == 1 and self.ground_truth[i] == 0 else 0
+            FN += 1 if self.prediction[i] == 0 and self.ground_truth[i] == 1 else 0
         return FN
 
     def __tn(self):
@@ -257,13 +267,24 @@ class IndicatorCalculation():  # 包含二分类中各种指标
         return (self.__tp() + self.__tn()) / (self.__tn() + self.__tp() + self.__fn() + self.__fp())
 
     def get_recall(self):
-        return self.__tp() / (self.__tp() + self.__fp())
+        divisor = self.__division_detection(self.__tp() + self.__fn())
+        if divisor == 0:
+            return None
+        else:
+            return self.__tp() / divisor
 
     def get_precision(self):
-        return self.__tp() / (self.__tp() + self.__fn())
+        divisor = self.__division_detection(self.__tp() + self.__fp())
+        if divisor == 0:
+            return None
+        else:
+            return self.__tp() / divisor
 
     def get_f1score(self):
-        return (2 * self.get_recall() * self.get_precision()) / (self.get_recall() + self.get_precision())
+        if self.get_recall() is None or self.get_precision() is None:
+            return None
+        else:
+            return (2 * self.get_recall() * self.get_precision()) / (self.get_recall() + self.get_precision())
 
 
 if __name__ == '__main__':
