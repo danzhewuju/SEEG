@@ -331,14 +331,14 @@ def maml_framwork():
                         x_spt_vae, y_spt, x_qry_vae, y_qry = x_spt_vae.squeeze(0).to(device), y_spt.squeeze(0).to(
                             device), x_qry_vae.squeeze(0).to(device), y_qry.squeeze(0).to(device)
 
-                        accs, loss_test = maml.finetunning(x_spt_vae, y_spt, x_qry_vae, y_qry)
+                        acc, _, _, _, loss_test = maml.finetunning(x_spt_vae, y_spt, x_qry_vae, y_qry)
 
                         loss_all_test.append(loss_test.item())
                         accs_all_test.append(accs)
 
                     # [b, update_step+1]
-                    accs = np.array(accs_all_test).mean(axis=0).astype(np.float16)
-                    plt_test_acc.append(accs[-1])
+                    # accs = np.array(accs_all_test).mean(axis=0).astype(np.float16)
+                    plt_test_acc.append(accs)
                     avg_loss = np.mean(np.array(loss_all_test))
                     plt_test_loss.append(avg_loss)
 

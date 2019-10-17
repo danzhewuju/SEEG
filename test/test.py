@@ -323,7 +323,7 @@ def test_24():
     a = [0, 0, 0, 0, 0]
     b = [1, 1, 1, 1, 1]
     cal = IndicatorCalculation(b, a)
-    print(cal.get_f1score(), cal.get_accuracy(), cal.get_precision(), cal.get_f1score())
+    print(cal.get_f1score())
 
 
 if __name__ == '__main__':

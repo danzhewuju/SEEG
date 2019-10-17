@@ -232,7 +232,7 @@ class IndicatorCalculation():  # 包含二分类中各种指标
             self.ground_truth = ground_truth  # [0, 1, 0, 0, 1 ]
 
     @staticmethod
-    def __division_detection(number):  # division detection
+    def __division_detection(number):  # division detection if divisor is zero, the result is zero
         return 0 if number == 0 else number
 
     def __tp(self):
@@ -269,20 +269,21 @@ class IndicatorCalculation():  # 包含二分类中各种指标
     def get_recall(self):
         divisor = self.__division_detection(self.__tp() + self.__fn())
         if divisor == 0:
-            return None
+            return 0
         else:
             return self.__tp() / divisor
 
     def get_precision(self):
         divisor = self.__division_detection(self.__tp() + self.__fp())
         if divisor == 0:
-            return None
+            return 0
         else:
             return self.__tp() / divisor
 
     def get_f1score(self):
-        if self.get_recall() is None or self.get_precision() is None:
-            return None
+        if (self.get_recall() is None) or (self.get_precision() is None) or (
+                (self.get_recall() + self.get_precision()) == 0):
+            return 0
         else:
             return (2 * self.get_recall() * self.get_precision()) / (self.get_recall() + self.get_precision())
 
