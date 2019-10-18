@@ -25,7 +25,7 @@ parser.add_argument("-r", "--relation_dim", type=int, default=8)
 parser.add_argument("-w", "--class_num", type=int, default=2)
 parser.add_argument("-s", "--sample_num_per_class", type=int, default=10)
 parser.add_argument("-b", "--batch_num_per_class", type=int, default=10)
-parser.add_argument("-e", "--episode", type=int, default=2000)
+parser.add_argument("-e", "--episode", type=int, default=4000)
 parser.add_argument("-t", "--test_episode", type=int, default=50)
 parser.add_argument("-l", "--learning_rate", type=float, default=0.001)
 parser.add_argument("-g", "--gpu", type=int, default=0)
@@ -336,7 +336,7 @@ def main():
     plt.plot(plt_test_acc, label='Acc')
     plt.legend(loc='upper right')
     plt.savefig('./drawing/test.png')
-    plt.show()
+    # plt.show()
 
     plt.figure()
     plt.title("training info")
@@ -346,7 +346,7 @@ def main():
     plt.plot(plt_train_acc, label='Acc')
     plt.legend(loc='upper right')
     plt.savefig('./drawing/train.png')
-    plt.show()
+    # plt.show()
 
 
 if __name__ == '__main__':

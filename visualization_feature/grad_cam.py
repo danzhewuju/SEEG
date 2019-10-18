@@ -8,12 +8,12 @@ import torch.nn as nn
 from torch.autograd import Function
 from torch.autograd import Variable
 import sys
+sys.path.append('../')
 from MAML.learner import *
 import json
-from MAML.meta import Meta
+from VMAML.meta import Meta
 from util import matrix_normalization_recorder
 
-sys.path.append('../')
 
 from util.util_file import matrix_normalization, trans_numpy_cv2, get_matrix_max_location
 

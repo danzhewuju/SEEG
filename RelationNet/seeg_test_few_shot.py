@@ -232,7 +232,7 @@ def main():
 
                 cal.set_values(predict_labels, test_labels)
                 acc = cal.get_accuracy()
-                precision = cal.get_accuracy()
+                precision = cal.get_precision()
                 recall = cal.get_recall()
                 f1_score = cal.get_f1score()
                 accuracies.append(acc)
