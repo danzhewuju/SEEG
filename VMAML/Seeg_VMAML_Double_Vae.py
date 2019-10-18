@@ -18,7 +18,7 @@ from torch.utils.data import DataLoader
 sys.path.append('../')
 
 from MAML.Mamlnet import *
-from VMAML.meta import *
+from VMAML.vmeta import *
 from util.util_file import matrix_normalization
 import matplotlib.pyplot as plt
 import time
@@ -334,16 +334,16 @@ def maml_framwork():
                         acc, _, _, _, loss_test = maml.finetunning(x_spt_vae, y_spt, x_qry_vae, y_qry)
 
                         loss_all_test.append(loss_test.item())
-                        accs_all_test.append(accs)
+                        accs_all_test.append(acc)
 
                     # [b, update_step+1]
                     # accs = np.array(accs_all_test).mean(axis=0).astype(np.float16)
-                    plt_test_acc.append(accs)
+                    plt_test_acc.append(acc)
                     avg_loss = np.mean(np.array(loss_all_test))
                     plt_test_loss.append(avg_loss)
 
-                print('Test acc:', accs)
-                test_accuracy = accs[-1]
+                test_accuracy = np.array(accs_all_test).mean()
+                print('Test acc:', test_accuracy)
                 if test_accuracy >= last_accuracy:
                     # save networks
                     torch.save(maml.state_dict(), str(

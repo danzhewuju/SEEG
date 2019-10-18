@@ -320,11 +320,20 @@ def test_23():
 
 
 def test_24():
-    a = [0, 0, 0, 0, 0]
-    b = [1, 1, 1, 1, 1]
+    a = [0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1]
+
+    b = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]
     cal = IndicatorCalculation(b, a)
-    print(cal.get_f1score())
+    print(cal.get_accuracy(), cal.get_precision(), cal.get_recall(), cal.get_f1score())
+
+
+def recall(p, r):
+    f = 2 * p * r / (p + r)
+    print("recall:{}".format(f))
 
 
 if __name__ == '__main__':
-    test_24()
+    # recall(0.77909, 0.78750)
+    # test_24()
+    recall(0.78116,0.82250)
+

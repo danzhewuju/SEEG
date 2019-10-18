@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader
 sys.path.append('../')
 
 from MAML.Mamlnet import *
-from VMAML.meta import *
+from VMAML.vmeta import *
 from VAE.ConVae import VAE
 from util.util_file import matrix_normalization
 import matplotlib.pyplot as plt

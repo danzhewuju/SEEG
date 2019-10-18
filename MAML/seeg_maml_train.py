@@ -56,10 +56,10 @@ def main():
     print('Total trainable tensors:', num)
 
     # batchsz here means total episode number
-    mini = Seegnet(args.dataset_dir, mode='train_vae', n_way=args.n_way, k_shot=args.k_spt,
+    mini = Seegnet(args.dataset_dir, mode='train', n_way=args.n_way, k_shot=args.k_spt,
                    k_query=args.k_qry,
                    batchsz=args.epoch)
-    mini_test = Seegnet(args.dataset_dir, mode='test_vae', n_way=args.n_way, k_shot=args.k_spt,
+    mini_test = Seegnet(args.dataset_dir, mode='test', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
                         batchsz=100)
     last_accuracy = 0.0
@@ -94,24 +94,24 @@ def main():
                     x_spt, y_spt, x_qry, y_qry = x_spt.squeeze(0).to(device), y_spt.squeeze(0).to(device), \
                                                  x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
 
-                    accs, loss_test = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
+                    accs, _, _, _, loss_test = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
 
                     loss_all_test.append(loss_test)
                     accs_all_test.append(accs)
 
                 # [b, update_step+1]
-                accs = np.array(accs_all_test).mean(axis=0).astype(np.float16)
-                plt_test_acc.append(accs[-1])
+                plt_test_acc.append(accs)
                 avg_loss = np.mean(np.array(loss_all_test))
                 plt_test_loss.append(avg_loss)
 
                 print('Test acc:', accs)
-                test_accuracy = accs[-1]
+                test_accuracy = accs
                 if test_accuracy >= last_accuracy:
                     # save networks
                     torch.save(maml.state_dict(), str(
                         "./models/maml" + str(args.n_way) + "way_" + str(
                             args.k_spt) + "shot.pkl"))
+                    print("Model saved successfully!")
                     last_accuracy = test_accuracy
     plt.figure()
     plt.title("testing info")
@@ -136,7 +136,7 @@ def main():
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('--epoch', type=int, help='epoch number', default=4000)
+    argparser.add_argument('--epoch', type=int, help='epoch number', default=1000)
     argparser.add_argument('--n_way', type=int, help='n way', default=2)
     argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=8)
     argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=8)

@@ -7,5 +7,5 @@
 @Function:
 """
 
-from VMAML.meta import *
+from VMAML.vmeta import *
 from VMAML.Seeg_VMAML import *

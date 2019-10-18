@@ -260,32 +260,32 @@ class Meta(nn.Module):
         fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, net.parameters())))
 
         # this is the loss and accuracy before first update
-        # with torch.no_grad():
-        #     # [setsz, nway]
-        #     logits_q = net(x_qry, net.parameters(), bn_training=True)
-        #     # [setsz]
-        #     pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-        #     # scalar
-        #     # correct = torch.eq(pred_q, y_qry).sum().item()
-        #     cal.set_values(pred_q, y_qry)
-        #     corrects[0] += cal.get_accuracy()  # 指标构建
-        #     precisions[0] += cal.get_precision()
-        #     recalls[0] += cal.get_recall()
-        #     f1scores[0] += cal.get_f1score()
-        #
-        # # this is the loss and accuracy after the first update
-        # with torch.no_grad():
-        #     # [setsz, nway]
-        #     logits_q = net(x_qry, fast_weights, bn_training=True)
-        #     # [setsz]
-        #     pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-        #     # scalar
-        #     # correct = torch.eq(pred_q, y_qry).sum().item()
-        #     cal.set_values(pred_q, y_qry)
-        #     corrects[1] += cal.get_accuracy()
-        #     precisions[1] += cal.get_precision()
-        #     recalls[1] += cal.get_recall()
-        #     f1scores[1] += cal.get_f1score()
+        with torch.no_grad():
+            # [setsz, nway]
+            logits_q = net(x_qry, net.parameters(), bn_training=True)
+            # [setsz]
+            pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
+            # scalar
+            # correct = torch.eq(pred_q, y_qry).sum().item()
+            cal.set_values(pred_q, y_qry)
+            corrects[0] = cal.get_accuracy()  # 指标构建
+            precisions[0] = cal.get_precision()
+            recalls[0] = cal.get_recall()
+            f1scores[0] = cal.get_f1score()
+
+        # this is the loss and accuracy after the first update
+        with torch.no_grad():
+            # [setsz, nway]
+            logits_q = net(x_qry, fast_weights, bn_training=True)
+            # [setsz]
+            pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
+            # scalar
+            # correct = torch.eq(pred_q, y_qry).sum().item()
+            cal.set_values(pred_q, y_qry)
+            corrects[1] = cal.get_accuracy()
+            precisions[1] = cal.get_precision()
+            recalls[1] = cal.get_recall()
+            f1scores[1] = cal.get_f1score()
 
         loss_all = 0
         for k in range(1, self.update_step_test):
@@ -302,22 +302,22 @@ class Meta(nn.Module):
             loss_q = F.cross_entropy(logits_q, y_qry)
             loss_all += loss_q.cpu().detach().numpy()
 
-            if k == self.update_step_test - 1:
-                with torch.no_grad():
-                    pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-                    # correct = torch.eq(pred_q, y_qry).sum().item()  # convert to numpy
-                    cal.set_values(pred_q, y_qry)
-                    corrects[k + 1] += cal.get_accuracy()
-                    precisions[k + 1] += cal.get_precision()
-                    recalls[k + 1] += cal.get_recall()
-                    f1scores[k + 1] += cal.get_f1score()
+            with torch.no_grad():
+                pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
+                # correct = torch.eq(pred_q, y_qry).sum().item()  # convert to numpy
+                cal.set_values(pred_q, y_qry)
+                corrects[k + 1] = cal.get_accuracy()
+                precisions[k + 1] = cal.get_precision()
+                recalls[k + 1] = cal.get_recall()
+                f1scores[k + 1] = cal.get_f1score()
 
         # del net
         loss_all /= self.update_step_test - 1
 
         # accs = np.array(corrects) / querysz
+        index = corrects.index(max(corrects)) # 选取准确率最高的那个结果
 
-        return corrects[-1], precisions[-1], recalls[-1], f1scores[-1], loss_all
+        return corrects[index], precisions[index], recalls[index], f1scores[index], loss_all
 
 
 def main():

@@ -285,7 +285,7 @@ class IndicatorCalculation():  # 包含二分类中各种指标
                 (self.get_recall() + self.get_precision()) == 0):
             return 0
         else:
-            return (2 * self.get_recall() * self.get_precision()) / (self.get_recall() + self.get_precision())
+            return (2 * self.__tp()) / (2 * self.__tp() + self.__fn() + self.__fp())
 
 
 if __name__ == '__main__':

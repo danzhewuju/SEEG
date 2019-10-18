@@ -18,7 +18,7 @@ from Seeg_VMAML import VAE
 
 sys.path.append('../')
 from MAML.Mamlnet import Seegnet
-from VMAML.meta import *
+from VMAML.vmeta import *
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument('--epoch', type=int, help='epoch number', default=2000)
@@ -218,7 +218,7 @@ def main():
         precision_avg = np.array(precisions).mean()
         recall_avg = np.array(recalls).mean()
         f1score_avg = np.array(f1scores).mean()
-        print('Test Accuracy:{:.5f}, Test Precision:{:.5f}, Test Recall:{:.5f}, Test F1 score:{:.5f}'.
+        print('Test Accuracy:{}, Test Precision:{}, Test Recall:{}, Test F1 score:{}'.
               format(acc_avg, precision_avg, recall_avg, f1score_avg))
 
         test_accuracy.append(acc_avg)

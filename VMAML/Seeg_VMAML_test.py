@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader
 from VAE.ConVae import VAE
 sys.path.append('../')
 from MAML.Mamlnet import Seegnet
-from VMAML.meta import *
+from VMAML.vmeta import *
 from util.util_file import matrix_normalization
 
 argparser = argparse.ArgumentParser()
