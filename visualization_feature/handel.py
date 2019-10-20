@@ -229,9 +229,10 @@ def raw_data_slice():
     # 1.癫痫发作前的原始数据的重写
     clean_dir("./raw_data_time_sequentially")  # 删除文件夹下面已有的旧的文件
     # p_name = "ZK"
+    config = "./json_path/config.json"
     config_json = json.load(open(config))
     path_commom_channel = config_json["handel.dynamic_detection__path_channel_list_"+p_name]
-    path_dir = "../data/raw_data/ZK/ZK_Pre_seizure"
+    path_dir = "../data/raw_data/{}/{}_Pre_seizure".format(p_name, p_name)
     flag = 0
     for index, p in enumerate(os.listdir(path_dir)):
         if index == 0:
@@ -311,8 +312,8 @@ def dynamic_detection():
     clean_dir("./heatmap")  # 清空heatmap 文件夹下面所有文件
 
     config_info = json.load(open("./json_path/config.json"))  # 读取配置文件信息
-    raw_data_path = config_info['person_raw_data']
-    channel_info_path = config_info['handel.dynamic_detection__path_channel_list']  # 信道的排序信息表
+    raw_data_path = config_info['person_raw_data_'+p_name]
+    channel_info_path = config_info['handel.dynamic_detection__path_channel_list_'+p_name]  # 信道的排序信息表
     channel_names = pd.read_csv(channel_info_path, sep=',')
     channel_list = channel_names['chan_name'].tolist()
     raw_data = read_raw(raw_data_path)
@@ -352,7 +353,7 @@ def dynamic_detection():
 
 
 if __name__ == '__main__':
-    p_name = "ZK"
+    p_name = "WSH"
     # TODO: list
     # 1.0 需要运行 feature_hotmap.py 文件, 保证文件夹heatmao, raw_data_signal 里面存在照片
     # 1. 将两个原信号连接在一起,一个是热力信号，一个是原始的波形信号
@@ -365,10 +366,10 @@ if __name__ == '__main__':
     # time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
-    # sequentially_signal()
+    sequentially_signal()
 
     # 2.3 将按照时间的片段信号和热力图进行结合
-    image_contact_process_by_time()
+    # image_contact_process_by_time()
 
     # 3.1 从整体的文件进行热力分析， 以及热力图分割，读取完整的文件，防止热力图被分割
     # dynamic_detection()

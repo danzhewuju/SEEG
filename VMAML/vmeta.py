@@ -311,7 +311,7 @@ class Meta(nn.Module):
                 recalls[k + 1] = cal.get_recall()
                 f1scores[k + 1] = cal.get_f1score()
 
-        # del net
+        del net
         loss_all /= self.update_step_test - 1
 
         # accs = np.array(corrects) / querysz

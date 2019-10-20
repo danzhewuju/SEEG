@@ -12,5 +12,25 @@
   "handel.sequentially__path_ZK": "./log/ZK_SZ1_pre_seizure_raw.txt",
   "handel.sequentially__path_channel_list_ZK": "../data/data_slice/channels_info/ZK_seq.csv",
   "handel.sequentially__start_time_ZK": "6:49:11",
-  "handel.dynamic_detection__path_channel_list_ZK":"../data/data_slice/channels_info/ZK_seq.csv"
+  "handel.dynamic_detection__path_channel_list_ZK":"../data/data_slice/channels_info/ZK_seq.csv",
+
+  "person_raw_data_WSH": "../data/raw_data/WSH/WSH_Pre_seizure/WSH_SZ1_pre_seizure_raw.fif",
+  "handel.sequentially__path_WSH": "./log/WSH_SZ1_pre_seizure_raw.txt",
+  "handel.sequentially__path_channel_list_WSH": "../data/data_slice/channels_info/WSH_seq.csv",
+  "handel.sequentially__start_time_WSH": "23:52:27",
+  "handel.dynamic_detection__path_channel_list_WSH":"../data/data_slice/channels_info/WSH_seq.csv",
+
+  "person_raw_data_LK": "../data/raw_data/LK/LK_Pre_seizure/LK_SZ1_pre_seizure_raw.fif",
+  "handel.sequentially__path_LK": "./log/LK_SZ1_pre_seizure_raw.txt",
+  "handel.sequentially__path_channel_list_LK": "../data/data_slice/channels_info/LK_seq.csv",
+  "handel.sequentially__start_time_LK": "15:47:28",
+  "handel.dynamic_detection__path_channel_list_LK":"../data/data_slice/channels_info/LK_seq.csv",
+
+  "person_raw_data_SYF": "../data/raw_data/SYF/SYF_Pre_seizure/SYF_SZ1_pre_seizure_raw.fif",
+  "handel.sequentially__path_SYF": "./log/SYF_SZ1_pre_seizure_raw.txt",
+  "handel.sequentially__path_channel_list_SYF": "../data/data_slice/channels_info/SYF_seq.csv",
+  "handel.sequentially__start_time_SYF": "23:22:14",
+  "handel.dynamic_detection__path_channel_list_SYF":"../data/data_slice/channels_info/SYF_seq.csv"
+
+
 }

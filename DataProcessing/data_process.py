@@ -9,6 +9,8 @@ import random
 
 import numpy as np
 from dataset_info import up_sampling, sampling_rewrite
+import sys
+sys.path.append("../")
 
 from RelationNet import *
 
@@ -21,7 +23,7 @@ args = parser.parse_args()
 
 TRAIN_RATIO = args.ratio
 VAL_RATIO = args.val
-patient_test = "ZK"
+patient_test = "LK"
 
 
 def data_process():
