@@ -335,5 +335,7 @@ def recall(p, r):
 if __name__ == '__main__':
     # recall(0.77909, 0.78750)
     # test_24()
-    recall(0.78116,0.82250)
+    # a = []
+    # if a is None:
+    #     print("T")
 

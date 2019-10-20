@@ -8,12 +8,12 @@ import torch.nn as nn
 from torch.autograd import Function
 from torch.autograd import Variable
 import sys
+
 sys.path.append('../')
 from MAML.learner import *
 import json
 from VMAML.vmeta import Meta
 from util import matrix_normalization_recorder
-
 
 from util.util_file import matrix_normalization, trans_numpy_cv2, get_matrix_max_location
 
@@ -410,6 +410,8 @@ def get_feature_map(path_data, location_name):
                 recorder_old_channel_index.append(p + count)  # 原来的随机过程进行了删除，现在需要复原
             if flag_op_channel == 1:
                 recorder_old_channel_index.append(p - count)  # 原来的随机过程进行了采样
+    else:
+        recorder_old_channel_index = channel_number  # 如果尺寸保持一致就不在变化
 
     location_full_path = os.path.join("./log", location_name)
     if os.path.exists(location_full_path):
@@ -424,10 +426,11 @@ def get_feature_map(path_data, location_name):
     location_time_str = "-".join(location_time)
     fp.write("{},{}\n".format(location_time_str, location_spatial_str))
     fp.close()
-
-    channel_location = "-loc" + ("-{}" * 5).format(recorder_old_channel_index[0], recorder_old_channel_index[1],
-                                                   recorder_old_channel_index[2], recorder_old_channel_index[3],
-                                                   recorder_old_channel_index[4])
+    if len(recorder_old_channel_index) != 0:
+        channel_location = "-loc" + ("-{}" * 5).format(recorder_old_channel_index[0], recorder_old_channel_index[1],
+                                                       recorder_old_channel_index[2], recorder_old_channel_index[3],
+                                                       recorder_old_channel_index[4])
+    # else:
 
     name = path_data.split("/")[-1][:-4] + channel_location + ".jpg"
     save_path = os.path.join("./heatmap", name)

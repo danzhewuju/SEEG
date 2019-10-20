@@ -103,7 +103,7 @@ def create_raw_data_signal_by_similarity(image_dir="./heatmap"):
 def create_raw_data_signal_by_time(image_dir="./heatmap"):
     # p_name = "ZK"
 
-    raw_path_list = get_first_dir_path("./raw_data_time_sequentially/preseizure/"+p_name, "npy")
+    raw_path_list = get_first_dir_path("./raw_data_time_sequentially/preseizure/" + p_name, "npy")
     raw_data_name = [re.findall("/.+/(.+)", p)[0] for p in raw_path_list]
     dict_name_path = dict(zip(raw_data_name, raw_path_list))
 
@@ -177,7 +177,7 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/ZK"):
     '''
     clean_dir("./log/")
     # p_name = "ZK"
-    path="./raw_data_time_sequentially/preseizure/" + p_name
+    path = "./raw_data_time_sequentially/preseizure/" + p_name
     file_name = p_name + "_SZ1_pre_seizure_raw"  # 指定了这个文件来让医生进行验证
     file_name = file_name + ".txt"
     heat_map_dir = "./heatmap"
@@ -231,15 +231,13 @@ def raw_data_slice():
     # p_name = "ZK"
     config = "./json_path/config.json"
     config_json = json.load(open(config))
-    path_commom_channel = config_json["handel.dynamic_detection__path_channel_list_"+p_name]
-    path_dir = "../data/raw_data/{}/{}_Pre_seizure".format(p_name, p_name)
+    path_commom_channel = config_json["handel.dynamic_detection__path_channel_list_" + p_name]
+    path_dir = config_json["person_raw_data_" + p_name]
     flag = 0
-    for index, p in enumerate(os.listdir(path_dir)):
-        if index == 0:
-            print("processing data from {}".format(p))
-            path_raw = os.path.join(path_dir, p)
-            name = p_name
-            generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
+    print("processing data from {}".format(path_dir))
+    path_raw = path_dir
+    name = p_name
+    generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
     print("癫痫发作前的睡眠处理完成！！！")
 
     # 2.正常数据的重写
@@ -256,13 +254,13 @@ def raw_data_slice():
 def sequentially_signal(config="./json_path/config.json"):  # 时间序列的热点分析
     config_json = json.load(open(config))
     # p_name = "ZK"
-    path = config_json['handel.sequentially__path_'+p_name]
+    path = config_json['handel.sequentially__path_' + p_name]
 
-    channel_list_path = config_json['handel.sequentially__path_channel_list_'+p_name]
+    channel_list_path = config_json['handel.sequentially__path_channel_list_' + p_name]
     channel_pandas = pd.read_csv(channel_list_path)
     channel_list = channel_pandas['chan_name']  # 获得与信道对应的index-channel的列表
 
-    start_time = config_json['handel.sequentially__start_time_'+p_name]
+    start_time = config_json['handel.sequentially__start_time_' + p_name]
     start_time_list = [int(x) for x in start_time.split(":")]
 
     save_signal_info = config_json['handel.sequentially__save_dir']
@@ -312,8 +310,8 @@ def dynamic_detection():
     clean_dir("./heatmap")  # 清空heatmap 文件夹下面所有文件
 
     config_info = json.load(open("./json_path/config.json"))  # 读取配置文件信息
-    raw_data_path = config_info['person_raw_data_'+p_name]
-    channel_info_path = config_info['handel.dynamic_detection__path_channel_list_'+p_name]  # 信道的排序信息表
+    raw_data_path = config_info['person_raw_data_' + p_name]
+    channel_info_path = config_info['handel.dynamic_detection__path_channel_list_' + p_name]  # 信道的排序信息表
     channel_names = pd.read_csv(channel_info_path, sep=',')
     channel_list = channel_names['chan_name'].tolist()
     raw_data = read_raw(raw_data_path)
@@ -353,7 +351,7 @@ def dynamic_detection():
 
 
 if __name__ == '__main__':
-    p_name = "WSH"
+    p_name = "LK"
     # TODO: list
     # 1.0 需要运行 feature_hotmap.py 文件, 保证文件夹heatmao, raw_data_signal 里面存在照片
     # 1. 将两个原信号连接在一起,一个是热力信号，一个是原始的波形信号
@@ -366,10 +364,10 @@ if __name__ == '__main__':
     # time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
-    sequentially_signal()
+    # sequentially_signal()
 
     # 2.3 将按照时间的片段信号和热力图进行结合
-    # image_contact_process_by_time()
+    image_contact_process_by_time()
 
     # 3.1 从整体的文件进行热力分析， 以及热力图分割，读取完整的文件，防止热力图被分割
     # dynamic_detection()

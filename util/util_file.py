@@ -184,6 +184,7 @@ def clean_dir(path):
         print("clean finished!")
     else:
         print("cancel operation !")
+        exit(0)
 
 
 def trans_numpy_cv2(data):

@@ -23,7 +23,7 @@ args = parser.parse_args()
 
 TRAIN_RATIO = args.ratio
 VAL_RATIO = args.val
-patient_test = "LK"
+patient_test = "SYF"
 
 
 def data_process():
