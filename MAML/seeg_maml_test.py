@@ -55,10 +55,13 @@ def main():
     device = torch.device('cuda')
     maml = Meta(args, config).to(device)
     if os.path.exists(
-            "./models/" + str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")):
-        path = "./models/" + str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")
-        maml.load_state_dict(path)
+            str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")):
+        path = str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")
+        maml.load_state_dict(torch.load(path))
         print("load model :{} successfully".format(path))
+    else:
+        print("model don't existed!")
+        exit(0)
 
     tmp = filter(lambda x: x.requires_grad, maml.parameters())
     num = sum(map(lambda x: np.prod(x.shape), tmp))
@@ -117,8 +120,8 @@ if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--epoch', type=int, help='epoch number', default=2000)
     argparser.add_argument('--n_way', type=int, help='n way', default=2)
-    argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=10)
-    argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=10)
+    argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=8)
+    argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=8)
     argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
     argparser.add_argument('--imgc', type=int, help='imgc', default=5)
     argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
