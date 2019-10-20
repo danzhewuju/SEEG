@@ -101,7 +101,9 @@ def create_raw_data_signal_by_similarity(image_dir="./heatmap"):
 
 
 def create_raw_data_signal_by_time(image_dir="./heatmap"):
-    raw_path_list = get_first_dir_path("./raw_data_time_sequentially/preseizure/BDP", "npy")
+    # p_name = "ZK"
+
+    raw_path_list = get_first_dir_path("./raw_data_time_sequentially/preseizure/"+p_name, "npy")
     raw_data_name = [re.findall("/.+/(.+)", p)[0] for p in raw_path_list]
     dict_name_path = dict(zip(raw_data_name, raw_path_list))
 
@@ -167,14 +169,16 @@ def image_connection(data_signal_dir, raw_data_dir, save_dir="./contact_image"):
         plt.close(0)
 
 
-def time_heat_map(path="./raw_data_time_sequentially/preseizure/BDP"):
+def time_heat_map(path="./raw_data_time_sequentially/preseizure/ZK"):
     '''
 
     :return:
     构造时间序列的热力图
     '''
     clean_dir("./log/")
-    file_name = "BDP_SZ1_pre_seizure_raw"  # 指定了这个文件来让医生进行验证
+    # p_name = "ZK"
+    path="./raw_data_time_sequentially/preseizure/" + p_name
+    file_name = p_name + "_SZ1_pre_seizure_raw"  # 指定了这个文件来让医生进行验证
     file_name = file_name + ".txt"
     heat_map_dir = "./heatmap"
     path_data = get_first_dir_path(path, 'npy')
@@ -224,37 +228,40 @@ def raw_data_slice():
     '''
     # 1.癫痫发作前的原始数据的重写
     clean_dir("./raw_data_time_sequentially")  # 删除文件夹下面已有的旧的文件
-    path_commom_channel = "../data/data_slice/channels_info/BDP_seq.csv"
-    path_dir = "../data/raw_data/BDP/BDP_Pre_seizure"
+    # p_name = "ZK"
+    config_json = json.load(open(config))
+    path_commom_channel = config_json["handel.dynamic_detection__path_channel_list_"+p_name]
+    path_dir = "../data/raw_data/ZK/ZK_Pre_seizure"
     flag = 0
     for index, p in enumerate(os.listdir(path_dir)):
         if index == 0:
             print("processing data from {}".format(p))
             path_raw = os.path.join(path_dir, p)
-            name = "BDP"
+            name = p_name
             generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
     print("癫痫发作前的睡眠处理完成！！！")
 
     # 2.正常数据的重写
     # BDP data
-    path_commom_channel = "../data/data_slice/channels_info/BDP_seq.csv"
-    path_raw_normal_sleep = ['../data/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif']
-    name = "BDP"
-    flag = 2
-    for path_raw in path_raw_normal_sleep:
-        generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
-    print("{}正常睡眠的数据处理完成！".format(name))
+    # path_commom_channel = "../data/data_slice/channels_info/BDP_seq.csv"
+    # path_raw_normal_sleep = ['../data/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif']
+    # name = "BDP"
+    # flag = 2
+    # for path_raw in path_raw_normal_sleep:
+    #     generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
+    # print("{}正常睡眠的数据处理完成！".format(name))
 
 
 def sequentially_signal(config="./json_path/config.json"):  # 时间序列的热点分析
     config_json = json.load(open(config))
-    path = config_json['handel.sequentially__path']
+    # p_name = "ZK"
+    path = config_json['handel.sequentially__path_'+p_name]
 
-    channel_list_path = config_json['handel.sequentially__path_channel_list']
+    channel_list_path = config_json['handel.sequentially__path_channel_list_'+p_name]
     channel_pandas = pd.read_csv(channel_list_path)
     channel_list = channel_pandas['chan_name']  # 获得与信道对应的index-channel的列表
 
-    start_time = config_json['handel.sequentially__BDP_start_time']
+    start_time = config_json['handel.sequentially__start_time_'+p_name]
     start_time_list = [int(x) for x in start_time.split(":")]
 
     save_signal_info = config_json['handel.sequentially__save_dir']
@@ -345,6 +352,7 @@ def dynamic_detection():
 
 
 if __name__ == '__main__':
+    p_name = "ZK"
     # TODO: list
     # 1.0 需要运行 feature_hotmap.py 文件, 保证文件夹heatmao, raw_data_signal 里面存在照片
     # 1. 将两个原信号连接在一起,一个是热力信号，一个是原始的波形信号

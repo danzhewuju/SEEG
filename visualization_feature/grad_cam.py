@@ -11,7 +11,7 @@ import sys
 sys.path.append('../')
 from MAML.learner import *
 import json
-from VMAML.meta import Meta
+from VMAML.vmeta import Meta
 from util import matrix_normalization_recorder
 
 
