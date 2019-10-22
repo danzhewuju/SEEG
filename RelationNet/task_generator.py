@@ -14,6 +14,11 @@ from torch.utils.data.sampler import Sampler
 
 sys.path.append('../')
 from util.util_file import matrix_normalization
+import json
+
+config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
+print("patient_test is {}".format(patient_test))
 
 
 def mini_data_folders(model_name ='mixed_data'):
@@ -23,8 +28,8 @@ def mini_data_folders(model_name ='mixed_data'):
     :return:
     '''
 
-    train_folder = '../data/seeg/{}/train_vae'.format(model_name)
-    test_folder = '../data/seeg/{}/val_vae'.format(model_name)
+    train_folder = '../data/seeg/{}/{}/train'.format(model_name, patient_test)
+    test_folder = '../data/seeg/{}/{}/val'.format(model_name, patient_test)
 
     metatrain_folders = [os.path.join(train_folder, label)
                          for label in os.listdir(train_folder)

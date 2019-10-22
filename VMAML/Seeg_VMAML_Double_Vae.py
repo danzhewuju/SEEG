@@ -23,6 +23,10 @@ from util.util_file import matrix_normalization
 import matplotlib.pyplot as plt
 import time
 from tqdm import tqdm
+import json
+
+config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
@@ -36,11 +40,12 @@ argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning 
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=8)
 argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
-argparser.add_argument('--dataset_dir', type=str, help="training data set", default="../data/seeg/zero_data")
+argparser.add_argument('--dataset_dir', type=str, help="training data set",
+                       default="../data/seeg/zero_data/{}".format(patient_test))
 argparser.add_argument('--no-cuda', action='store_true', default=False, help='enables CUDA training')
-argparser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/train')
-argparser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/test')
-argparser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/val')
+argparser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/{}/train'.format(patient_test))
+argparser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/test'.format(patient_test))
+argparser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
 
 args = argparser.parse_args()
 
@@ -140,6 +145,8 @@ class MyDataset(Dataset):  # 重写dateset的相关类
         return len(self.imgs)
 
 
+print(TRAIN_PATH)
+print(TEST_PATH)
 datas = Data_info(path_train=TRAIN_PATH, path_test=TEST_PATH)
 all_data = datas.data_train + datas.data_test  # 所有的训练集
 positive_loader = MyDataset(datas.preseizure)  # 作为训练集
@@ -349,12 +356,12 @@ def maml_framwork():
                     # save networks
                     torch.save(maml.state_dict(), str(
                         "./models/maml" + str(args.n_way) + "way_" + str(
-                            args.k_spt) + "shot.pkl"))
+                            args.k_spt) + "shot_{}.pkl".format(patient_test)))
                     last_accuracy = test_accuracy
 
-                    torch.save(vae_p.state_dict(), "./models/Vae_positive.pkl")
+                    torch.save(vae_p.state_dict(), "./models/Vae_positive_{}.pkl".format(patient_test))
                     print("VAE positive model save successfully!")
-                    torch.save(vae_n.state_dict(), "./models/Vae_negative.pkl")
+                    torch.save(vae_n.state_dict(), "./models/Vae_negative_{}.pkl".format(patient_test))
                     print("VAE negative model save successfully!")
                     print("{} and {} model have saved!!!".format("maml", "vae"))
     plt.figure()

@@ -16,6 +16,8 @@ import sys
 sys.path.append('../')
 from util.util_file import *
 
+import json
+
 
 def imshow(img):
     npimg = img.numpy()
@@ -34,8 +36,8 @@ def imshow(img):
 
 
 def mini_imagenet_folders(model_name):
-    train_folder = '../data/seeg/{}/train'.format(model_name)
-    test_folder = '../data/seeg/{}/val'.format(model_name)
+    train_folder = '../data/seeg/{}/{}/train'.format(model_name, patient_test)
+    test_folder = '../data/seeg/{}/{}/val'.format(model_name, patient_test)
 
     metatrain_folders = [os.path.join(train_folder, label)
                          for label in os.listdir(train_folder)

@@ -9,18 +9,24 @@
 
 import torch
 import sys
+
 sys.path.append("../")
 from util import *
 from vae import trans_data, VAE
 from tqdm import tqdm
+import json
 
-train_path = "../data/seeg/zero_data/train"
-test_path = "../data/seeg/zero_data/test"
-val_path = "../data/seeg/zero_data/val"
+config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
+print("patient_test is {}".format(patient_test))
 
-save_train_dir = "../data/seeg/zero_data/train_vae"
-save_test_dir = "../data/seeg/zero_data/test_vae"
-save_val_dir = "../data/seeg/zero_data/val_vae"
+train_path = "../data/seeg/zero_data/{}/train".format(patient_test)
+test_path = "../data/seeg/zero_data/{}/test".format(patient_test)
+val_path = "../data/seeg/zero_data/{}/val".format(patient_test)
+
+save_train_dir = "../data/seeg/zero_data/{}/train_vae".format(patient_test)
+save_test_dir = "../data/seeg/zero_data/{}/test_vae".format(patient_test)
+save_val_dir = "../data/seeg/zero_data/{}/val_vae".format(patient_test)
 
 
 def vae_data(raw_path, save_path):  # train-test dataset and positive/negative

@@ -11,9 +11,15 @@ from torch import nn, optim
 from torch.nn import functional as F
 from torch.utils.data import Dataset
 import sys
+
 sys.path.append("../")
 from util.util_file import matrix_normalization
 from tqdm import tqdm
+import json
+
+config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
+print("patient_test is {}".format(patient_test))
 
 parser = argparse.ArgumentParser(description='VAE MNIST Example')
 parser.add_argument('--batch-size', type=int, default=32, metavar='N',
@@ -22,9 +28,9 @@ parser.add_argument('--epochs', type=int, default=5, metavar='N',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='enables CUDA training')
-parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/train')
-parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/test')
-parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/val')
+parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/{}/train'.format(patient_test))
+parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/test'.format(patient_test))
+parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
 parser.add_argument('--log-interval', type=int, default=10, metavar='N',
@@ -130,7 +136,7 @@ class VAE(nn.Module):
         super(VAE, self).__init__()
 
         # self.fc1 = nn.Linear(resize[0] * resize[1], 400)
-        self.fc1 = nn.Linear(resize[0]*resize[1], 2000)
+        self.fc1 = nn.Linear(resize[0] * resize[1], 2000)
         self.fc12 = nn.Linear(2000, 200)
         self.fc21 = nn.Linear(200, 20)
         self.fc22 = nn.Linear(200, 20)
@@ -176,7 +182,7 @@ def loss_function(recon_x, x, mu, logvar):
     # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
 
-    return abs(BCE+KLD)
+    return abs(BCE + KLD)
 
 
 def train_negative(epoch):

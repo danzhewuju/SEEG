@@ -13,6 +13,7 @@ import sys
 sys.path.append("../")
 
 from RelationNet import *
+import json
 
 parser = argparse.ArgumentParser(description="data split")
 parser.add_argument('-r', '--ratio', type=float, default=0.6)  # 将数据集划分为测试集，以及验证集
@@ -23,7 +24,9 @@ args = parser.parse_args()
 
 TRAIN_RATIO = args.ratio
 VAL_RATIO = args.val
-patient_test = "WSH"
+config = json.load(open("./config/fig.json", 'r'))
+patient_test = config['patient_test']
+print("test patient is :{}".format(patient_test))
 
 
 def data_process():
@@ -31,22 +34,22 @@ def data_process():
     function： 混合式的数据划分，
     :return:
     '''
-    train_folder = "../data/seeg/mixed_data/train"
-    test_folder = "../data/seeg/mixed_data/test"
-    val_folder = '../data/seeg/mixed_data/val'
+    train_folder = "../data/seeg/mixed_data/{}/train".format(patient_test)
+    test_folder = "../data/seeg/mixed_data/{}/test".format(patient_test)
+    val_folder = '../data/seeg/mixed_data/{}/val'.format(patient_test)
 
     if os.path.exists(train_folder) is not True:
         os.makedirs(train_folder)
     else:
-        os.system("rm -r ../data/seeg/mixed_data/train/*")
+        os.system("rm -r ../data/seeg/mixed_data/{}/train/*".format(patient_test))
     if os.path.exists(test_folder) is not True:
         os.makedirs(test_folder)
     else:
-        os.system("rm -r ../data/seeg/mixed_data/test/*")
+        os.system("rm -r ../data/seeg/mixed_data/{}/test/*".format(patient_test))
     if os.path.exists(val_folder) is not True:
         os.makedirs(val_folder)
     else:
-        os.system("rm -r ../data/seeg/mixed_data/val/*")
+        os.system("rm -r ../data/seeg/mixed_data/{}/val/*".format(patient_test))
 
     path_normal = "sleep_normal"
     path_pre_seizure = "pre_zeizure"
@@ -167,7 +170,7 @@ def data_process_n_1():
     TEST_RATIO = 0.3
 
     resampling_base_size = 3000
-    dataset_dir = '../data/seeg/zero_data'  # 当前所在的数据集, 不同的方法会在不同的数据集上
+    dataset_dir = '../data/seeg/zero_data/{}'.format(patient_test)  # 当前所在的数据集, 不同的方法会在不同的数据集上
     train_folder = os.path.join(dataset_dir, 'train')
     test_folder = os.path.join(dataset_dir, 'test')
     val_folder = os.path.join(dataset_dir, 'val')

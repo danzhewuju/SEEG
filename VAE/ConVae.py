@@ -20,6 +20,11 @@ from torch.nn import functional as F
 from torch.utils.data import Dataset, DataLoader
 
 from util.util_file import matrix_normalization
+import json
+
+config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
+print("patient_test is {}".format(patient_test))
 
 parser = argparse.ArgumentParser(description='VAE MNIST Example')
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
@@ -28,9 +33,9 @@ parser.add_argument('--epochs', type=int, default=10, metavar='N',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='enables CUDA training')
-parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/train')
-parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/test')
-parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/val')
+parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/{}/train'.format(patient_test))
+parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/test'.format(patient_test))
+parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
 parser.add_argument('--log-interval', type=int, default=10, metavar='N',

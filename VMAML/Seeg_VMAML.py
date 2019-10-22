@@ -22,6 +22,11 @@ from VAE.ConVae import VAE
 from util.util_file import matrix_normalization
 import matplotlib.pyplot as plt
 import time
+import json
+
+config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
+print("patient_test is {}".format(patient_test))
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument('--epoch', type=int, help='epoch number', default=4000)
@@ -37,9 +42,9 @@ argparser.add_argument('--update_step', type=int, help='task-level inner update 
 argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
 argparser.add_argument('--dataset_dir', type=str, help="training data set", default="../data/seeg/zero_data")
 argparser.add_argument('--no-cuda', action='store_true', default=False, help='enables CUDA training')
-argparser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/train')
-argparser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/test')
-argparser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/val')
+argparser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/{}/train'.format(patient_test))
+argparser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/test'.format(patient_test))
+argparser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
 
 args = argparser.parse_args()
 

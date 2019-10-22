@@ -290,8 +290,8 @@ class IndicatorCalculation():  # 包含二分类中各种指标
             return (2 * self.__tp()) / (2 * self.__tp() + self.__fn() + self.__fp())
 
     def get_auc(self):
-        y_predict = self.prediction
-        y_real = self.ground_truth
+        y_predict = self.prediction.cpu()
+        y_real = self.ground_truth.cpu()
         auc_score = metrics.roc_auc_score(y_real, y_predict)
         return auc_score
 

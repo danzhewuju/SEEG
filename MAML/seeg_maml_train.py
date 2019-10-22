@@ -10,6 +10,11 @@ from torch.utils.data import DataLoader
 sys.path.append('../')
 from Mamlnet import Seegnet
 from meta import Meta
+import json
+
+config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
+print("patient_test is {}".format(patient_test))
 
 
 def mean_confidence_interval(accs, confidence=0.95):
@@ -148,7 +153,8 @@ if __name__ == '__main__':
     argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.001)
     argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
     argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
-    argparser.add_argument('--dataset_dir', type=str, help="training data set", default="../data/seeg/zero_data")
+    argparser.add_argument('--dataset_dir', type=str, help="training data set",
+                           default="../data/seeg/zero_data/{}".format(patient_test))
 
     args = argparser.parse_args()
 

@@ -20,6 +20,12 @@ sys.path.append('../')
 from MAML.Mamlnet import Seegnet
 from VMAML.vmeta import *
 
+import json
+
+config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
+print("patient_test is {}".format(patient_test))
+
 argparser = argparse.ArgumentParser()
 argparser.add_argument('--epoch', type=int, help='epoch number', default=2000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
@@ -32,7 +38,8 @@ argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning 
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
 argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
-argparser.add_argument('--dataset_dir', type=str, help="training data set", default="../data/seeg/zero_data")
+argparser.add_argument('--dataset_dir', type=str, help="training data set",
+                       default="../data/seeg/zero_data/{}".format(patient_test))
 
 args = argparser.parse_args()
 
@@ -146,10 +153,10 @@ def main():
     np.random.seed(222)
 
     print(args)
+    path = str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot_{}.pkl".format(patient_test))
 
-    if os.path.exists(
-            str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")):
-        path = str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")
+    if os.path.exists(path):
+
         maml.load_state_dict(torch.load(path))
         print("load model success")
     else:

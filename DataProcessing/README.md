@@ -6,4 +6,6 @@
 3. data_process.py/data_duration_process.py 主要是用于训练集的数据划分，data_duration_process.py：预警时间的训练
 data_process.py 三分类的数据划分
 
+注意：需要设置patient_test 这个关键字， 之后所有的程序都依赖于这个关键字！
+
 

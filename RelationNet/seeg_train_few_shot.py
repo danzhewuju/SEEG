@@ -18,6 +18,11 @@ from torch.optim.lr_scheduler import StepLR
 
 import task_generator as tg
 from util.util_file import *
+import json
+
+config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
+print("patient_test is {}".format(patient_test))
 
 parser = argparse.ArgumentParser(description="One Shot Visual Recognition")
 parser.add_argument("-f", "--feature_dim", type=int, default=64)
@@ -319,10 +324,10 @@ def main():
                 # save networks
                 torch.save(feature_encoder.state_dict(), str(
                     "./models/seegnet_feature_encoder_" + str(CLASS_NUM) + "way_" + str(
-                        SAMPLE_NUM_PER_CLASS) + "shot.pkl"))
+                        SAMPLE_NUM_PER_CLASS) + "shot_{}.pkl".format(patient_test)))
                 torch.save(relation_network.state_dict(), str(
                     "./models/seegnet_relation_network_" + str(CLASS_NUM) + "way_" + str(
-                        SAMPLE_NUM_PER_CLASS) + "shot.pkl"))
+                        SAMPLE_NUM_PER_CLASS) + "shot_{}.pkl".format(patient_test)))
 
                 print("save networks for episode:", episode)
 
