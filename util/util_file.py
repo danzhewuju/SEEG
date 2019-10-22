@@ -9,6 +9,7 @@ import random
 
 import cv2
 import numpy as np
+from sklearn import metrics
 
 
 def sigmoid(x):
@@ -136,7 +137,7 @@ def get_matrix_max_location(mtx_data, k, reverse=True):
 
     :param mtx_data: 矩阵的数据
     :param k: 获取前K 个最大、最小
-    :param reverse: True : 最大， False: 最小
+    :param reverse: True : 最大，逆序 False: 最小，否则正序
     :return:[(0, 0), (2, 1), (2, 2), (1, 1), (1, 2)] 结果是按照顺序进行排序
     '''
     d_f = mtx_data.flatten()
@@ -287,6 +288,12 @@ class IndicatorCalculation():  # 包含二分类中各种指标
             return 0
         else:
             return (2 * self.__tp()) / (2 * self.__tp() + self.__fn() + self.__fp())
+
+    def calculate_auc(self):
+        y_predict = self.prediction
+        y_real = self.ground_truth
+        auc_score = metrics.roc_auc_score(y_real, y_predict)
+        return auc_score
 
 
 if __name__ == '__main__':

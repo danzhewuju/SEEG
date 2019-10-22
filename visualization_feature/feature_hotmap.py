@@ -76,7 +76,7 @@ if __name__ == '__main__':
     f = open('./json_path/LK_preseizure_sorted.json', 'r')
     clean_dir('./heatmap')
     clean_dir('./raw_data_signal')
-    count = 100
+    count = 300
     data = f.read()
     json_data = json.loads(data)
     for i in range(count):

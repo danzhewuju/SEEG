@@ -224,9 +224,12 @@ def seeg_npy_plot(data, channels, save_path):
     plt.figure(0)
     plt.subplots_adjust(hspace=0.6, wspace=0.6)
     for i in range(k):
-        plt.subplot(k, 1, i + 1)
-        plt.title("channel:{}".format(channels[i]))
-        plt.plot(data[channels[i]])
+        try:
+            plt.subplot(k, 1, i + 1)
+            plt.title("channel:{}".format(channels[i]))
+            plt.plot(data[channels[i]])
+        except IndexError:
+            print("IndexError")
     plt.savefig(save_path)
     plt.close(0)
     # plt.show()

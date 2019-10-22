@@ -183,7 +183,7 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/ZK"):
     heat_map_dir = "./heatmap"
     path_data = get_first_dir_path(path, 'npy')
     path_data.sort()  # 根据uuid 按照时间序列进行排序
-    count = 100  # 拼接的时间
+    count = 300  # 拼接的时间
     clean_dir(heat_map_dir)  # 清除文件夹里面所有文件
     for p in path_data:
         get_feature_map(p, file_name)
@@ -351,20 +351,20 @@ def dynamic_detection():
 
 
 if __name__ == '__main__':
-    p_name = "LK"
+    p_name = "WSH"
     # TODO: list
     # 1.0 需要运行 feature_hotmap.py 文件, 保证文件夹heatmao, raw_data_signal 里面存在照片
     # 1. 将两个原信号连接在一起,一个是热力信号，一个是原始的波形信号
     # image_contact_process_by_similarity()
 
     # 2.1 生成未滤波数据的切片, 可以设置是否选择滤波处理
-    # raw_data_slice()
+    raw_data_slice()
 
     # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接,拼接我60s
-    # time_heat_map()
+    time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
-    # sequentially_signal()
+    sequentially_signal()
 
     # 2.3 将按照时间的片段信号和热力图进行结合
     image_contact_process_by_time()
