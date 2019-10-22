@@ -149,7 +149,7 @@ def main():
 
     if os.path.exists(
             str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")):
-        path =str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")
+        path = str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")
         maml.load_state_dict(torch.load(path))
         print("load model success")
     else:
@@ -172,6 +172,7 @@ def main():
     test_precision = []
     test_recall = []
     test_f1score = []
+    test_auc = []
     for epoch in range(10):
         # fetch meta_batchsz num of episode each time
         db_test = DataLoader(mini_test, 1, shuffle=True, num_workers=1, pin_memory=True)
@@ -179,12 +180,13 @@ def main():
         precisions = []
         recalls = []
         f1scores = []
+        aucs = []
 
         for x_spt, y_spt, x_qry, y_qry in db_test:
             # 1.未引入VAE模块
             x_spt, y_spt, x_qry, y_qry = x_spt.squeeze(0).to(device), y_spt.squeeze(0).to(device), \
                                          x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
-            acc, precision, recall, f1score, loss_t = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
+            result, loss_t = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
 
             # # 2.需要引入VAE编码
             # x_spt_p, x_spt_n = trans_data_vae(x_spt.numpy(), y_spt)
@@ -211,29 +213,34 @@ def main():
             #                              x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
             # accs, loss_t = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
 
-            accs.append(acc)
-            precisions.append(precision)
-            recalls.append(recall)
-            f1scores.append(f1score)
+            accs.append(result['accuracy'])
+            precisions.append(result['precision'])
+            recalls.append(result['recall'])
+            f1scores.append(result['f1score'])
+            aucs.append(result['auc'])
 
         # [b, update_step+1]
         acc_avg = np.array(accs).mean()
         precision_avg = np.array(precisions).mean()
         recall_avg = np.array(recalls).mean()
         f1score_avg = np.array(f1scores).mean()
-        print('Test Accuracy:{}, Test Precision:{}, Test Recall:{}, Test F1 score:{}'.
-              format(acc_avg, precision_avg, recall_avg, f1score_avg))
+        auc_avg = np.array(aucs).mean()
+        print('Test Accuracy:{}, Test Precision:{}, Test Recall:{}, Test F1 score:{}, Test AUC:{}'.
+              format(acc_avg, precision_avg, recall_avg, f1score_avg, auc_avg))
 
         test_accuracy.append(acc_avg)
         test_precision.append(precision_avg)
         test_recall.append(recall_avg)
         test_f1score.append(f1score_avg)
+        test_auc.append(auc_avg)
     acc_mean, h = mean_confidence_interval(np.array(test_accuracy))
     pre_mean, h_p = mean_confidence_interval(np.array(test_precision))
     recall_mean, h_r = mean_confidence_interval(np.array(test_recall))
     f1_mean, h_f1 = mean_confidence_interval(np.array(test_f1score))
+    auc_mean, h_au = mean_confidence_interval(np.array(test_auc))
     print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}"
-          "\n average f1score :{}, h:{}\n".format(acc_mean, h, pre_mean, h_p, recall_mean, h_r, f1_mean, h_f1))
+          "\n average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(acc_mean, h, pre_mean, h_p, recall_mean, h_r,
+                                                                          f1_mean, h_f1, auc_mean, h_au))
 
 
 if __name__ == '__main__':

@@ -165,12 +165,14 @@ def run():
     total_precision = []
     total_recall = []
     total_f1_score = []
+    total_auc = []
     for i in range(10):
         correct = 0
         accuracies = []
         precisions = []
         recalls = []
         f1scores = []
+        aucs = []
         with torch.no_grad():
             for (data, labels) in val_loader:
                 data = data.cuda(GPU)
@@ -183,25 +185,30 @@ def run():
                 precisions.append(cal.get_precision())
                 recalls.append(cal.get_recall())
                 f1scores.append(cal.get_f1score())
+                aucs.append(cal.get_auc())
         acc_avg = np.array(accuracies).mean()
         precisions_avg = np.array(precisions).mean()
         recall_avg = np.array(recalls).mean()
         f1score_avg = np.array(f1scores).mean()
+        auc_avg = np.array(aucs).mean()
+
 
         total_accuracy.append(acc_avg)
         total_precision.append(precisions_avg)
         total_recall.append(recall_avg)
         total_f1_score.append(f1score_avg)
+        total_auc.append(auc_avg)
 
-        print('Test Accuracy:{:.5f}, Test Precision:{:.5f}, Test Recall:{:.5f}, Test F1 score:{:.5f}'.
-              format(acc_avg, precisions_avg, recall_avg, f1score_avg))
+        print('Test Accuracy:{:.5f}, Test Precision:{:.5f}, Test Recall:{:.5f}, Test F1 score:{:.5f}, Test AUC:{:.5f}'.
+              format(acc_avg, precisions_avg, recall_avg, f1score_avg, auc_avg))
     average_accuracy, h_a = mean_confidence_interval(total_accuracy)
     average_precision, h_p = mean_confidence_interval(np.array(total_precision))
     average_recall, h_r = mean_confidence_interval(np.array(total_recall))
     average_f1score, h_f = mean_confidence_interval(np.array(total_f1_score))
+    average_auc, h_au = mean_confidence_interval(total_auc)
     print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n "
-          "average f1score :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p, average_recall, h_r,
-                                               average_f1score, h_f))
+          "average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p, average_recall, h_r,
+                                               average_f1score, h_f, average_auc, h_au))
     end_time = time.time()
     run_time = end_time - start_time
     print("Running Time {:.4f}".format(run_time))

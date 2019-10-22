@@ -331,7 +331,8 @@ def maml_framwork():
                         x_spt_vae, y_spt, x_qry_vae, y_qry = x_spt_vae.squeeze(0).to(device), y_spt.squeeze(0).to(
                             device), x_qry_vae.squeeze(0).to(device), y_qry.squeeze(0).to(device)
 
-                        acc, _, _, _, loss_test = maml.finetunning(x_spt_vae, y_spt, x_qry_vae, y_qry)
+                        result, loss_test = maml.finetunning(x_spt_vae, y_spt, x_qry_vae, y_qry)
+                        acc = result['accuracy']
 
                         loss_all_test.append(loss_test.item())
                         accs_all_test.append(acc)

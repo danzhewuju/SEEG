@@ -94,7 +94,8 @@ def main():
                     x_spt, y_spt, x_qry, y_qry = x_spt.squeeze(0).to(device), y_spt.squeeze(0).to(device), \
                                                  x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
 
-                    accs, _, _, _, loss_test = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
+                    result, loss_test = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
+                    accs = result['accuracy']
 
                     loss_all_test.append(loss_test)
                     accs_all_test.append(accs)

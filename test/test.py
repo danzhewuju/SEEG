@@ -324,7 +324,7 @@ def test_24():
 
     b = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]
     cal = IndicatorCalculation(b, a)
-    print(cal.get_accuracy(), cal.get_precision(), cal.get_recall(), cal.get_f1score())
+    print(cal.get_accuracy(), cal.get_precision(), cal.get_recall(), cal.get_f1score(), cal.calculate_auc())
 
 
 def recall(p, r):
@@ -333,9 +333,14 @@ def recall(p, r):
 
 
 if __name__ == '__main__':
+    a = {"yuhao": 116}
+    data = json.dumps(a)
+    p = json.loads(data)
+    print(p['yuhao'])
+    # b = data['yuhao']
+    # print(b)
     # recall(0.77909, 0.78750)
     # test_24()
     # a = []
     # if a is None:
     #     print("T")
-

@@ -181,6 +181,7 @@ def main():
     total_precision = []
     total_recall = []
     total_f1_score = []
+    total_auc = []
     cal = IndicatorCalculation()
     for episode in range(EPISODE):
 
@@ -191,6 +192,7 @@ def main():
         precisions = []
         recalls = []
         f1scores = []
+        aucs = []
         for i in range(TEST_EPISODE):
             total_rewards = 0
             task = tg.SeegnetTask(metatest_folders, CLASS_NUM, SAMPLE_NUM_PER_CLASS, 15)
@@ -235,32 +237,37 @@ def main():
                 precision = cal.get_precision()
                 recall = cal.get_recall()
                 f1_score = cal.get_f1score()
+                auc = cal.get_auc()
                 accuracies.append(acc)
                 precisions.append(precision)
                 recalls.append(recall)
                 f1scores.append(f1_score)
+                aucs.append(auc)
 
-        test_accuracy, h = mean_confidence_interval(np.array(accuracies))
-        test_precision, h = mean_confidence_interval(np.array(precisions))
-        test_recall, h = mean_confidence_interval(np.array(recalls))
-        test_f1score, h = mean_confidence_interval(np.array(f1scores))
-        print('Test Accuracy:{:.5f}, Test Precision:{:.5f}, Test Recall:{:.5f}, Test F1 score:{:.5f}'.
-              format(test_accuracy, test_precision, test_recall, test_f1score))
+        test_accuracy = np.array(accuracies).mean()
+        test_precision = np.array(precisions).mean()
+        test_recall = np.array(recalls).mean()
+        test_f1score = np.array(f1scores).mean()
+        test_auc = np.array(aucs).mean()
+        print('Test Accuracy:{:.5f}, Test Precision:{:.5f}, Test Recall:{:.5f}, Test F1 score:{:.5f},  Test AUC:{:.5f}'.
+              format(test_accuracy, test_precision, test_recall, test_f1score, test_auc))
 
-        print("test accuracy:", test_accuracy, "h:", h)
+        print("test accuracy:", test_accuracy)
 
         total_accuracy.append(test_accuracy)
         total_precision.append(test_precision)
         total_recall.append(test_recall)
         total_f1_score.append(test_f1score)
+        total_auc.append(test_auc)
     average_accuracy, h_a = mean_confidence_interval(total_accuracy)
     average_precision, h_p = mean_confidence_interval(np.array(total_precision))
     average_recall, h_r = mean_confidence_interval(np.array(total_recall))
     average_f1score, h_f = mean_confidence_interval(np.array(total_f1_score))
-
+    average_auc, h_au = mean_confidence_interval(total_auc)
     print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n "
-          "average f1score :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p, average_recall, h_r,
-                                               average_f1score, h_f))
+          "average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p,
+                                                                       average_recall, h_r,
+                                                                       average_f1score, h_f, average_auc, h_au))
 
 
 if __name__ == '__main__':

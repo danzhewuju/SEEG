@@ -148,6 +148,7 @@ class Meta(nn.Module):
         precisions = [0 for _ in range(self.update_step_test + 1)]  # precision
         recalls = [0 for _ in range(self.update_step_test + 1)]  # recalls
         f1scores = [0 for _ in range(self.update_step_test + 1)]  # F_1 score
+        auc = [0 for _ in range(self.update_step_test + 1)]
         cal = IndicatorCalculation()
 
         # in order to not ruin the state of running_mean/variance and bn_weight/bias
@@ -174,6 +175,7 @@ class Meta(nn.Module):
             precisions[0] += cal.get_precision()
             recalls[0] += cal.get_recall()
             f1scores[0] += cal.get_f1score()
+            auc[0] = cal.get_auc()
 
         # this is the loss and accuracy after the first update
         with torch.no_grad():
@@ -185,10 +187,11 @@ class Meta(nn.Module):
             cal.set_values(pred_q, y_qry)
 
             # correct = torch.eq(pred_q, y_qry).sum().item()
-            corrects[1] += cal.get_accuracy()  # 指标构建
-            precisions[1] += cal.get_precision()
-            recalls[1] += cal.get_recall()
-            f1scores[1] += cal.get_f1score()
+            corrects[1] = cal.get_accuracy()  # 指标构建
+            precisions[1] = cal.get_precision()
+            recalls[1] = cal.get_recall()
+            f1scores[1] = cal.get_f1score()
+            auc[1] = cal.get_auc()
         loss_all = 0
         for k in range(1, self.update_step_test):
             # 1. run the i-th task and compute loss for k=1~K-1
@@ -212,6 +215,7 @@ class Meta(nn.Module):
                 precisions[k + 1] = cal.get_precision()
                 recalls[k + 1] = cal.get_recall()
                 f1scores[k + 1] = cal.get_f1score()
+                auc[k+1] = cal.get_auc()
 
         del net
         loss_all /= self.update_step_test - 1
@@ -219,8 +223,15 @@ class Meta(nn.Module):
         # accs = np.array(corrects) / querysz
 
         index = corrects.index(max(corrects))  # 选取准确率最高的那个结果
+        result = {"accuracy": corrects[index],
+                  "precision": precisions[index],
+                  "recall": recalls[index],
+                  "f1score": recalls[index],
+                  "auc": auc[index],
+                  }
+        # accs = np.array(corrects) / querysz
 
-        return corrects[index], precisions[index], recalls[index], f1scores[index], loss_all
+        return result, loss_all
 
 
 def main():

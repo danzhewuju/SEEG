@@ -246,6 +246,7 @@ class Meta(nn.Module):
         precisions = [0 for _ in range(self.update_step_test + 1)]  # precision
         recalls = [0 for _ in range(self.update_step_test + 1)]  # recalls
         f1scores = [0 for _ in range(self.update_step_test + 1)]  # F_1 score
+        auc = [0 for _ in range(self.update_step_test + 1)]
         cal = IndicatorCalculation()
 
         # in order to not ruin the state of running_mean/variance and bn_weight/bias
@@ -272,6 +273,7 @@ class Meta(nn.Module):
             precisions[0] = cal.get_precision()
             recalls[0] = cal.get_recall()
             f1scores[0] = cal.get_f1score()
+            auc[0] = cal.get_auc()
 
         # this is the loss and accuracy after the first update
         with torch.no_grad():
@@ -286,6 +288,7 @@ class Meta(nn.Module):
             precisions[1] = cal.get_precision()
             recalls[1] = cal.get_recall()
             f1scores[1] = cal.get_f1score()
+            auc[1] = cal.get_auc()
 
         loss_all = 0
         for k in range(1, self.update_step_test):
@@ -310,14 +313,21 @@ class Meta(nn.Module):
                 precisions[k + 1] = cal.get_precision()
                 recalls[k + 1] = cal.get_recall()
                 f1scores[k + 1] = cal.get_f1score()
+                auc[k + 1] = cal.get_auc()
 
         del net
+        index = corrects.index(max(corrects))  # 选取准确率最高的那个结果
+
         loss_all /= self.update_step_test - 1
-
+        result = {"accuracy": corrects[index],
+                  "precision": precisions[index],
+                  "recall": recalls[index],
+                  "f1score": recalls[index],
+                  "auc": auc[index],
+                  }
         # accs = np.array(corrects) / querysz
-        index = corrects.index(max(corrects)) # 选取准确率最高的那个结果
 
-        return corrects[index], precisions[index], recalls[index], f1scores[index], loss_all
+        return result, loss_all
 
 
 def main():
