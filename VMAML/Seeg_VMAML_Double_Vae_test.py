@@ -72,8 +72,8 @@ maml = Meta(args, config).to(device)
 # 构建两个编码器
 vae_p = VAE().to(device)
 vae_n = VAE().to(device)
-model_vae_p_path = "./models/Vae_negative.pkl"
-model_vae_n_path = "./model/Vae_positive.pkl"
+model_vae_p_path = "./models/Vae_negative_{}.pkl".format(patient_test)
+model_vae_n_path = "./model/Vae_positive_{}.pkl".format(patient_test)
 if os.path.exists(model_vae_n_path) and os.path.exists(model_vae_p_path):
     vae_p.load_state_dict(torch.load(model_vae_p_path))
     vae_n.load_state_dict(torch.load(model_vae_n_path))
