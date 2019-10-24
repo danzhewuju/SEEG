@@ -8,10 +8,12 @@
 """
 import pandas as pd
 import os
-
+import json
+config = json.load(open("./json_path/config.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
 
 def cal_acc_visualization():
-    path = "./log/heatmap.csv"
+    path = "./log/{}/heatmap.csv".format(patient_test)
     if os.path.exists(path) is False:
         print("{} file is not existed!".format(path))
         exit(0)

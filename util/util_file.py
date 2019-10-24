@@ -296,6 +296,14 @@ class IndicatorCalculation():  # 包含二分类中各种指标
         return auc_score
 
 
+def dir_create_check(path_dir):
+    if os.path.exists(path_dir) is False:
+        os.mkdir(path_dir)
+        print("{} has been created!".format(path_dir))
+    else:
+        print("{} has existed!".format(path_dir))
+
+
 if __name__ == '__main__':
     for i in range(10):
         a = np.random.randint(0, 10, (3, 3))

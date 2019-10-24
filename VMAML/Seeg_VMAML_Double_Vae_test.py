@@ -153,7 +153,9 @@ def main():
     np.random.seed(222)
 
     print(args)
-    path = str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot_{}.pkl".format(patient_test))
+    path = str(
+        "./models/{}/maml".format(patient_test) + str(args.n_way) + "way_" + str(args.k_spt) + "shot_{}.pkl".format(
+            patient_test))
 
     if os.path.exists(path):
 

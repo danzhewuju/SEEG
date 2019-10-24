@@ -19,7 +19,7 @@ sys.path.append('../')
 
 from MAML.Mamlnet import *
 from VMAML.vmeta import *
-from util.util_file import matrix_normalization
+from util.util_file import matrix_normalization, dir_create_check
 import matplotlib.pyplot as plt
 import time
 from tqdm import tqdm
@@ -352,16 +352,17 @@ def maml_framwork():
 
                 test_accuracy = np.array(accs_all_test).mean()
                 print('Test acc:', test_accuracy)
+                dir_create_check("./models/{}".format(patient_test))
                 if test_accuracy >= last_accuracy:
                     # save networks
                     torch.save(maml.state_dict(), str(
-                        "./models/maml" + str(args.n_way) + "way_" + str(
+                        "./models/{}/maml".format(patient_test) + str(args.n_way) + "way_" + str(
                             args.k_spt) + "shot_{}.pkl".format(patient_test)))
                     last_accuracy = test_accuracy
 
-                    torch.save(vae_p.state_dict(), "./models/Vae_positive_{}.pkl".format(patient_test))
+                    torch.save(vae_p.state_dict(), "./models/{}/Vae_positive_{}.pkl".format(patient_test, patient_test))
                     print("VAE positive model saved successfully!")
-                    torch.save(vae_n.state_dict(), "./models/Vae_negative_{}.pkl".format(patient_test))
+                    torch.save(vae_n.state_dict(), "./models/{}/Vae_negative_{}.pkl".format(patient_test, patient_test))
                     print("VAE negative model saved successfully!")
                     print("{} and {} models have been saved!!!".format("maml", "vae"))
     plt.figure()

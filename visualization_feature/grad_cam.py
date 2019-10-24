@@ -16,10 +16,9 @@ from VMAML.vmeta import Meta
 from util import matrix_normalization_recorder
 
 from util.util_file import matrix_normalization, trans_numpy_cv2, get_matrix_max_location
+
 config = json.load(open("./json_path/config.json", 'r'))  # 需要指定训练所使用的数据
 patient_test = config['patient_test']
-print("patient_test is {}".format(patient_test))
-
 
 flag_model = "MAML"  # 切换内核，有两种模式：CNN, VMAML
 print("using model:{}".format(flag_model))
@@ -213,11 +212,11 @@ class GradCam:
         index_p = np.argmax(output.cpu().data.numpy())
         if os.path.exists('./log/') is not True:
             os.mkdir('./log/')
-        if os.path.exists("./log/{}_heatmap.csv".format(patient_test)) is not True:
-            f = open("./log/heatmap.csv", 'w')
+        if os.path.exists("./log/{}/heatmap.csv".format(patient_test)) is not True:
+            f = open("./log/{}/heatmap.csv".format(patient_test), 'w')
             f.writelines("ground truth,prediction\n")
         else:
-            f = open("./log/()_heatmap.csv".format(patient_test), 'a')
+            f = open("./log/{}/heatmap.csv".format(patient_test), 'a')
 
         str = "{},{}\n".format(index, index_p)
         f.writelines(str)
@@ -417,7 +416,7 @@ def get_feature_map(path_data, location_name):
     else:
         recorder_old_channel_index = channel_number  # 如果尺寸保持一致就不在变化
 
-    location_full_path = os.path.join("./log", location_name)
+    location_full_path = os.path.join("./log", location_name)  # 生成完整的路径
     if os.path.exists(location_full_path):
         fp = open(location_full_path, 'a')
     else:
@@ -437,7 +436,7 @@ def get_feature_map(path_data, location_name):
     # else:
 
     name = path_data.split("/")[-1][:-4] + channel_location + ".jpg"
-    save_path = os.path.join("./heatmap", name)
+    save_path = os.path.join("./log/{}/heatmap".format(patient_test), name)
     show_cam_on_image(img, mask, save_path)  # 将热力图写回到原来的图片
 
 
@@ -490,12 +489,12 @@ def get_feature_map_dynamic(data, name, key_flag=True):
         else:
             # 不在保存相关的信道信息，仅仅只对照片进行保留
 
-            save_path = os.path.join("./heatmap", name)
+            save_path = os.path.join("./log/{}/heatmap".format(patient_test), name)
             show_cam_on_image(img, mask, save_path)  # 将热力图写回到原来的图片
             return -1  # 返回安全吗
     else:
         # 不在保存相关的信道信息，仅仅只对照片进行保留
 
-        save_path = os.path.join("./heatmap", name)
+        save_path = os.path.join("./log/{}/heatmap".format(patient_test), name)
         show_cam_on_image(img, mask, save_path)  # 将热力图写回到原来的图片
         return -1  # 返回安全吗

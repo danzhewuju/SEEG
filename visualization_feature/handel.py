@@ -18,6 +18,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import os
 from grad_cam import *
+from util.util_file import dir_create_check
 
 config = json.load(open("./json_path/config.json", 'r'))  # 需要指定训练所使用的数据
 patient_test = config['patient_test']
@@ -104,9 +105,9 @@ def create_raw_data_signal_by_similarity(image_dir="./heatmap"):
 
 
 def create_raw_data_signal_by_time(image_dir="./heatmap"):
-    # p_name = "ZK"
+    # patient_test = "ZK"
 
-    raw_path_list = get_first_dir_path("./raw_data_time_sequentially/preseizure/" + p_name, "npy")
+    raw_path_list = get_first_dir_path("./raw_data_time_sequentially/preseizure/" + patient_test, "npy")
     raw_data_name = [re.findall("/.+/(.+)", p)[0] for p in raw_path_list]
     dict_name_path = dict(zip(raw_data_name, raw_path_list))
 
@@ -178,15 +179,16 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/ZK"):
     :return:
     构造时间序列的热力图
     '''
-    clean_dir("./log/")
-    # p_name = "ZK"
-    path = "./raw_data_time_sequentially/preseizure/" + p_name
-    file_name = p_name + "_SZ1_pre_seizure_raw"  # 指定了这个文件来让医生进行验证
+    clean_dir("./log/{}/".format(patient_test))
+    # patient_test = "ZK"
+    path = "./raw_data_time_sequentially/preseizure/" + patient_test
+    file_name = "{}/{}_SZ1_pre_seizure_raw".format(patient_test, patient_test)  # 指定了这个文件来让医生进行验证
     file_name = file_name + ".txt"
-    heat_map_dir = "./heatmap"
+    heat_map_dir = "./log/{}/heatmap".format(patient_test)
     path_data = get_first_dir_path(path, 'npy')
     path_data.sort()  # 根据uuid 按照时间序列进行排序
     count = 300  # 拼接的时间
+    dir_create_check(heat_map_dir)
     clean_dir(heat_map_dir)  # 清除文件夹里面所有文件
     for p in path_data:
         get_feature_map(p, file_name)
@@ -196,6 +198,7 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/ZK"):
     size = test_1.size
     plt.figure(figsize=(2 * count, 3))
     result = Image.new(test_1.mode, (size[0] * count, size[1]))
+
     prediction = pd.read_csv("./log/{}/heatmap.csv".format(patient_test), sep=',')
     for i in range(count):
         if prediction.loc[i]["ground truth"] != prediction.loc[i]["prediction"]:
@@ -203,22 +206,24 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/ZK"):
         else:
             img = Image.open(heat_map_path[i])
         result.paste(img, box=(i * size[0], 0))
-    result.save("./60s.png")
+    result.save("./log/{}/heatmap{}.png".format(patient_test, count * 2))
     plt.imshow(result)
     plt.show()
 
 
 def image_contact_process_by_similarity():  # 流程处理函数
-    path_a = "./heatmap"
-    path_b = "./raw_data_signal"
+    path_a = "./log/{}/heatmap".format(patient_test)
+    path_b = "./log/{}/raw_data_signal".format(patient_test)
 
     create_raw_data_signal_by_similarity()  # 生成原始信号中梯队最高的信道的信号图像
     image_connection(path_a, path_b)
 
 
 def image_contact_process_by_time():
-    path_a = "./heatmap"
-    path_b = "./raw_data_signal"
+    path_a = "./log/{}/heatmap".format(patient_test)
+    path_b = "./log/{}/raw_data_signal".format(patient_test)
+    dir_create_check(path_a)
+    dir_create_check(path_b)
 
     create_raw_data_signal_by_time()  # 生成原始信号中梯队最高的信道的信号图像
     image_connection(path_a, path_b)
@@ -230,16 +235,16 @@ def raw_data_slice():
     :return:
     '''
     # 1.癫痫发作前的原始数据的重写
-    clean_dir("./raw_data_time_sequentially")  # 删除文件夹下面已有的旧的文件
-    # p_name = "ZK"
+    clean_dir("./raw_data_time_sequentially/preseizure/{}".format(patient_test))  # 删除文件夹下面已有的旧的文件
+    # patient_test = "ZK"
     config = "./json_path/config.json"
     config_json = json.load(open(config))
-    path_commom_channel = config_json["handel.dynamic_detection__path_channel_list_" + p_name]
-    path_dir = config_json["person_raw_data_" + p_name]
+    path_commom_channel = config_json["handel.dynamic_detection__path_channel_list_" + patient_test]
+    path_dir = config_json["person_raw_data_" + patient_test]
     flag = 0
     print("processing data from {}".format(path_dir))
     path_raw = path_dir
-    name = p_name
+    name = patient_test
     generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
     print("癫痫发作前的睡眠处理完成！！！")
 
@@ -256,14 +261,14 @@ def raw_data_slice():
 
 def sequentially_signal(config="./json_path/config.json"):  # 时间序列的热点分析
     config_json = json.load(open(config))
-    # p_name = "ZK"
-    path = config_json['handel.sequentially__path_' + p_name].format(patient_test)
+    # patient_test = "ZK"
+    path = config_json['handel.sequentially__path_' + patient_test].format(patient_test)
 
-    channel_list_path = config_json['handel.sequentially__path_channel_list_' + p_name]
+    channel_list_path = config_json['handel.sequentially__path_channel_list_' + patient_test]
     channel_pandas = pd.read_csv(channel_list_path)
     channel_list = channel_pandas['chan_name']  # 获得与信道对应的index-channel的列表
 
-    start_time = config_json['handel.sequentially__start_time_' + p_name]
+    start_time = config_json['handel.sequentially__start_time_' + patient_test]
     start_time_list = [int(x) for x in start_time.split(":")]
 
     save_signal_info = config_json['handel.sequentially__save_dir']
@@ -313,8 +318,8 @@ def dynamic_detection():
     clean_dir("./heatmap")  # 清空heatmap 文件夹下面所有文件
 
     config_info = json.load(open("./json_path/config.json"))  # 读取配置文件信息
-    raw_data_path = config_info['person_raw_data_' + p_name]
-    channel_info_path = config_info['handel.dynamic_detection__path_channel_list_' + p_name]  # 信道的排序信息表
+    raw_data_path = config_info['person_raw_data_' + patient_test]
+    channel_info_path = config_info['handel.dynamic_detection__path_channel_list_' + patient_test]  # 信道的排序信息表
     channel_names = pd.read_csv(channel_info_path, sep=',')
     channel_list = channel_names['chan_name'].tolist()
     raw_data = read_raw(raw_data_path)
@@ -354,8 +359,9 @@ def dynamic_detection():
 
 
 if __name__ == '__main__':
-    p_name = patient_test
     print("patient_test is {}".format(patient_test))
+    path_dir = "./log/{}".format(patient_test)
+    dir_create_check(path_dir)
 
     # TODO: list
     # 1.0 需要运行 feature_hotmap.py 文件, 保证文件夹heatmao, raw_data_signal 里面存在照片
@@ -363,16 +369,16 @@ if __name__ == '__main__':
     # image_contact_process_by_similarity()
 
     # 2.1 生成未滤波数据的切片, 可以设置是否选择滤波处理
-    raw_data_slice()
+    # raw_data_slice()
 
     # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接,拼接我60s
     time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
-    sequentially_signal()
+    # sequentially_signal()
 
     # 2.3 将按照时间的片段信号和热力图进行结合
-    image_contact_process_by_time()
+    # image_contact_process_by_time()
 
     # 3.1 从整体的文件进行热力分析， 以及热力图分割，读取完整的文件，防止热力图被分割
     # dynamic_detection()
