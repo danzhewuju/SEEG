@@ -19,6 +19,9 @@ import matplotlib.pyplot as plt
 import os
 from grad_cam import *
 
+config = json.load(open("./json_path/config.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
+
 
 def get_hotmap_dic(path_hotmap, path_b_raw_data):
     path_all_a = get_first_dir_path(path_hotmap)
@@ -193,7 +196,7 @@ def time_heat_map(path="./raw_data_time_sequentially/preseizure/ZK"):
     size = test_1.size
     plt.figure(figsize=(2 * count, 3))
     result = Image.new(test_1.mode, (size[0] * count, size[1]))
-    prediction = pd.read_csv("./log/heatmap.csv", sep=',')
+    prediction = pd.read_csv("./log/{}/heatmap.csv".format(patient_test), sep=',')
     for i in range(count):
         if prediction.loc[i]["ground truth"] != prediction.loc[i]["prediction"]:
             img = Image.new('RGBA', (int(200), int(130)), color=(100, 100, 100, 255))
@@ -254,7 +257,7 @@ def raw_data_slice():
 def sequentially_signal(config="./json_path/config.json"):  # 时间序列的热点分析
     config_json = json.load(open(config))
     # p_name = "ZK"
-    path = config_json['handel.sequentially__path_' + p_name]
+    path = config_json['handel.sequentially__path_' + p_name].format(patient_test)
 
     channel_list_path = config_json['handel.sequentially__path_channel_list_' + p_name]
     channel_pandas = pd.read_csv(channel_list_path)
@@ -351,7 +354,9 @@ def dynamic_detection():
 
 
 if __name__ == '__main__':
-    p_name = "WSH"
+    p_name = patient_test
+    print("patient_test is {}".format(patient_test))
+
     # TODO: list
     # 1.0 需要运行 feature_hotmap.py 文件, 保证文件夹heatmao, raw_data_signal 里面存在照片
     # 1. 将两个原信号连接在一起,一个是热力信号，一个是原始的波形信号

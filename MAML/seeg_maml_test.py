@@ -60,8 +60,8 @@ def main():
     device = torch.device('cuda')
     maml = Meta(args, config).to(device)
     if os.path.exists(
-            str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")):
-        path = str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot.pkl")
+            str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot_{}.pkl".format(patient_test))):
+        path = str("./models/maml" + str(args.n_way) + "way_" + str(args.k_spt) + "shot_{}.pkl".format(patient_test))
         maml.load_state_dict(torch.load(path))
         print("load model :{} successfully".format(path))
     else:

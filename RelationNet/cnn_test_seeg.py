@@ -32,7 +32,7 @@ parser.add_argument('-s', '--sample', default=100)  # 对其进行重采样
 parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/{}/train'.format(patient_test))
 parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/test'.format(patient_test))
 parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
-parser.add_argument('-m_p', '--model_path', default='./models/cnn_model/model-cnn.ckpt')
+parser.add_argument('-m_p', '--model_path', default='./models/cnn_model/model-cnn_{}.ckpt')
 parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
 parser.add_argument('-b', '--batch_size', type=int, default=16)
@@ -45,7 +45,7 @@ args = parser.parse_args()
 TEST_PATH = args.test_path
 TRAIN_PATH = args.train_path
 VAL_PATH = args.val_path  # 验证数据的文件夹
-MODLE_PATH = args.model_path
+MODLE_PATH = args.model_path.format(patient_test)
 GPU = args.GPU  # 使用哪个GPU
 NUM_CLASS = args.class_number  # 分类的个数
 BATCH_SIZE = args.batch_size
@@ -197,7 +197,6 @@ def run():
         f1score_avg = np.array(f1scores).mean()
         auc_avg = np.array(aucs).mean()
 
-
         total_accuracy.append(acc_avg)
         total_precision.append(precisions_avg)
         total_recall.append(recall_avg)
@@ -212,8 +211,9 @@ def run():
     average_f1score, h_f = mean_confidence_interval(np.array(total_f1_score))
     average_auc, h_au = mean_confidence_interval(total_auc)
     print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n "
-          "average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p, average_recall, h_r,
-                                               average_f1score, h_f, average_auc, h_au))
+          "average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p,
+                                                                       average_recall, h_r,
+                                                                       average_f1score, h_f, average_auc, h_au))
     end_time = time.time()
     run_time = end_time - start_time
     print("Running Time {:.4f}".format(run_time))

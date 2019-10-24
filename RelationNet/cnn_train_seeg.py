@@ -15,6 +15,10 @@ import json
 config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
 patient_test = config['patient_test']
 print("patient_test is {}".format(patient_test))
+
+config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
+print("patient_test is {}".format(patient_test))
 from VAE.vae import trans_data, VAE
 
 '''
@@ -32,7 +36,7 @@ parser.add_argument('-s', '--sample', default=100)  # 对其进行重采样
 parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/{}/train'.format(patient_test))
 parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/test'.format(patient_test))
 parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
-parser.add_argument('--model_path', default="./models/cnn_model/model-cnn.ckpt")
+parser.add_argument('--model_path', default="./models/cnn_model/model-cnn_{}.ckpt")
 parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
 parser.add_argument('-b', '--batch_size', type=int, default=32)
@@ -50,7 +54,7 @@ NUM_CLASS = args.class_number  # 分类的个数
 BATCH_SIZE = args.batch_size
 LEARNING_RATE = args.learning_rate
 NUM_EPOCH = args.epoch
-MODEL_PATH = args.model_path
+MODEL_PATH = args.model_path.format(patient_test)
 # input = 130*200
 x_ = 8
 y_ = 12

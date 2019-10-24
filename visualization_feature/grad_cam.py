@@ -16,6 +16,10 @@ from VMAML.vmeta import Meta
 from util import matrix_normalization_recorder
 
 from util.util_file import matrix_normalization, trans_numpy_cv2, get_matrix_max_location
+config = json.load(open("./json_path/config.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
+print("patient_test is {}".format(patient_test))
+
 
 flag_model = "MAML"  # 切换内核，有两种模式：CNN, VMAML
 print("using model:{}".format(flag_model))
@@ -209,11 +213,11 @@ class GradCam:
         index_p = np.argmax(output.cpu().data.numpy())
         if os.path.exists('./log/') is not True:
             os.mkdir('./log/')
-        if os.path.exists("./log/heatmap.csv") is not True:
+        if os.path.exists("./log/{}_heatmap.csv".format(patient_test)) is not True:
             f = open("./log/heatmap.csv", 'w')
             f.writelines("ground truth,prediction\n")
         else:
-            f = open("./log/heatmap.csv", 'a')
+            f = open("./log/()_heatmap.csv".format(patient_test), 'a')
 
         str = "{},{}\n".format(index, index_p)
         f.writelines(str)
@@ -359,10 +363,10 @@ def get_feature_map(path_data, location_name):
     device = torch.device('cuda')
     if flag_model == "CNN":
         model = CNN().cuda(device) if args.use_cuda else CNN()  # 模型架构的调整， 1.CNN, 2. MAML
-        model_path = config['grad_cam.get_feature_map__model_path_cnn']
+        model_path = config['grad_cam.get_feature_map__model_path_cnn'].format(patient_test)
     else:
         model = Meta(args, config_maml).cuda(device) if args.use_cuda else Meta(args, config_maml)
-        model_path = config['grad_cam.get_feature_map__model_path_maml']
+        model_path = config['grad_cam.get_feature_map__model_path_maml'].format(patient_test)
 
     model.load_state_dict(torch.load(model_path, map_location=lambda storage, loc: storage))
     print("load {} model success!".format(model_path))

@@ -116,7 +116,7 @@ def main():
                     # save networks
                     torch.save(maml.state_dict(), str(
                         "./models/maml" + str(args.n_way) + "way_" + str(
-                            args.k_spt) + "shot.pkl"))
+                            args.k_spt) + "shot_{}.pkl".format(patient_test)))
                     print("Model saved successfully!")
                     last_accuracy = test_accuracy
     plt.figure()
