@@ -46,7 +46,7 @@ def matrix_normalization(data, resize_shape=(130, 200)):
     return data
 
 
-class Seegnet(Dataset):
+class Seegnet(Dataset): # 任务集的构造
     """
     put mini-imagenet files as :
     root :

@@ -29,7 +29,7 @@ config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指�
 patient_test = config['patient_test']
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=4000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=3000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
@@ -215,8 +215,8 @@ def show_eeg(data):
 # 构造了两个VAE的编码器
 vae_p = VAE().to(device)
 vae_n = VAE().to(device)
-optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.001)
-optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.001)
+optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.005)
+optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.005)
 
 
 # 仅仅使用一个VAE的编码器
@@ -299,7 +299,7 @@ def maml_framwork():
 
     # flag_vae = True  # 设置梯度反向传播的标志位，vae
     # flag_maml = not flag_vae  # 设置梯度反向传播的薄志伟，maml
-    for epoch in range(1):
+    for epoch in range(2):
         # fetch meta_batchsz num of episode each time
         db = DataLoader(mini, args.task_num, shuffle=True, num_workers=1, pin_memory=True)
 
@@ -360,10 +360,10 @@ def maml_framwork():
                     last_accuracy = test_accuracy
 
                     torch.save(vae_p.state_dict(), "./models/Vae_positive_{}.pkl".format(patient_test))
-                    print("VAE positive model save successfully!")
+                    print("VAE positive model saved successfully!")
                     torch.save(vae_n.state_dict(), "./models/Vae_negative_{}.pkl".format(patient_test))
-                    print("VAE negative model save successfully!")
-                    print("{} and {} model have saved!!!".format("maml", "vae"))
+                    print("VAE negative model saved successfully!")
+                    print("{} and {} models have been saved!!!".format("maml", "vae"))
     plt.figure()
     plt.title("testing info")
     plt.xlabel("episode")
