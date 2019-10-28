@@ -79,7 +79,7 @@ def main():
     #                     batchsz=1000)
     mini_test = Seegnet(args.dataset_dir, mode='val', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
-                        batchsz=50)
+                        batchsz=500)
     test_accuracy = []
     test_precision = []
     test_recall = []
