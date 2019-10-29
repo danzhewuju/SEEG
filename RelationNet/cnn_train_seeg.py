@@ -41,7 +41,7 @@ parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
 parser.add_argument('-b', '--batch_size', type=int, default=32)
 parser.add_argument('-l', '--learning_rate', type=float, default=0.001)
-parser.add_argument('-e', '--epoch', type=int, default=10)
+parser.add_argument('-e', '--epoch', type=int, default=4)
 args = parser.parse_args()
 
 # hyper parameter setting
@@ -270,6 +270,8 @@ def run():
     print('Test Accuracy of the model on the {} test seegs: {} %'.format(datas.test_length,
                                                                          100 * correct / total))
     Acc = correct / total
+
+    dir_create_check("./models/cnn_model")
 
     # Save the model checkpoint
     timestamp = str(int(time.time()))

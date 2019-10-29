@@ -9,6 +9,7 @@ from util.util_file import *
 import re
 from functools import reduce
 from util.util_file import IndicatorCalculation
+import logging
 import torch
 from torch.nn import functional as F
 import json
@@ -332,15 +333,23 @@ def recall(p, r):
     print("recall:{}".format(f))
 
 
-if __name__ == '__main__':
-    a = {"yuhao": 116}
-    data = json.dumps(a)
-    p = json.loads(data)
-    print(p['yuhao'])
-    # b = data['yuhao']
-    # print(b)
-    # recall(0.77909, 0.78750)
-    # test_24()
-    # a = []
-    # if a is None:
-    #     print("T")
+def log(f):
+    def wrapper(*args, **kwargs):
+        logging.basicConfig(level=logging.INFO, filename='test.log', format="%(levelname)s:%(asctime)s:%(message)s")
+        print("This is log!")
+        return f(*args)
+
+    return wrapper
+
+
+@log
+def f():
+    print("yuhao!")
+
+
+@log
+def f1(name, tt, d):
+    print("Alex-{}-{}-{}".format(name, tt, d))
+
+
+f1("yuhao", "y", "h")
