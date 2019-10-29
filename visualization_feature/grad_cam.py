@@ -10,7 +10,7 @@ from torch.autograd import Variable
 import sys
 
 sys.path.append('../')
-from MAML.learner import *
+# from MAML.learner import
 import json
 from VMAML.vmeta import Meta
 from util import matrix_normalization_recorder

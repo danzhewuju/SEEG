@@ -179,7 +179,7 @@ def clean_dir(path):
     clean_path = os.path.join(path, "*")
     print("you will clean all files in {}, do you continued?(y/n)".format(clean_path))
     key = str(input())
-    if key == "y":
+    if key == "y" or key == "Y":
         print("cleaning the files in {}".format(clean_path))
         os.system("rm -r {}".format(clean_path))
         print("clean finished!")

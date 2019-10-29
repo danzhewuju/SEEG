@@ -11,17 +11,14 @@ import sys
 
 sys.path.append('../')
 from util import *
-from DataProcessing.transferdata import *
+from DataProcessing.transferdata import generate_data, resample
 import re
 from tqdm import tqdm
 from PIL import Image
 import matplotlib.pyplot as plt
 import os
-from grad_cam import *
+from grad_cam import patient_test, classification, get_feature_map, get_feature_map_dynamic
 from util.util_file import dir_create_check
-
-config = json.load(open("./json_path/config.json", 'r'))  # 需要指定训练所使用的数据
-patient_test = config['patient_test']
 
 
 def get_hotmap_dic(path_hotmap, path_b_raw_data):
@@ -214,8 +211,8 @@ def time_heat_map():
             img = Image.open(heat_map_path[i])
         result.paste(img, box=(i * size[0], 0))
     result.save("./log/{}/{}/heatmap{}.png".format(patient_test, classification, count * 2))
-    plt.imshow(result)
-    plt.show()
+    # plt.imshow(result)
+    # plt.show()
 
 
 def image_contact_process_by_similarity():  # 流程处理函数
@@ -236,7 +233,7 @@ def image_contact_process_by_time():
     image_connection(path_a, path_b)
 
 
-def raw_data_slice(classification="preseizure"):
+def raw_data_slice():
     '''
     1.医生需要原始的数据，需要未经过切片的原始数据，因此此时需要重写相关函数。不经过滤波,数据是没有按照时间顺序来排序
     :return:
@@ -363,10 +360,12 @@ def dynamic_detection():
 
 
 if __name__ == '__main__':
-    print("patient_test is {}".format(patient_test))
-    path_dir = "./log/{}".format(patient_test)
+    config = json.load(open("./json_path/config.json", 'r'))  # 需要指定训练所使用的数据
+    patient_test = config['patient_test']
+    classification = config['classification']
+    print("patient_test is : {}, classification is : {}".format(patient_test, classification))
+    path_dir = "./log/{}/{}".format(patient_test, classification)
     dir_create_check(path_dir)
-    classification = "sleep"
 
     # TODO: list
     # 1.0 需要运行 feature_hotmap.py 文件, 保证文件夹heatmao, raw_data_signal 里面存在照片
@@ -374,16 +373,16 @@ if __name__ == '__main__':
     # image_contact_process_by_similarity()
 
     # 2.1 生成未滤波数据的切片, 可以设置是否选择滤波处理
-    # raw_data_slice()
+    raw_data_slice()
 
     # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接,拼接我60s
-    # time_heat_map()
+    time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
-    # sequentially_signal()
+    sequentially_signal()
 
     # 2.3 将按照时间的片段信号和热力图进行结合
-    # image_contact_process_by_time()
+    image_contact_process_by_time()
 
     # 3.1 从整体的文件进行热力分析， 以及热力图分割，读取完整的文件，防止热力图被分割
-    dynamic_detection()
+    # dynamic_detection()
