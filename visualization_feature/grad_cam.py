@@ -19,6 +19,7 @@ from util.util_file import matrix_normalization, trans_numpy_cv2, get_matrix_max
 
 config = json.load(open("./json_path/config.json", 'r'))  # 需要指定训练所使用的数据
 patient_test = config['patient_test']
+classification = config['classification']
 
 flag_model = "MAML"  # 切换内核，有两种模式：CNN, VMAML
 print("using model:{}".format(flag_model))
@@ -212,11 +213,11 @@ class GradCam:
         index_p = np.argmax(output.cpu().data.numpy())
         if os.path.exists('./log/') is not True:
             os.mkdir('./log/')
-        if os.path.exists("./log/{}/heatmap.csv".format(patient_test)) is not True:
-            f = open("./log/{}/heatmap.csv".format(patient_test), 'w')
+        if os.path.exists("./log/{}/{}/heatmap.csv".format(patient_test, classification)) is not True:
+            f = open("./log/{}/{}/heatmap.csv".format(patient_test, classification), 'w')
             f.writelines("ground truth,prediction\n")
         else:
-            f = open("./log/{}/heatmap.csv".format(patient_test), 'a')
+            f = open("./log/{}/{}/heatmap.csv".format(patient_test, classification), 'a')
 
         str = "{},{}\n".format(index, index_p)
         f.writelines(str)
@@ -355,7 +356,7 @@ def get_feature_map(path_data, location_name):
     '''
     args = get_args()
     config = json.load(open('./json_path/config.json'))
-
+    classification = config["classification"]
     # Can work with any model, but it assumes that the model has a
     # feature method, and a classifier method,
     # as in the VGG models in torchvision.
@@ -392,7 +393,7 @@ def get_feature_map(path_data, location_name):
 
     # If None, returns the map for the highest scoring category.
     # Otherwise, targets the requested index.
-    target_index = 0  # 目标函数
+    target_index = 0 if classification == "preseizure" else 1  # 目标函数
 
     mask = grad_cam(input, target_index)
     location = get_matrix_max_location(mask, 5)  # 获得最大梯度的位置，包含时间位置和物理位置
@@ -436,7 +437,7 @@ def get_feature_map(path_data, location_name):
     # else:
 
     name = path_data.split("/")[-1][:-4] + channel_location + ".jpg"
-    save_path = os.path.join("./log/{}/heatmap".format(patient_test), name)
+    save_path = os.path.join("./log/{}/{}/heatmap".format(patient_test, classification), name)
     show_cam_on_image(img, mask, save_path)  # 将热力图写回到原来的图片
 
 

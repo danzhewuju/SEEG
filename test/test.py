@@ -342,14 +342,11 @@ def log(f):
     return wrapper
 
 
-@log
-def f():
-    print("yuhao!")
+def test_dir():
+    path = "./yuhao/ni/hao"
+    dir_create_check(path)
+    print(path)
 
 
-@log
-def f1(name, tt, d):
-    print("Alex-{}-{}-{}".format(name, tt, d))
-
-
-f1("yuhao", "y", "h")
+if __name__ == '__main__':
+    test_dir()
