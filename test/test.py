@@ -10,6 +10,7 @@ import re
 from functools import reduce
 from util.util_file import IndicatorCalculation
 import logging
+import mne
 import torch
 from torch.nn import functional as F
 import json
@@ -349,4 +350,6 @@ def test_dir():
 
 
 if __name__ == '__main__':
-    test_dir()
+    path = "/home/cbd109-3/Users/data/hmq/raw_data/huashan_data_normal_3/ZK_Sleep.edf"
+    data = mne.io.read_raw_edf(path, preload=False)
+    print(get_recorder_time(data))

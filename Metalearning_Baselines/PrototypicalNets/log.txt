@@ -1,0 +1,6 @@
+2019-11-04 15:29:01,012 - /home/cbd109-2/Users/data/yh/python/prototypical-network-pytorch-1/utils.py[line:241] - INFO:
+accuracy:0.65867,h:0.00364
+precision:0.67695,h:0.00477
+recall:0.65517,h:0.00804
+f1:0.64628,h:0.00509
+auc:0.65867,h:0.00364

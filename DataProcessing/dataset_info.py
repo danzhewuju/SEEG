@@ -122,7 +122,7 @@ def sampling_rewrite(result_dic, save_dir):
 
     :param result_dic:
     :param save_dir:
-    采样数据的重新写回，主要是将采样数据的邪乎操作
+    采样数据的重新写回，主要是将采样数据的写会操作
     :return:
     '''
     for name, path_f in result_dic:

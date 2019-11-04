@@ -10,6 +10,7 @@ import random
 import numpy as np
 from dataset_info import up_sampling, sampling_rewrite
 import sys
+
 sys.path.append("../")
 
 from RelationNet import *

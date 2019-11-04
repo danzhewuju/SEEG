@@ -373,10 +373,10 @@ if __name__ == '__main__':
     # image_contact_process_by_similarity()
 
     # 2.1 生成未滤波数据的切片, 可以设置是否选择滤波处理
-    raw_data_slice()
+    # raw_data_slice()
 
     # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接,拼接我60s
-    time_heat_map()
+    # time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
     sequentially_signal()
