@@ -10,7 +10,7 @@ MNE: pip install -U https://api.github.com/repos/mne-tools/mne-python/zipball/ma
 Python : pip install python 
 
 
-## content
+## Content
 
 **data**  There are some data about raw seeg data, processed data, and channels information.
 
@@ -29,6 +29,8 @@ Python : pip install python
 **Visualization**  SEEG heatmap calculation
 
 **Statistical files** Experimental result 
+
+**Metalearning_Baselines** other meta learning models
 
 
 

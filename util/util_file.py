@@ -10,6 +10,9 @@ import random
 import cv2
 import numpy as np
 from sklearn import metrics
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
 
 
 def sigmoid(x):
@@ -302,6 +305,42 @@ def dir_create_check(path_dir):
         print("{} has been created!".format(path_dir))
     else:
         print("{} has existed!".format(path_dir))
+
+
+class Pyemail:
+    def set_SMTP(self):
+        # 第三方 SMTP 服务
+        self.mail_host = "smtp.qq.com"  # 设置服务器
+        self.mail_user = "danyuhao@qq.com"  # 用户名
+        self.mail_pass = "guwoxifmcgribdfj"  # 口令
+
+    def set_sender(self, sender='danyuhao@qq.com'):
+        self.sender = sender
+
+    def set_receivers(self, *kwg):
+        receivers = [x for x in kwg]
+        self.receivers = receivers
+
+    def send_info(self):
+        try:
+            smtpObj = smtplib.SMTP()
+            smtpObj.connect(self.mail_host, 25)  # 25 为 SMTP 端口号
+            smtpObj.login(self.mail_user, self.mail_pass)
+            smtpObj.sendmail(self.sender, self.receivers, self.message.as_string())
+            print("邮件发送成功")
+        except smtplib.SMTPException:
+            print("Error: 无法发送邮件")
+
+    def __init__(self, tital, message_info):
+        self.set_SMTP()
+        self.set_sender()
+        self.set_receivers("danyuhao@qq.com")
+        self.message = MIMEText(message_info, 'plain', 'utf-8')
+        self.message['From'] = Header("Lab", 'utf-8')
+        self.message['To'] = Header("Alex", 'utf-8')
+        self.subject = tital
+        self.message['Subject'] = Header(self.subject, 'utf-8')
+        self.send_info()
 
 
 if __name__ == '__main__':

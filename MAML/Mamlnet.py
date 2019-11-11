@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 import sys
+
 sys.path.append('../')
 
 from util.util_file import get_label_data
@@ -46,7 +47,7 @@ def matrix_normalization(data, resize_shape=(130, 200)):
     return data
 
 
-class Seegnet(Dataset): # 任务集的构造
+class Seegnet(Dataset):  # 任务集的构造
     """
     put mini-imagenet files as :
     root :
@@ -101,25 +102,6 @@ class Seegnet(Dataset): # 任务集的构造
         :return: {label:[file1, file2 ...]}
         """
         dictLabels = {0: [], 1: []}
-        # with open(csvf) as csvfile:
-        #     csvreader = csvfile.reader(csvfile, delimiter=',')
-        #     next(csvreader, None)  # skip (filename, label)
-        #     for i, row in enumerate(csvreader):
-        #         filename = row[0]
-        #         label = row[1]
-        #         # append filename to current label
-        #         if label in dictLabels.keys():
-        #             dictLabels[label].append(filename)
-        #         else:
-        #             dictLabels[label] = [filename]
-
-        # data = pd.read_csv(csvf, sep=",")
-        # filenames = list(data['filename'])
-        # labels = list(data['label'])
-        # filename_label = dict(zip(filenames, labels))
-        # for i in range(len(labels)):
-        #     dictLabels[labels[i]].append(filenames[i])
-        # return dictLabels, filename_label
         data_labels = get_label_data(path)
         for path, label in data_labels.items():
             dictLabels[label].append(path)
