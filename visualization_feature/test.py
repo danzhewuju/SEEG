@@ -4,10 +4,13 @@ import sys
 sys.path.append("../")
 import json
 import os
+import re
 
-
-
-
-
-if __name__ == '__main__':
-    test_3()
+path = "./log/BDP/preseizure/"
+data_list = os.listdir(path)
+print(data_list)
+for p in data_list:
+    if "preseizure" in p:
+        print("True")
+    else:
+        print("false")

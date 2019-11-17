@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import os
 from grad_cam import patient_test, classification, get_feature_map, get_feature_map_dynamic
 from util.util_file import dir_create_check
+import pandas as pd
 
 
 def get_hotmap_dic(path_hotmap, path_b_raw_data):
@@ -359,10 +360,28 @@ def dynamic_detection():
         flag_tail += 2
 
 
+def feature_similarity():
+    path_dir = "./log/{}/{}".format(patient_test, classification)  # 所要读取特征的文件夹
+    data_dir = "./raw_data_time_sequentially/{}/{}".format(classification, patient_test)
+    raw_data_sequence = get_first_dir_path(data_dir, suffix='npy')  # 原始数据的序列
+    raw_data_sequence.sort()  # 按照时间序列来获得数据  # 数据
+    # 找到文件列表中记录了features
+    key_dict = {"preseizure": "pre_seizure", "sleep": "Sleep"}
+    _ = os.listdir(path_dir)
+    file_name = ""
+    for p in _:
+        if key_dict[classification] in p:
+            file_name = p
+            break
+    file_path = os.path.join(path_dir, file_name)
+    print("Finding file: {} ", file_name)
+    feature_data = pd.read_csv(file_path)  # 特征的相关信息， 特征信息
+
+
 if __name__ == '__main__':
     config = json.load(open("./json_path/config.json", 'r'))  # 需要指定训练所使用的数据
-    patient_test = config['patient_test']
-    classification = config['classification']
+    patient_test = config['patient_test']  # "BDP"
+    classification = config['classification']  # "sleep", "preseizure"
     print("patient_test is : {}, classification is : {}".format(patient_test, classification))
     path_dir = "./log/{}/{}".format(patient_test, classification)
     dir_create_check(path_dir)

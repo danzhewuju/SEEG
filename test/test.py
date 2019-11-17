@@ -365,5 +365,25 @@ def dtw_test():
     print(scores)
 
 
+def uuid_test():
+    n = 10
+    uuids = []
+    for i in range(10):
+        s = uuid.uuid1()
+        uuids.append(str(s))
+    u = uuids.copy()
+    print(u)
+    random.shuffle(uuids)
+    uu = uuids.copy()
+    print(uu)
+    uuids.sort()
+    print(uuids)
+    if u == uu:
+        print("True")
+    else:
+        print("False")
+
+
+
 if __name__ == '__main__':
-    dtw_test()
+    uuid_test()
