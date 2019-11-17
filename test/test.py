@@ -8,9 +8,12 @@ from RelationNet.Seegdata import *
 from util.util_file import *
 import re
 from functools import reduce
-from util.util_file import IndicatorCalculation
+from util.util_file import IndicatorCalculation, similarity_dtw
 import logging
+from tqdm import tqdm
 import mne
+from dtw import dtw
+
 import torch
 from torch.nn import functional as F
 import json
@@ -349,7 +352,18 @@ def test_dir():
     print(path)
 
 
+def dtw_test():
+    path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/visualization_feature/raw_data_time_sequentially/preseizure/BDP/27a4193a-f62c-11e9-a8f2-e0d55e6ff654-0.npy"
+    data = np.load(path)
+    scores = []
+    for p in tqdm(data[:20]):
+        score = 0
+        for m in data:
+            score += similarity_dtw(p, m)
+        score /= data.shape[0]
+        scores.append(score)
+    print(scores)
+
+
 if __name__ == '__main__':
-    path = "/home/cbd109-3/Users/data/hmq/raw_data/huashan_data_normal_3/ZK_Sleep.edf"
-    data = mne.io.read_raw_edf(path, preload=False)
-    print(get_recorder_time(data))
+    dtw_test()

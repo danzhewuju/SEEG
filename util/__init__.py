@@ -2,5 +2,4 @@
 
 
 from .seeg_utils import *
-from .draw import *
 from .util_file import *

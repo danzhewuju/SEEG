@@ -13,10 +13,16 @@ from sklearn import metrics
 import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
+from dtw import dtw
+import math
 
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
+
+
+def tanh(x):
+    return math.sinh(x) / math.cosh(x)
 
 
 def get_all_file_path(path, suffix='fif'):  # 主要是获取某文件夹下面所有的文件列表
@@ -341,6 +347,20 @@ class Pyemail:
         self.subject = tital
         self.message['Subject'] = Header(self.subject, 'utf-8')
         self.send_info()
+
+
+def similarity_dtw(s1, s2):
+    '''
+
+    :param s1:  序列1
+    :param s2:  序列2
+    :return:
+    '''
+    ratio = 10  # 设定的放缩系数，避免数据的相似度过于集中
+    euclidean_norm = lambda x, y: np.abs(ratio * (x - y))
+    d, cost_matrix, acc_cost_matrix, path = dtw(s1, s2, dist=euclidean_norm)
+    score = 1 - tanh(d)  # 相似度的评分【0,1】 0： 完全不同， 1： 完全相同
+    return score
 
 
 if __name__ == '__main__':
