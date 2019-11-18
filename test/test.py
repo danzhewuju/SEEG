@@ -11,6 +11,7 @@ from functools import reduce
 from util.util_file import IndicatorCalculation, similarity_dtw
 import logging
 from tqdm import tqdm
+from functools import partial
 import mne
 from dtw import dtw
 
@@ -384,6 +385,15 @@ def uuid_test():
         print("False")
 
 
+def a():
+    print("this is a ")
+
+
+def b():
+    print("this is b ")
+
 
 if __name__ == '__main__':
-    uuid_test()
+    menu = {1: partial(a), 2: partial(b)}
+    key = int(input())
+    menu[key]()

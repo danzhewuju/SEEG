@@ -1,6 +1,6 @@
 {
-  "patient_test": "ZK",
-  "classification": "sleep",
+  "patient_test": "BDP",
+  "classification": "preseizure",
   "handel.sequentially__save_dir": "./log/{}/{}/signal_info.txt",
   "grad_cam.get_feature_map__model_path_maml": "../VMAML/models/{0}/maml2way_5shot_{0}.pkl",
   "grad_cam.get_feature_map__model_path_cnn": "./models/model-cnn.ckpt",

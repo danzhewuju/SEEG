@@ -20,6 +20,7 @@ import os
 from grad_cam import patient_test, classification, get_feature_map, get_feature_map_dynamic
 from util.util_file import dir_create_check
 import pandas as pd
+from functools import partial
 
 
 def get_hotmap_dic(path_hotmap, path_b_raw_data):
@@ -386,17 +387,55 @@ def feature_similarity():
         location_start = int(spatial_location[i].split("-")[0])
         start_time = max(0, time_start - duration_time // 2)  # 选择特征的区域
         end_time = min(200, time_start + duration_time // 2)
-        feature_data.append(data[location_start][start_time:end_time])  # 存储特征对应的波形
+        if end_time - start_time == duration_time:
+            feature_data.append(data[location_start][start_time:end_time])  # 存储特征对应的波形
+    save_path = os.path.join(path_dir, "{}-feature.npy".format(patient_test))
+    feature_data = np.asarray(feature_data)
+    save_numpy_info(feature_data, save_path)
 
 
-if __name__ == '__main__':
+def menu():
+    def display():
+        star = lambda x: "*" * x
+        print(star(30))
+        print(star(5), end="")
+        print("0. 程序退出", end="")
+        print(star(5))
+        print(star(5), end="")
+        print("1. 数据切片的生成", end="")
+        print(star(5))
+        print(star(5), end="")
+        print("2. 拼接热力图", end="")
+        print(star(5))
+        print(star(5), end="")
+        print("3. 计算时间序列", end="")
+        print(star(5))
+        print(star(5), end="")
+        print("4. 时间片段和热力图的结合", end="")
+        print(star(5))
+        print(star(5), end="")
+        print("5. 特征的保存", end="")
+        print(star(5))
+        print(star(30))
+        print("请输入你的操作：", end="")
+
     config = json.load(open("./json_path/config.json", 'r'))  # 需要指定训练所使用的数据
     patient_test = config['patient_test']  # "BDP"
     classification = config['classification']  # "sleep", "preseizure"
     print("patient_test is : {}, classification is : {}".format(patient_test, classification))
     path_dir = "./log/{}/{}".format(patient_test, classification)
     dir_create_check(path_dir)
+    handle_menu = {1: partial(raw_data_slice), 2: partial(time_heat_map), 3: partial(sequentially_signal),
+                   4: partial(image_contact_process_by_time), 0: partial(exit), 5: partial(feature_similarity)}
 
+    while True:
+        print("现在的测试病人是：{}, 测试状态是：{}".format(patient_test, classification))
+        display()
+        key = int(input())
+        handle_menu[key]()
+
+
+if __name__ == '__main__':
     # TODO: list
     # 1.0 需要运行 feature_hotmap.py 文件, 保证文件夹heatmao, raw_data_signal 里面存在照片
     # 1. 将两个原信号连接在一起,一个是热力信号，一个是原始的波形信号
@@ -406,13 +445,15 @@ if __name__ == '__main__':
     # raw_data_slice()
 
     # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接,拼接我60s
-    time_heat_map()
+    # time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
-    sequentially_signal()
+    # sequentially_signal()
 
     # 2.3 将按照时间的片段信号和热力图进行结合
-    image_contact_process_by_time()
+    # image_contact_process_by_time()
 
     # 3.1 从整体的文件进行热力分析， 以及热力图分割，读取完整的文件，防止热力图被分割
     # dynamic_detection()
+
+    menu()
