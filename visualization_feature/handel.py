@@ -375,7 +375,18 @@ def feature_similarity():
             break
     file_path = os.path.join(path_dir, file_name)
     print("Finding file: {} ", file_name)
-    feature_data = pd.read_csv(file_path)  # 特征的相关信息， 特征信息
+    data_frame = pd.read_csv(file_path)  # 特征的相关信息， 特征信息
+    time_location = data_frame['time_location'].tolist()
+    spatial_location = data_frame['spatial_location'].tolist()
+    feature_data = []  # 将feature data 提取出来
+    duration_time = 50  # 设定特征的持续时间50*10=500ms
+    for i in range(len(time_location)):  # 保存选取得特征
+        data = np.load(raw_data_sequence[i])
+        time_start = int(spatial_location[i].split("-")[0])
+        location_start = int(spatial_location[i].split("-")[0])
+        start_time = max(0, time_start - duration_time // 2)  # 选择特征的区域
+        end_time = min(200, time_start + duration_time // 2)
+        feature_data.append(data[location_start][start_time:end_time])  # 存储特征对应的波形
 
 
 if __name__ == '__main__':
@@ -395,7 +406,7 @@ if __name__ == '__main__':
     # raw_data_slice()
 
     # 2.2. 拼接热力图， 将热力图按照时间序列进行拼接,拼接我60s
-    # time_heat_map()
+    time_heat_map()
 
     # 2.3 按照绝对时间来计算序列
     sequentially_signal()
