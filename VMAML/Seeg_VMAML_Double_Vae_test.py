@@ -19,7 +19,7 @@ from Seeg_VMAML import VAE
 sys.path.append('../')
 from MAML.Mamlnet import Seegnet
 from VMAML.vmeta import *
-
+from util.util_file import Pyemail
 import json
 
 config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
@@ -247,6 +247,11 @@ def main():
     recall_mean, h_r = mean_confidence_interval(np.array(test_recall))
     f1_mean, h_f1 = mean_confidence_interval(np.array(test_f1score))
     auc_mean, h_au = mean_confidence_interval(np.array(test_auc))
+    result = "average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(
+        acc_mean, h, pre_mean, h_p, recall_mean, h_r,
+        f1_mean, h_f1, auc_mean, h_au)
+    Pyemail("实验结果", result)
+
     print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}"
           "\n average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(acc_mean, h, pre_mean, h_p, recall_mean, h_r,
                                                                           f1_mean, h_f1, auc_mean, h_au))
