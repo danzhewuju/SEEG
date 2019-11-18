@@ -215,8 +215,8 @@ def show_eeg(data):
 # 构造了两个VAE的编码器
 vae_p = VAE().to(device)
 vae_n = VAE().to(device)
-optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.005)
-optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.005)
+optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.002)
+optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.002)
 
 
 # 仅仅使用一个VAE的编码器

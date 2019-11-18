@@ -386,7 +386,10 @@ def uuid_test():
 
 
 def a():
-    print("this is a ")
+    a = np.random.rand(10)
+    print(a)
+    b = np.pad(a, (0, 10), 'constant')
+    print(b)
 
 
 def b():
@@ -394,6 +397,4 @@ def b():
 
 
 if __name__ == '__main__':
-    menu = {1: partial(a), 2: partial(b)}
-    key = int(input())
-    menu[key]()
+    a()

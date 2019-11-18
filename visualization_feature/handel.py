@@ -387,8 +387,11 @@ def feature_similarity():
         location_start = int(spatial_location[i].split("-")[0])
         start_time = max(0, time_start - duration_time // 2)  # 选择特征的区域
         end_time = min(200, time_start + duration_time // 2)
-        if end_time - start_time == duration_time:
-            feature_data.append(data[location_start][start_time:end_time])  # 存储特征对应的波形
+        if end_time - start_time < duration_time:
+            data_pad = data[location_start][start_time:end_time]
+            data_pad = np.pad(data_pad, (0, duration_time-(end_time-start_time)), 'constant')
+            feature_data.append(data_pad)
+        feature_data.append(data[location_start][start_time:end_time])  # 存储特征对应的波形
     save_path = os.path.join(path_dir, "{}-feature.npy".format(patient_test))
     feature_data = np.asarray(feature_data)
     save_numpy_info(feature_data, save_path)
