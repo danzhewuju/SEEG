@@ -15,6 +15,8 @@ from email.mime.text import MIMEText
 from email.header import Header
 from dtw import dtw
 import math
+from scipy.fftpack import fft, ifft
+import matplotlib.pyplot as plt
 
 
 def sigmoid(x):
@@ -361,6 +363,26 @@ def similarity_dtw(s1, s2):
     d, cost_matrix, acc_cost_matrix, path = dtw(s1, s2, dist=euclidean_norm)
     score = 1 - tanh(d)  # 相似度的评分【0,1】 0： 完全不同， 1： 完全相同
     return score
+
+
+def fft_function(data):
+    '''
+    傅里叶的频谱分析
+    :param data:
+    :return:
+    '''
+    fft_y = fft(data)
+    N = len(data)
+    x = range(int(N / 2))
+    y_ = np.abs(fft_y) * 2 / N
+    y = y_[range(int(N / 2))]
+    plt.figure()
+    plt.plot(x, y, 'r')
+    plt.xlabel("Frequency")
+    plt.ylabel("Amplitude")
+    name = "Frequency"
+    plt.title(name)
+    plt.show()
 
 
 if __name__ == '__main__':
