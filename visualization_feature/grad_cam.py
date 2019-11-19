@@ -335,10 +335,9 @@ def get_args():
     argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
     argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
     argparser.add_argument('--dataset_dir', type=str, help="training data set", default="../data/seeg/zero_data")
-    argparser.add_argument('--use-cuda', action='store_true', default=False,
+    argparser.add_argument('--use_cuda', action='store_true', default=False,
                            help='Use NVIDIA GPU acceleration')
     args = argparser.parse_args()
-    args.use_cuda = args.use_cuda and torch.cuda.is_available()
     if args.use_cuda:
         print("Using GPU for acceleration")
     else:
@@ -393,6 +392,7 @@ def get_feature_map(path_data, location_name):
 
     # If None, returns the map for the highest scoring category.
     # Otherwise, targets the requested index.
+    target_index = 0 if classification == "preseizure" else 1  # 目标函数  0: preseizure 1: positive
     target_index = 0 if classification == "preseizure" else 1  # 目标函数  0: preseizure 1: positive
 
     mask = grad_cam(input, target_index)

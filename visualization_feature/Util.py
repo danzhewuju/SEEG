@@ -31,5 +31,5 @@ def cal_acc_visualization():
     print("accuracy: {:.2f}%".format(acc * 100))
 
 
-if __name__ == '__main__':
-    cal_acc_visualization()
+# if __name__ == '__main__':
+#     cal_acc_visualization()

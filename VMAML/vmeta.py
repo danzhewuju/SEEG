@@ -6,7 +6,7 @@ from torch import nn
 from torch import optim
 from torch.nn import functional as F
 
-from vlearner import Learner
+from VMAML.vlearner import Learner
 from util.util_file import IndicatorCalculation
 
 
@@ -315,7 +315,7 @@ class Meta(nn.Module):
                 f1scores[k + 1] = cal.get_f1score()
                 auc[k + 1] = cal.get_auc()
 
-        del net
+        # del net
         index = corrects.index(max(corrects))  # 选取准确率最高的那个结果
 
         loss_all /= self.update_step_test - 1

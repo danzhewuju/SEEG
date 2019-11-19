@@ -215,8 +215,8 @@ def show_eeg(data):
 # 构造了两个VAE的编码器
 vae_p = VAE().to(device)
 vae_n = VAE().to(device)
-optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.0005)
-optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.0005)
+optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.005)
+optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.005)
 
 
 # 仅仅使用一个VAE的编码器
@@ -300,7 +300,7 @@ def maml_framwork():
 
     # flag_vae = True  # 设置梯度反向传播的标志位，vae
     # flag_maml = not flag_vae  # 设置梯度反向传播的薄志伟，maml
-    for epoch in range(1):
+    for epoch in range(2):  # 设置迭代次数
         # fetch meta_batchsz num of episode each time
         db = DataLoader(mini, args.task_num, shuffle=True, num_workers=1, pin_memory=True)
 

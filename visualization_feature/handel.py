@@ -21,6 +21,7 @@ from grad_cam import patient_test, classification, get_feature_map, get_feature_
 from util.util_file import dir_create_check
 import pandas as pd
 from functools import partial
+from Util import cal_acc_visualization
 
 
 def get_hotmap_dic(path_hotmap, path_b_raw_data):
@@ -190,14 +191,11 @@ def time_heat_map():
     heat_map_dir = "./log/{}/{}/heatmap".format(patient_test, classification)
     path_data = get_first_dir_path(path, 'npy')
     path_data.sort()  # 根据uuid 按照时间序列进行排序
-    count = 300  # 拼接的时间
+    count = min(len(path_data), 300)  # 拼接的时间
     dir_create_check(heat_map_dir)
     clean_dir(heat_map_dir)  # 清除文件夹里面所有文件
-    for index, p in enumerate(path_data):
-        if index < count:
-            get_feature_map(p, file_name)
-        else:
-            break
+    for index, p in enumerate(path_data[:count]):
+        get_feature_map(p, file_name)
     heat_map_path = get_first_dir_path(heat_map_dir)
     heat_map_path.sort()
     test_1 = Image.open(heat_map_path[0])
@@ -362,6 +360,10 @@ def dynamic_detection():
 
 
 def feature_similarity():
+    '''
+
+    :return: 用于生成特征数据
+    '''
     path_dir = "./log/{}/{}".format(patient_test, classification)  # 所要读取特征的文件夹
     data_dir = "./raw_data_time_sequentially/{}/{}".format(classification, patient_test)
     raw_data_sequence = get_first_dir_path(data_dir, suffix='npy')  # 原始数据的序列
@@ -389,7 +391,7 @@ def feature_similarity():
         end_time = min(200, time_start + duration_time // 2)
         if end_time - start_time < duration_time:
             data_pad = data[location_start][start_time:end_time]
-            data_pad = np.pad(data_pad, (0, duration_time-(end_time-start_time)), 'constant')
+            data_pad = np.pad(data_pad, (0, duration_time - (end_time - start_time)), 'constant')
             feature_data.append(data_pad)
         feature_data.append(data[location_start][start_time:end_time])  # 存储特征对应的波形
     save_path = os.path.join(path_dir, "{}-feature.npy".format(patient_test))
@@ -397,30 +399,43 @@ def feature_similarity():
     save_numpy_info(feature_data, save_path)
 
 
+def feature_analysis():
+    '''
+
+    :return: 主要用于特征的分析，
+    '''
+    # 是否加入特征的验证系统
+    preseizure_name_list = ["BDP", "LK", "SYF", "ZK"]
+    feature_data_path = "./log/{0}/{1}/{0}-feature.npy".format(patient_test, classification)
+    feature_data = np.load(feature_data_path)
+    feature_score = []
+    for p in tqdm(feature_data):
+        score = 0
+        for n in feature_data:
+            score += similarity_dtw(p, n)
+        score /= feature_data.shape[0]
+        round(score, 6)
+        feature_score.append(score)
+    data_dic = {"ID": range(0, len(feature_score)), "Score": feature_score}
+    data_frame = pd.DataFrame(data_dic)
+    save_path = "./log/{0}/{1}/{0}-feature_score.csv".format(patient_test, classification)
+    data_frame.to_csv(save_path, index=None)
+    print("Similarity of features has finished. The result has been saved in {}".format(save_path))
+
+
 def menu():
-    def display():
+    def display_line(messages):
         star = lambda x: "*" * x
         print(star(30))
-        print(star(5), end="")
-        print("0. 程序退出", end="")
-        print(star(5))
-        print(star(5), end="")
-        print("1. 数据切片的生成", end="")
-        print(star(5))
-        print(star(5), end="")
-        print("2. 拼接热力图", end="")
-        print(star(5))
-        print(star(5), end="")
-        print("3. 计算时间序列", end="")
-        print(star(5))
-        print(star(5), end="")
-        print("4. 时间片段和热力图的结合", end="")
-        print(star(5))
-        print(star(5), end="")
-        print("5. 特征的保存", end="")
-        print(star(5))
+        for i in range(len(messages)):
+            print("{}".format(messages[i]))
         print(star(30))
         print("请输入你的操作：", end="")
+
+    def display():
+        messages = ["0.程序退出", "1.数据切片的生成", "2.拼接热力图", "3.计算时间序列", "4.时间片段和热力图的结合", "5.特征数据提取", "6.计算评价指标",
+                    "7.特征相似度计算"]
+        display_line(messages)
 
     config = json.load(open("./json_path/config.json", 'r'))  # 需要指定训练所使用的数据
     patient_test = config['patient_test']  # "BDP"
@@ -429,7 +444,8 @@ def menu():
     path_dir = "./log/{}/{}".format(patient_test, classification)
     dir_create_check(path_dir)
     handle_menu = {1: partial(raw_data_slice), 2: partial(time_heat_map), 3: partial(sequentially_signal),
-                   4: partial(image_contact_process_by_time), 0: partial(exit), 5: partial(feature_similarity)}
+                   4: partial(image_contact_process_by_time), 0: partial(exit), 5: partial(feature_similarity),
+                   6: partial(cal_acc_visualization), 7: partial(feature_analysis)}
 
     while True:
         print("现在的测试病人是：{}, 测试状态是：{}".format(patient_test, classification))
@@ -458,5 +474,4 @@ if __name__ == '__main__':
 
     # 3.1 从整体的文件进行热力分析， 以及热力图分割，读取完整的文件，防止热力图被分割
     # dynamic_detection()
-
     menu()
