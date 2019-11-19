@@ -377,7 +377,7 @@ def feature_similarity():
             file_name = p
             break
     file_path = os.path.join(path_dir, file_name)
-    print("Finding file: {} ", file_name)
+    print("Finding file: {} ".format(file_name))
     data_frame = pd.read_csv(file_path)  # 特征的相关信息， 特征信息
     time_location = data_frame['time_location'].tolist()
     spatial_location = data_frame['spatial_location'].tolist()
@@ -393,10 +393,12 @@ def feature_similarity():
             data_pad = data[location_start][start_time:end_time]
             data_pad = np.pad(data_pad, (0, duration_time - (end_time - start_time)), 'constant')
             feature_data.append(data_pad)
-        feature_data.append(data[location_start][start_time:end_time])  # 存储特征对应的波形
+        else:
+            feature_data.append(data[location_start][start_time:end_time])  # 存储特征对应的波形
     save_path = os.path.join(path_dir, "{}-feature.npy".format(patient_test))
-    feature_data = np.asarray(feature_data)
-    save_numpy_info(feature_data, save_path)
+    feature_data = np.asarray(feature_data).reshape(len(feature_data), -1)
+    np.save(save_path, feature_data)
+    print("{} file has been saved!".format(save_path))
 
 
 def feature_analysis():
