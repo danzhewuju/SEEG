@@ -425,6 +425,28 @@ def feature_analysis():
     print("Similarity of features has finished. The result has been saved in {}".format(save_path))
 
 
+def random_sample():
+    '''
+    勾践随机采样的方法
+    :return:
+    '''
+    data_path = "./raw_data_time_sequentially/{}/{}".format(classification, patient_test)
+    data_list = get_first_dir_path(data_path, suffix='npy')
+    data_list.sort()
+    data_random_sample = []
+    duration = 50
+    for p in data_list:
+        data = np.load(p, allow_pickle=True)
+        channel_no = random.randint(0, len(data) - 1)
+        star = random.randint(0, data.shape[1] - duration - 1)
+        data_sample = data[channel_no][star:star + duration]
+        data_random_sample.append(data_sample)
+    data_random_sample = np.array(data_random_sample).reshape(len(data_list), duration)
+    save_path = "./log/{0}/{1}/{0}-random_sample.npy".format(patient_test, classification)
+    np.save(save_path, data_random_sample)
+    print("Sampling finished")
+
+
 def menu():
     def display_line(messages):
         star = lambda x: "*" * x
@@ -436,7 +458,7 @@ def menu():
 
     def display():
         messages = ["0.程序退出", "1.数据切片的生成", "2.拼接热力图", "3.计算时间序列", "4.时间片段和热力图的结合", "5.特征数据提取", "6.计算评价指标",
-                    "7.特征相似度计算"]
+                    "7.特征相似度计算", "8.数据的随机采样"]
         display_line(messages)
 
     config = json.load(open("./json_path/config.json", 'r'))  # 需要指定训练所使用的数据
@@ -447,7 +469,7 @@ def menu():
     dir_create_check(path_dir)
     handle_menu = {1: partial(raw_data_slice), 2: partial(time_heat_map), 3: partial(sequentially_signal),
                    4: partial(image_contact_process_by_time), 0: partial(exit), 5: partial(feature_similarity),
-                   6: partial(cal_acc_visualization), 7: partial(feature_analysis)}
+                   6: partial(cal_acc_visualization), 7: partial(feature_analysis), 8: partial(random_sample)}
 
     while True:
         print("现在的测试病人是：{}, 测试状态是：{}".format(patient_test, classification))

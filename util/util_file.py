@@ -385,6 +385,26 @@ def fft_function(data):
     plt.show()
 
 
+def histogram_spectrum(data):
+    frequency = []
+    for i, d in enumerate(data):
+        fft_y = fft(d)
+        N = len(d)
+        x = range(int(N / 2))
+        y_ = np.abs(fft_y) * 2 / N
+        y = y_[range(int(N / 2))]
+        index = np.argmax(y)
+        frequency.append(index)
+    print(frequency)
+    plt.figure()
+    plt.hist(frequency)
+    plt.xlabel("Frequency")
+    # plt.xticks(np.arange(min(frequency), max(frequency) + 1, 1.0))
+    plt.ylabel("count")
+    plt.title("Histogram of the spectrum")
+    plt.show()
+
+
 if __name__ == '__main__':
     for i in range(10):
         a = np.random.randint(0, 10, (3, 3))

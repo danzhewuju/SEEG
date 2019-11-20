@@ -481,9 +481,15 @@ if __name__ == '__main__':
     # axes[2].set_xlabel("frequency (Hz)", fontsize=14)
     # axes[2].set_ylabel("$|F|$", fontsize=14)
     # plt.show()
-    path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/visualization_feature/raw_data_time_sequentially/preseizure/BDP/e68ae816-0a94-11ea-a8f2-e0d55e6ff654-0.npy"
-    data = np.load(path)
+    # path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/visualization_feature/raw_data_time_sequentially/preseizure/BDP/e68ae816-0a94-11ea-a8f2-e0d55e6ff654-0.npy"
+    # data = np.load(path)
+    # print(data.shape)
+    # d = data[0]
+    # print(d)
+    # fft_function(d)
+    path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/visualization_feature/log/BDP/preseizure/BDP-random_sample.npy"
+    data = np.load(path, allow_pickle=True)
     print(data.shape)
-    d = data[0]
-    print(d)
-    fft_function(d)
+    histogram_spectrum(data)
+    # for i in range(100):
+    #     print(np.random.randint(0, 10, 1))
