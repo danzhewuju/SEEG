@@ -2,6 +2,7 @@ import re
 import sys
 from scipy import fftpack
 import numpy as np
+from handel import feature_analysis
 import matplotlib.pyplot as plt
 
 sys.path.append("../")
@@ -51,8 +52,6 @@ def test_fft(path):
 
 
 if __name__ == '__main__':
-    path = "./log/BDP/preseizure/BDP-feature.npy"
+    path = "./log/BDP/preseizure/BDP-random_sample.npy"
     # test_fft(path)
-    data = np.load(path)
-
-    print(data.shape)
+    feature_analysis(feature_data_path=path)

@@ -36,6 +36,7 @@ argparser.add_argument('--k_qry', type=int, help='k shot for query set', default
 argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
+argparser.add_argument('--vae_lr', type=float, help='meta-level outer learning rate', default=0.002)
 argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.001)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=8)
@@ -53,6 +54,7 @@ args.cuda = not args.no_cuda and torch.cuda.is_available()
 TEST_PATH = args.test_path
 TRAIN_PATH = args.train_path
 VAL_PATH = args.val_path
+VAE_LR = args.vae_lr
 device = torch.device("cuda" if args.cuda else "cpu")
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
@@ -215,8 +217,8 @@ def show_eeg(data):
 # 构造了两个VAE的编码器
 vae_p = VAE().to(device)
 vae_n = VAE().to(device)
-optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.005)
-optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.005)
+optimizer_vae_p = optim.Adam(vae_p.parameters(), lr=0.002)
+optimizer_vae_n = optim.Adam(vae_n.parameters(), lr=0.002)
 
 
 # 仅仅使用一个VAE的编码器

@@ -17,6 +17,7 @@ from dtw import dtw
 import math
 from scipy.fftpack import fft, ifft
 import matplotlib.pyplot as plt
+from collections import Counter
 
 
 def sigmoid(x):
@@ -385,7 +386,7 @@ def fft_function(data):
     plt.show()
 
 
-def histogram_spectrum(data):
+def histogram_spectrum(data, file_pass=10):
     frequency = []
     for i, d in enumerate(data):
         fft_y = fft(d)
@@ -397,10 +398,11 @@ def histogram_spectrum(data):
         frequency.append(index)
     print(frequency)
     plt.figure()
-    plt.hist(frequency)
+    frequency = list(filter(lambda x: x <= 10, frequency))
+    count = len(dict(Counter(frequency)))
+    plt.hist(frequency, density=True, bins=count)
     plt.xlabel("Frequency")
-    # plt.xticks(np.arange(min(frequency), max(frequency) + 1, 1.0))
-    plt.ylabel("count")
+    plt.ylabel("Density")
     plt.title("Histogram of the spectrum")
     plt.show()
 

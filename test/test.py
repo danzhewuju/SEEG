@@ -12,6 +12,7 @@ from util.util_file import IndicatorCalculation, similarity_dtw
 import logging
 from tqdm import tqdm
 import pandas as pd
+from collections import Counter
 
 from functools import partial
 import mne
@@ -491,5 +492,7 @@ if __name__ == '__main__':
     data = np.load(path, allow_pickle=True)
     print(data.shape)
     histogram_spectrum(data)
+    # a = [11, 11, 2, 3]
+    # print(len(dict(Counter(a))))
     # for i in range(100):
     #     print(np.random.randint(0, 10, 1))

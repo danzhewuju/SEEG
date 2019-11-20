@@ -359,7 +359,7 @@ def dynamic_detection():
         flag_tail += 2
 
 
-def feature_similarity():
+def save_feature_data():
     '''
 
     :return: 用于生成特征数据
@@ -401,14 +401,14 @@ def feature_similarity():
     print("{} file has been saved!".format(save_path))
 
 
-def feature_analysis():
+def feature_analysis(feature_data_path="./log/{0}/{1}/{0}-feature.npy".format(patient_test, classification)):
     '''
 
     :return: 主要用于特征的分析，
     '''
     # 是否加入特征的验证系统
     preseizure_name_list = ["BDP", "LK", "SYF", "ZK"]
-    feature_data_path = "./log/{0}/{1}/{0}-feature.npy".format(patient_test, classification)
+
     feature_data = np.load(feature_data_path)
     feature_score = []
     for p in tqdm(feature_data):
@@ -468,7 +468,7 @@ def menu():
     path_dir = "./log/{}/{}".format(patient_test, classification)
     dir_create_check(path_dir)
     handle_menu = {1: partial(raw_data_slice), 2: partial(time_heat_map), 3: partial(sequentially_signal),
-                   4: partial(image_contact_process_by_time), 0: partial(exit), 5: partial(feature_similarity),
+                   4: partial(image_contact_process_by_time), 0: partial(exit), 5: partial(save_feature_data),
                    6: partial(cal_acc_visualization), 7: partial(feature_analysis), 8: partial(random_sample)}
 
     while True:
