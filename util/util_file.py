@@ -18,6 +18,7 @@ import math
 from scipy.fftpack import fft, ifft
 import matplotlib.pyplot as plt
 from collections import Counter
+from scipy.stats import wasserstein_distance
 
 
 def sigmoid(x):
@@ -363,6 +364,12 @@ def similarity_dtw(s1, s2):
     euclidean_norm = lambda x, y: np.abs(ratio * (x - y))
     d, cost_matrix, acc_cost_matrix, path = dtw(s1, s2, dist=euclidean_norm)
     score = 1 - tanh(d)  # 相似度的评分【0,1】 0： 完全不同， 1： 完全相同
+    return score
+
+
+def similarity_EMD(s1, s2):
+    k = 1e3
+    score = 1 - np.tanh(k * wasserstein_distance(s1, s2))
     return score
 
 
