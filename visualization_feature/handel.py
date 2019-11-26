@@ -134,7 +134,7 @@ def create_raw_data_signal_by_time(image_dir="./log/{}/{}/heatmap".format(patien
         name = re.findall('heatmap/(.+)', raw_path)[0]
         selected_raw_path.append((name, channels_number))
 
-    for index, (name, channels_number) in tqdm(enumerate(selected_raw_path)):
+    for index, (name, channels_number) in enumerate(tqdm(selected_raw_path)):
         new_name = name[:-4] + '.jpg'
         save_path = os.path.join('./log/{}/{}/raw_data_signal'.format(patient_test, classification), new_name)
         data_p = dict_name_path[name]
@@ -425,6 +425,24 @@ def feature_analysis(feature_data_path="./log/{0}/{1}/{0}-feature.npy".format(pa
     print("Similarity of features has finished. The result has been saved in {}".format(save_path))
 
 
+def switch_patient():
+    name_list = ["BDP", "LK", "SYF", "WSH", "ZK"]
+    dict_map = dict(zip(range(len(name_list)), name_list))
+    josn_path = "./json_path/config.json"
+    with open(josn_path, 'r') as f:
+        data = json.load(f)
+        for k, v in dict_map.items():
+            print("{}.{}".format(k, v))
+        print("请输入你要切换的病人序号：", end="")
+        key = int(input())
+        selected_patient = dict_map[key]
+        data["patient_test"] = selected_patient
+
+    with  open(josn_path, 'w') as f:
+        json.dump(data, f)
+        print("已经切换为:{}".format(selected_patient))
+
+
 def random_sample():
     '''
     勾践随机采样的方法
@@ -458,7 +476,7 @@ def menu():
 
     def display():
         messages = ["0.程序退出", "1.数据切片的生成", "2.拼接热力图", "3.计算时间序列", "4.时间片段和热力图的结合", "5.特征数据提取", "6.计算评价指标",
-                    "7.特征相似度计算", "8.数据的随机采样"]
+                    "7.特征相似度计算", "8.数据的随机采样", "9.病人切换"]
         display_line(messages)
 
     config = json.load(open("./json_path/config.json", 'r'))  # 需要指定训练所使用的数据
@@ -469,7 +487,8 @@ def menu():
     dir_create_check(path_dir)
     handle_menu = {1: partial(raw_data_slice), 2: partial(time_heat_map), 3: partial(sequentially_signal),
                    4: partial(image_contact_process_by_time), 0: partial(exit), 5: partial(save_feature_data),
-                   6: partial(cal_acc_visualization), 7: partial(feature_analysis), 8: partial(random_sample)}
+                   6: partial(cal_acc_visualization), 7: partial(feature_analysis), 8: partial(random_sample),
+                   9: partial(switch_patient)}
 
     while True:
         print("现在的测试病人是：{}, 测试状态是：{}".format(patient_test, classification))
@@ -499,3 +518,4 @@ if __name__ == '__main__':
     # 3.1 从整体的文件进行热力分析， 以及热力图分割，读取完整的文件，防止热力图被分割
     # dynamic_detection()
     menu()
+    # switch_patient()

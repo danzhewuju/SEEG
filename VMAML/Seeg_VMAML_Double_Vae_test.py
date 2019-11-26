@@ -251,7 +251,7 @@ def main():
         acc_mean, h, pre_mean, h_p, recall_mean, h_r,
         f1_mean, h_f1, auc_mean, h_au)
     os.system("~/login")
-    Pyemail("实验结果", result)
+    Pyemail("{}的实验结果".format(patient_test), result)
 
     print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}"
           "\n average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(acc_mean, h, pre_mean, h_p, recall_mean, h_r,

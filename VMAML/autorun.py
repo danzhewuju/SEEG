@@ -9,5 +9,6 @@ from Seeg_VMAML_Double_Vae import maml_framwork
 from Seeg_VMAML_Double_Vae_test import main
 
 if __name__ == '__main__':
+    name = ["BDP", "LK", "SYF", "WSH", "ZK"]
     maml_framwork()
     main()
