@@ -429,6 +429,7 @@ def switch_patient():
     name_list = ["BDP", "LK", "SYF", "WSH", "ZK"]
     dict_map = dict(zip(range(len(name_list)), name_list))
     josn_path = "./json_path/config.json"
+    json_config = "../DataProcessing/config/fig.json"
     with open(josn_path, 'r') as f:
         data = json.load(f)
         for k, v in dict_map.items():
@@ -440,8 +441,15 @@ def switch_patient():
 
     with  open(josn_path, 'w') as f:
         json.dump(data, f)
-        print("已经切换为:{}".format(selected_patient))
+        print("{} patient_test 已经切换为:{}".format(josn_path, selected_patient))
 
+    with open(json_config, 'r') as f:
+        data = json.load(f)
+        data['patient_test'] = selected_patient
+    with open(json_config, 'w') as f:
+        json.dump(data, f)
+        print("{} patient_test 已近被切换为：{}".format(json_config, selected_patient))
+0
 
 def random_sample():
     '''
