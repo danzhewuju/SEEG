@@ -192,9 +192,10 @@ def time_heat_map():
     path_data = get_first_dir_path(path, 'npy')
     path_data.sort()  # 根据uuid 按照时间序列进行排序
     count = min(len(path_data), 300)  # 拼接的时间
+    selected_path = path_data[:count]
     dir_create_check(heat_map_dir)
-    clean_dir(heat_map_dir)  # 清除文件夹里面所有文件
-    for index, p in enumerate(path_data[:count]):
+    # clean_dir(heat_map_dir)  # 清除文件夹里面所有文件
+    for index, p in enumerate(selected_path):
         get_feature_map(p, file_name)
     heat_map_path = get_first_dir_path(heat_map_dir)
     heat_map_path.sort()
