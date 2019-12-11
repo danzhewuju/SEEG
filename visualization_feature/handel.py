@@ -137,12 +137,16 @@ def create_raw_data_signal_by_time(image_dir="./log/{}/{}/heatmap".format(patien
 
     for index, (name, channels_number) in enumerate(tqdm(selected_raw_path)):
         new_name = name[:-4] + '.jpg'
+        name_npy = name[:-4] + '.npy'
         save_path = os.path.join('./log/{}/{}/raw_data_signal'.format(patient_test, classification), new_name)
+        path_tmp = "./log/{}/{}/raw_data_signal_data_storage".format(patient_test, classification)
+        dir_create_check(path_tmp)
+        save_path_npy = os.path.join(path_tmp, name_npy)
         data_p = dict_name_path[name]
         raw_data = np.load(data_p)  # 此时相当于原始数据，信道数已经不一致了
         # 需要重新映射channel number 的序号
 
-        seeg_npy_plot(raw_data, channels_number, save_path)
+        seeg_npy_plot(raw_data, channels_number, save_path, save_path_npy=save_path_npy)
 
     print("All files has been written!")
 

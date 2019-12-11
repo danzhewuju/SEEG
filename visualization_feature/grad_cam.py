@@ -13,7 +13,7 @@ sys.path.append('../')
 # from MAML.learner import
 import json
 from VMAML.vmeta import Meta
-from util import matrix_normalization_recorder
+from util import matrix_normalization_recorder, dir_create_check
 
 from util.util_file import matrix_normalization, trans_numpy_cv2, get_matrix_max_location
 
@@ -179,13 +179,16 @@ def preprocess_image(img):
     return input
 
 
-def show_cam_on_image(img, mask, save_path):
+def show_cam_on_image(img, mask, save_path, save_path_npy=None):
     # img = np.transpose(img, (1, 0, 2))
     # mask = mask.T
     heatmap = cv2.applyColorMap(np.uint8(255 * mask), cv2.COLORMAP_JET)
     heatmap = np.float32(heatmap) / 255
     cam = heatmap + np.float32(img)
     cam = cam / np.max(cam)
+    if save_path_npy is not None:
+        save_data = np.uint8(255 * cam)
+        np.save(save_path_npy, save_data)
     cv2.imwrite(save_path, np.uint8(255 * cam))
 
 
@@ -437,8 +440,12 @@ def get_feature_map(path_data, location_name):
     # else:
 
     name = path_data.split("/")[-1][:-4] + channel_location + ".jpg"
+    name_npy = path_data.split("/")[-1][:-4] + channel_location + ".npy"
+    path_tmp = "./log/{}/{}/heatmap_data_storage".format(patient_test, classification)
+    dir_create_check(path_tmp)
+    save_path_npy = os.path.join(path_tmp, name_npy)
     save_path = os.path.join("./log/{}/{}/heatmap".format(patient_test, classification), name)
-    show_cam_on_image(img, mask, save_path)  # 将热力图写回到原来的图片
+    show_cam_on_image(img, mask, save_path, save_path_npy=save_path_npy)  # 将热力图写回到原来的图片
 
 
 def get_feature_map_dynamic(data, name, key_flag=True):

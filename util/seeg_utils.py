@@ -213,7 +213,7 @@ def eeg_preprocess(fin, fout, seeg_chan_name):
     del specific_chans
 
 
-def seeg_npy_plot(data, channels, save_path):
+def seeg_npy_plot(data, channels, save_path, save_path_npy=None):
     '''
 
     :param data: numpy 格式的数据
@@ -221,8 +221,12 @@ def seeg_npy_plot(data, channels, save_path):
     :return:
     '''
     k = len(channels)
+    k = 1  # 只选取一个信道
     plt.figure(0)
     plt.subplots_adjust(hspace=0.6, wspace=0.6)
+    if save_path_npy is not None:
+        data_p = data[channels[0]]
+        np.save(save_path_npy, data_p)
     for i in range(k):
         try:
             plt.subplot(k, 1, i + 1)
