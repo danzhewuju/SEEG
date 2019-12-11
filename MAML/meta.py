@@ -226,7 +226,7 @@ class Meta(nn.Module):
         result = {"accuracy": corrects[index],
                   "precision": precisions[index],
                   "recall": recalls[index],
-                  "f1score": recalls[index],
+                  "f1score": f1scores[index],
                   "auc": auc[index],
                   }
         # accs = np.array(corrects) / querysz

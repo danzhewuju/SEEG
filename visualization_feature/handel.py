@@ -104,6 +104,7 @@ def create_raw_data_signal_by_similarity(image_dir="./heatmap"):
         print("All files has been written!")
 
 
+# 将原始的数据和信道相结合
 def create_raw_data_signal_by_time(image_dir="./log/{}/{}/heatmap".format(patient_test, classification)):
     # patient_test = "ZK"
 
@@ -450,11 +451,12 @@ def switch_patient():
     with open(json_config, 'w') as f:
         json.dump(data, f)
         print("{} patient_test 已近被切换为：{}".format(json_config, selected_patient))
-0
+    menu()
+
 
 def random_sample():
     '''
-    勾践随机采样的方法
+    实现随机采样的方法
     :return:
     '''
     data_path = "./raw_data_time_sequentially/{}/{}".format(classification, patient_test)
