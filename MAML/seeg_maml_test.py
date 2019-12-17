@@ -16,6 +16,7 @@ from torch.utils.data import DataLoader
 from Mamlnet import Seegnet
 from meta import Meta
 import json
+from util.util_file import LogRecord
 
 config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
 patient_test = config['patient_test']
@@ -128,6 +129,11 @@ def main():
     print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}"
           "\n average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(acc_mean, h, pre_mean, h_p, recall_mean, h_r,
                                                                           f1_mean, h_f1, auc_mean, h_au))
+
+    result = "average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n average f1score "\
+             ":{}, h:{}\n average AUC :{}, h:{}\n".format(acc_mean, h, pre_mean, h_p, recall_mean, h_r, f1_mean, h_f1, auc_mean, h_au)
+    log = "{}-{}:\n{} ".format(os.path.basename(__file__), patient_test, result)
+    LogRecord.write_log(log)
 
 
 if __name__ == '__main__':

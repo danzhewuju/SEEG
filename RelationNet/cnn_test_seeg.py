@@ -19,7 +19,7 @@ from util.util_file import matrix_normalization
 import scipy as sp
 import scipy.stats
 from VAE.vae import trans_data, VAE
-from util.util_file import IndicatorCalculation
+from util.util_file import IndicatorCalculation, LogRecord
 import json
 
 config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
@@ -214,6 +214,11 @@ def run():
           "average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p,
                                                                        average_recall, h_r,
                                                                        average_f1score, h_f, average_auc, h_au))
+
+    result = "average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n average f1score "\
+             ":{}, h:{}\n average AUC :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p, average_recall, h_r, average_f1score, h_f, average_auc, h_au)
+    log = "{}-{}:\n{} ".format(os.path.basename(__file__), patient_test, result)
+    LogRecord.write_log(log)
     end_time = time.time()
     run_time = end_time - start_time
     print("Running Time {:.4f}".format(run_time))

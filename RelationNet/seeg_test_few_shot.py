@@ -20,7 +20,7 @@ from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 
 import task_generator_test as tg
-from util.util_file import IndicatorCalculation
+from util.util_file import IndicatorCalculation, LogRecord
 import json
 
 config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
@@ -273,6 +273,11 @@ def main():
           "average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p,
                                                                        average_recall, h_r,
                                                                        average_f1score, h_f, average_auc, h_au))
+
+    result = "average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n average f1score "\
+             ":{}, h:{}\n average AUC :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p, average_recall, h_r, average_f1score, h_f, average_auc, h_au)
+    log = "{}-{}:\n{} ".format(os.path.basename(__file__), patient_test, result)
+    LogRecord.write_log(log)
 
 
 if __name__ == '__main__':
