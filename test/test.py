@@ -8,7 +8,7 @@ from RelationNet.Seegdata import *
 from util.util_file import *
 import re
 from functools import reduce
-from util.util_file import IndicatorCalculation, similarity_dtw
+from util.util_file import IndicatorCalculation, similarity_dtw, LogRecord
 import logging
 from tqdm import tqdm
 import pandas as pd
@@ -405,8 +405,8 @@ def b():
 
 
 def test_auc():
-    a = [ 1, 1, 0, 0, 1]
-    b = [ 1, 1, 0, 0, 0]
+    a = [1, 1, 0, 0, 1]
+    b = [1, 1, 0, 0, 0]
     a = np.asarray(a)
     b = np.asarray(b)
     a = torch.from_numpy(a)
@@ -420,9 +420,11 @@ def test_auc():
 import multiprocessing
 
 
-def f(x):
-    return x * x
+def test_log_record():
+    result = "this is testing!"
+    LogRecord.write_log(result)
 
 
 if __name__ == '__main__':
-    test_auc()
+    print(__file__)
+    test_log_record()

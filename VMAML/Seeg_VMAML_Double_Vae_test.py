@@ -19,7 +19,7 @@ from Seeg_VMAML import VAE
 sys.path.append('../')
 from MAML.Mamlnet import Seegnet
 from VMAML.vmeta import *
-from util.util_file import Pyemail
+from util.util_file import Pyemail, LogRecord
 import json
 
 config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
@@ -36,7 +36,7 @@ argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
 argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=1e-3)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
-argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
+argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=10)
 argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=20)
 argparser.add_argument('--dataset_dir', type=str, help="training data set",
                        default="../data/seeg/zero_data/{}".format(patient_test))
@@ -232,14 +232,6 @@ def main():
         acc_avg = np.array(accs).mean()
         precision_avg = np.array(precisions).mean()
 
-
-
-
-
-
-
-
-
         recall_avg = np.array(recalls).mean()
         f1score_avg = np.array(f1scores).mean()
         auc_avg = np.array(aucs).mean()
@@ -265,6 +257,11 @@ def main():
     print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}"
           "\n average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(acc_mean, h, pre_mean, h_p, recall_mean, h_r,
                                                                           f1_mean, h_f1, auc_mean, h_au))
+
+    result = "average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(
+        acc_mean, h, pre_mean, h_p, recall_mean, h_r, f1_mean, h_f1, auc_mean, h_au)
+    log = "{}-{}:{} ".format(__file__, patient_test, result)
+    LogRecord.write_log(log)
 
 
 if __name__ == '__main__':

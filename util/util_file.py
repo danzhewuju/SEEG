@@ -19,6 +19,7 @@ from scipy.fftpack import fft, ifft
 import matplotlib.pyplot as plt
 from collections import Counter
 from scipy.stats import wasserstein_distance
+import time
 
 
 def sigmoid(x):
@@ -412,6 +413,23 @@ def histogram_spectrum(data, file_pass=10):
     plt.ylabel("Density")
     plt.title("Histogram of the spectrum")
     plt.show()
+
+
+class LogRecord:
+
+    @staticmethod
+    def write_log(log_txt, log_path="/home/cbd109-3/Users/data/yh/Program/Python/SEEG/log/Running_result.txt"):
+        base_dir = os.path.dirname(log_path)
+        if not os.path.exists(base_dir):
+            os.makedirs(base_dir)
+        if not os.path.exists(log_path):
+            f = open(log_path, 'w')
+        else:
+            f = open(log_path, 'a')
+        time_now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        result = "{}\n{}\n".format(time_now, log_txt)
+        f.write(result)
+        f.close()
 
 
 if __name__ == '__main__':

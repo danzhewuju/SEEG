@@ -39,7 +39,7 @@ argparser.add_argument('--task_num', type=int, help='meta batch size, namely tas
 argparser.add_argument('--vae_lr', type=float, help='meta-level outer learning rate', default=0.002)
 argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.001)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
-argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=8)
+argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=10)
 argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=20)
 argparser.add_argument('--dataset_dir', type=str, help="training data set",
                        default="../data/seeg/zero_data/{}".format(patient_test))
