@@ -37,7 +37,7 @@ argparser.add_argument('--task_num', type=int, help='meta batch size, namely tas
 argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=1e-3)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
-argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
+argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=20)
 argparser.add_argument('--dataset_dir', type=str, help="training data set",
                        default="../data/seeg/zero_data/{}".format(patient_test))
 
@@ -231,6 +231,15 @@ def main():
         # [b, update_step+1]
         acc_avg = np.array(accs).mean()
         precision_avg = np.array(precisions).mean()
+
+
+
+
+
+
+
+
+
         recall_avg = np.array(recalls).mean()
         f1score_avg = np.array(f1scores).mean()
         auc_avg = np.array(aucs).mean()

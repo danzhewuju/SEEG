@@ -51,7 +51,14 @@ def test_fft(path):
     plt.show()
 
 
+def test_data_shape(path):
+    data = np.load(path)
+    print(data.shape)
+
+
 if __name__ == '__main__':
-    path = "./log/BDP/preseizure/BDP-random_sample.npy"
-    # test_fft(path)
-    feature_analysis(feature_data_path=path)
+    # path = "./log/BDP/preseizure/BDP-random_sample.npy"
+    # # test_fft(path)
+    # feature_analysis(feature_data_path=path)
+    path = "./log/BDP/preseizure/BDP-feature.npy"
+    test_data_shape(path)

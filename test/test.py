@@ -404,6 +404,19 @@ def b():
     print(a_b)
 
 
+def test_auc():
+    a = [ 1, 1, 0, 0, 1]
+    b = [ 1, 1, 0, 0, 0]
+    a = np.asarray(a)
+    b = np.asarray(b)
+    a = torch.from_numpy(a)
+    b = torch.from_numpy(b)
+    cal = IndicatorCalculation()
+    cal.set_values(b, a)
+    print("ACC:{}, Precision:{}, Recall:{}, F1:{}, AUC:{}".format(cal.get_accuracy(), cal.get_precision(),
+                                                                  cal.get_recall(), cal.get_f1score(), cal.get_auc()))
+
+
 import multiprocessing
 
 
@@ -412,87 +425,4 @@ def f(x):
 
 
 if __name__ == '__main__':
-    # import numpy as np
-    # import matplotlib.pyplot as plt
-    #
-    #
-    # def signal_samples(t):
-    #     return np.sin(1 * np.pi * t) + np.sin(2 * np.pi * t) + np.sin(4 * np.pi * t)
-    #
-    #
-    # B = 5.0
-    # f_s = 2 * B
-    # delta_f = 0.01
-    # N = int(f_s / delta_f)
-    # T = N / f_s
-    # t = np.linspace(0, T, N)
-    # f_t = signal_samples(t)
-    #
-    # fig, axes = plt.subplots(1, 2, figsize=(8, 3), sharey=True)
-    # axes[0].plot(t, f_t)
-    # axes[0].set_xlabel("time (s)")
-    # axes[0].set_ylabel("signal")
-    # axes[1].plot(t, f_t)
-    # axes[1].set_xlim(0, 5)
-    # axes[1].set_xlabel("time (s)")
-    # plt.show()
-    #
-    # from scipy import fftpack
-    #
-    # F = fftpack.fft(f_t)
-    # f = fftpack.fftfreq(N, 1.0 / f_s)
-    # mask = np.where(f >= 0)
-    # fig, axes = plt.subplots(3, 1, figsize=(8, 6))
-    #
-    # axes[0].plot(f[mask], np.log(abs(F[mask])), label="real")
-    # axes[0].plot(B, 0, 'r*', markersize=10)
-    # axes[0].set_ylabel("$\log(|F|)$", fontsize=14)
-    #
-    # axes[1].plot(f[mask], abs(F[mask]) / N, label="real")
-    # axes[1].set_xlim(0, 2.5)
-    # axes[1].set_ylabel("$|F|$", fontsize=14)
-    #
-    # axes[2].plot(f[mask], abs(F[mask]) / N, label="real")
-    # axes[2].set_xlabel("frequency (Hz)", fontsize=14)
-    # axes[2].set_ylabel("$|F|$", fontsize=14)
-    # plt.show()
-    #
-    # path = "../visualization_feature/log/BDP/preseizure/BDP-feature.npy"
-    # data = np.load(path)
-    # B = 2
-    # f_s = 2 * B
-    # F = fftpack.fft(data[0])
-    # delta_f = 0.01
-    # N = int(f_s / delta_f)
-    # T = N / f_s
-    # t = np.linspace(0, T, N)
-    # f = fftpack.fftfreq(N, 1.0 / f_s)
-    # mask = np.where(f >= 0)
-    # fig, axes = plt.subplots(3, 1, figsize=(8, 6))
-    #
-    # axes[0].plot(f[mask], np.log(abs(F[mask])), label="real")
-    # axes[0].plot(B, 0, 'r*', markersize=10)
-    # axes[0].set_ylabel("$\log(|F|)$", fontsize=14)
-    #
-    # axes[1].plot(f[mask], abs(F[mask]) / N, label="real")
-    # axes[1].set_xlim(0, 2.5)
-    # axes[1].set_ylabel("$|F|$", fontsize=14)
-    #
-    # axes[2].plot(f[mask], abs(F[mask]) / N, label="real")
-    # axes[2].set_xlabel("frequency (Hz)", fontsize=14)
-    # axes[2].set_ylabel("$|F|$", fontsize=14)
-    # plt.show()
-    # path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/visualization_feature/raw_data_time_sequentially/preseizure/BDP/e68ae816-0a94-11ea-a8f2-e0d55e6ff654-0.npy"
-    # data = np.load(path)
-    # print(data.shape)
-    # d = data[0]
-    # print(d)
-    # fft_function(d)
-    path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/visualization_feature/log/BDP/preseizure/BDP-random_sample.npy"
-    data = np.load(path, allow_pickle=True)
-    print(data.shape)
-    histogram_spectrum(data)
-    # a = [11, 11, 2, 3]
-    # print(len(dict(Counter(a))))
-    # for i in range(100):
-    #     print(np.random.randint(0, 10, 1))
+    test_auc()

@@ -41,7 +41,7 @@ parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
 parser.add_argument('-b', '--batch_size', type=int, default=32)
 parser.add_argument('-l', '--learning_rate', type=float, default=0.001)
-parser.add_argument('-e', '--epoch', type=int, default=4)
+parser.add_argument('-e', '--epoch', type=int, default=5)
 args = parser.parse_args()
 
 # hyper parameter setting

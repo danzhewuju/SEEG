@@ -185,6 +185,7 @@ def time_heat_map():
     :return:
     构造时间序列的热力图
     '''
+    max_lenth = 1800
     clean_dir("./log/{}/{}".format(patient_test, classification))
     # patient_test = "ZK"
     path = "./raw_data_time_sequentially/{}/".format(classification) + patient_test
@@ -196,7 +197,7 @@ def time_heat_map():
     heat_map_dir = "./log/{}/{}/heatmap".format(patient_test, classification)
     path_data = get_first_dir_path(path, 'npy')
     path_data.sort()  # 根据uuid 按照时间序列进行排序
-    count = min(len(path_data), 300)  # 拼接的时间
+    count = min(len(path_data), max_lenth)  # 拼接的时间
     selected_path = path_data[:count]
     dir_create_check(heat_map_dir)
     # clean_dir(heat_map_dir)  # 清除文件夹里面所有文件
@@ -208,7 +209,6 @@ def time_heat_map():
     size = test_1.size
     plt.figure(figsize=(2 * count, 3))
     result = Image.new(test_1.mode, (size[0] * count, size[1]))
-
     prediction = pd.read_csv("./log/{}/{}/heatmap.csv".format(patient_test, classification), sep=',')
     for i in range(count):
         if prediction.loc[i]['ground truth'] != prediction.loc[i]['prediction']:
