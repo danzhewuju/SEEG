@@ -185,7 +185,7 @@ def time_heat_map():
     :return:
     构造时间序列的热力图
     '''
-    max_lenth = 1800
+    max_lenth = 2083
     clean_dir("./log/{}/{}".format(patient_test, classification))
     # patient_test = "ZK"
     path = "./raw_data_time_sequentially/{}/".format(classification) + patient_test

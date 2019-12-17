@@ -27,7 +27,7 @@ patient_test = config['patient_test']
 print("patient_test is {}".format(patient_test))
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=2000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=4000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
@@ -36,8 +36,8 @@ argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
 argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=1e-3)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
-argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=10)
-argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=20)
+argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
+argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=5)
 argparser.add_argument('--dataset_dir', type=str, help="training data set",
                        default="../data/seeg/zero_data/{}".format(patient_test))
 
@@ -182,7 +182,7 @@ def main():
     test_recall = []
     test_f1score = []
     test_auc = []
-    for epoch in range(10):
+    for epoch in range(5):
         # fetch meta_batchsz num of episode each time
         db_test = DataLoader(mini_test, 1, shuffle=True, num_workers=1, pin_memory=True)
         accs = []
@@ -260,7 +260,7 @@ def main():
 
     result = "average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(
         acc_mean, h, pre_mean, h_p, recall_mean, h_r, f1_mean, h_f1, auc_mean, h_au)
-    log = "{}-{}:{} ".format(__file__, patient_test, result)
+    log = "{}-{}:\n{} ".format(os.path.basename(__file__), patient_test, result)
     LogRecord.write_log(log)
 
 
