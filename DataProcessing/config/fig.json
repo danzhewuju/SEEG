@@ -1,5 +1,5 @@
 {
   "transferdata.save_split_data_test__path_dir_1": "../visualization_feature/raw_data_time_sequentially",
   "transferdata.save_split_data_test__path_dir_2": "../data/data_slice/split",
-  "patient_test": "ZK"
+  "patient_test": "BDP"
 }
