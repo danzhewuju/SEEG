@@ -142,11 +142,12 @@ def precision():
         data = data[np.newaxis, :]
         data = torch.from_numpy(data)
         data = data.to(device)
-        result = maml_net(data)
-        c_result = result.cpu().detach().numpy()
-        r = softmax(c_result)
-        pre_y = r.argmax(1)
-        pre_result[name_id] = pre_y
+        with torch.no_grad():
+            result = maml_net(data)
+            c_result = result.cpu().detach().numpy()
+            r = softmax(c_result)
+            pre_y = r.argmax(1)
+            pre_result[name_id] = pre_y
 
     save_name = save_file_util("precision", "{}-{}.pkl".format(patient_test, "pre-seizure-precision-0"))
     with open(save_name, 'wb') as f:
