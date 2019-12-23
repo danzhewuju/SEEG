@@ -254,7 +254,8 @@ def raw_data_slice():
     # 2.正常数据的重写
     # execute
     flag = flag_dic[classification]
-    clean_dir("./raw_data_time_sequentially/{}/{}".format(classification, patient_test))  # 删除文件夹下面已有的旧的文件
+    # 可以选择是否删除文件下的文件
+    # clean_dir("./raw_data_time_sequentially/{}/{}".format(classification, patient_test))  # 删除文件夹下面已有的旧的文件
 
     path_dir = config_json["person_raw_data_{}_".format(classification) + patient_test]
     print("processing data from {}".format(path_dir))

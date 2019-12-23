@@ -1,14 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2019/12/5 19:59
+# @Time    : 2019/12/23 21:00
 # @Author  : Alex
 # @Site    : 
-# @File    : menu.py
+# @File    : work_station.py
 # @Software: PyCharm
 
-def run():
 
-
-
-if __name__ == '__main__':
-    run()

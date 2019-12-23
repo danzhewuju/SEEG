@@ -36,17 +36,17 @@ argparser.add_argument('--k_qry', type=int, help='k shot for query set', default
 argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=5)
-argparser.add_argument('--vae_lr', type=float, help='meta-level outer learning rate', default=0.002)
+argparser.add_argument('--vae_lr', type=float, help='meta-level outer learning rate', default=0.001)
 argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.001)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
-argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=10)
-argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=20)
+argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
+argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=5)
 argparser.add_argument('--dataset_dir', type=str, help="training data set",
                        default="../data/seeg/zero_data/{}".format(patient_test))
 argparser.add_argument('--no-cuda', action='store_true', default=False, help='enables CUDA training')
-argparser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/{}/train'.format(patient_test))
-argparser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/test'.format(patient_test))
-argparser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
+argparser.add_argument('-train_p', '--train_path', default='../data/seeg/mixed_data/{}/train'.format(patient_test))
+argparser.add_argument('-test_p', '--test_path', default='../data/seeg/mixed_data/{}/test'.format(patient_test))
+argparser.add_argument('-val_p', '--val_path', default='../data/seeg/mixed_data/{}/val'.format(patient_test))
 
 args = argparser.parse_args()
 
@@ -355,7 +355,7 @@ def maml_framwork():
 
                 test_accuracy = np.array(accs_all_test).mean()
                 print('Test acc:', test_accuracy)
-                if test_accuracy >= last_accuracy:
+                if test_accuracy > last_accuracy:
                     # save networks
                     torch.save(maml.state_dict(), str(
                         "./models/{}/maml".format(patient_test) + str(args.n_way) + "way_" + str(

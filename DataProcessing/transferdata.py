@@ -89,7 +89,7 @@ def data_save(path_read, name, flag, common_channels, flag_duration=0, isfilter=
     :param name: 文件的名称用于保存切片的数据
     :param flag: 状态为， 区别:癫痫发作前， 正常睡眠状态
     :param common_channels: 选取的信道的序列
-    :param flag_duration:
+    :param flag_duration: 0 表示就 preseizure 的状态不在细分
     :param isFilter: 是否滤波，医生希望看到原始数据
     :return:
     '''
@@ -109,6 +109,7 @@ def generate_data(path, flag, name, path_commom_channel, flag_duration=0, isfilt
     :param flag: 标志 0 ： 表示癫痫发作前的状态， 1：表示癫痫正在发作 2:表示正常睡觉时的状态
     :param name:病人的名称
     :path_common_channel : 公共的信道名称
+    flag_duration: 默认是不进行癫痫状态的细分的
     :return:
     '''
     data = pd.read_csv(path_commom_channel, sep=',')

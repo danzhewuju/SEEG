@@ -122,10 +122,14 @@ def save_file_util(dir, name):
 
 
 def precision():
-    path = "../visualization_feature/raw_data_time_sequentially/{}/{}".format("preseizure", patient_test)
-    data_info = Data_info(path, 0)
-    print(data_info.full_path)
-    print(sorted(data_info.full_path))
+    true_label = 1
+    state_dic = {0: "preseizure", 1: "sleep"}
+    # 模型世界的状态
+    path = "../visualization_feature/raw_data_time_sequentially/{}/{}/filter/".format(state_dic[true_label], patient_test)
+    print("path:{}".format(path))
+    data_info = Data_info(path, true_label)
+    # print(data_info.full_path)
+    # print(sorted(data_info.full_path))
     my_dataset = MyDataset(data_info.full_path)
     maml = Meta(args, config).to(device)
     model_path = str(
@@ -150,13 +154,14 @@ def precision():
             pre_result[name_id] = pre_y
 
     save_name = save_file_util("precision", "{}-{}.pkl".format(patient_test, "pre-seizure-precision-0"))
+    # save_name = save_file_util("precision", "{}-{}.pkl".format(patient_test, "sleep-precision-1"))
     with open(save_name, 'wb') as f:
         pickle.dump(pre_result, f)
         print("save success!")
     sum_length = len(pre_result)
     count = 0
     for name_id, pre in pre_result.items():
-        if pre == 0:
+        if pre == true_label:
             count += 1
     print("Accuracy: {}".format(count / sum_length))
 
