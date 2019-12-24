@@ -316,7 +316,7 @@ class Meta(nn.Module):
                 auc[k + 1] = cal.get_auc()
 
         # del net
-        index = 0
+        index = len(corrects)-1
         # index = corrects.index(max(corrects))  # 选取准确率最高的那个结果
 
         loss_all /= self.update_step_test - 1
@@ -329,11 +329,6 @@ class Meta(nn.Module):
         # accs = np.array(corrects) / querysz
 
         return result, loss_all
-
-
-
-
-
 
 
 def main():

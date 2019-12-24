@@ -122,10 +122,10 @@ def save_file_util(dir, name):
 
 
 def precision():
-    true_label = 1
+    true_label = 0
     state_dic = {0: "preseizure", 1: "sleep"}
     # 模型世界的状态
-    path = "../visualization_feature/raw_data_time_sequentially/{}/{}/filter/".format(state_dic[true_label], patient_test)
+    path = "../visualization_feature/raw_data_time_sequentially/{}/{}/filter/pre_2".format(state_dic[true_label], patient_test)
     print("path:{}".format(path))
     data_info = Data_info(path, true_label)
     # print(data_info.full_path)
