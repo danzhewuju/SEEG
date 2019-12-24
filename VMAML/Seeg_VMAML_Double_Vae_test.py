@@ -160,7 +160,7 @@ def main():
     if os.path.exists(path):
 
         maml.load_state_dict(torch.load(path))
-        print("load model success")
+        print("load model success {}".format(path))
     else:
         print("model doesn't exist!")
         exit(0)
@@ -184,7 +184,7 @@ def main():
     test_auc = []
     for epoch in range(5):
         # fetch meta_batchsz num of episode each time
-        db_test = DataLoader(mini_test, 1, shuffle=True, num_workers=1, pin_memory=True)
+        db_test = DataLoader(mini_test, 5, shuffle=True, num_workers=1, pin_memory=True)
         accs = []
         precisions = []
         recalls = []

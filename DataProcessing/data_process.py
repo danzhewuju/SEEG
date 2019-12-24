@@ -190,7 +190,7 @@ def data_process_n_1():
         os.system("rm -r {}".format(val_folder))
 
     path_normal = "sleep_normal"
-    path_pre_seizure = "pre_zeizure"
+    path_pre_seizure = "pre_seizure"
     train_folder_dir_normal = os.path.join(train_folder, path_normal)
     train_folder_dir_pre = os.path.join(train_folder, path_pre_seizure)
     # train_folder_dir_awake = os.path.join(train_folder, path_awake)

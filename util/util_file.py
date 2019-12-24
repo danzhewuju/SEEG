@@ -304,8 +304,18 @@ class IndicatorCalculation():  # 包含二分类中各种指标
             return (2 * self.__tp()) / (2 * self.__tp() + self.__fn() + self.__fp())
 
     def get_auc(self):
-        y_predict = self.prediction.cpu()
-        y_real = self.ground_truth.cpu()
+        if type(self.prediction) is not np.ndarray:
+            self.prediction = np.asarray(self.prediction)
+            self.ground_truth = np.asarray(self.ground_truth)
+        # if False:
+        #     y_predict = self.prediction.cpu()
+        #     y_real = self.ground_truth.cpu()
+        # else:
+        #     y_predict = self.prediction
+        #     y_real = self.ground_truth
+        y_predict = self.prediction
+        y_real = self.ground_truth
+
         auc_score = metrics.roc_auc_score(y_real, y_predict)
         return auc_score
 
@@ -432,9 +442,11 @@ class LogRecord:
         f.close()
 
 
+def test_list():
+    a = [1, 2, 3]
+    b = [4, 5, 6]
+    print(a + b)
+
+
 if __name__ == '__main__':
-    for i in range(10):
-        a = np.random.randint(0, 10, (3, 3))
-        print(a)
-        print(get_matrix_max_location(a, 1))
-    # print(time_add(23,42,37, 14400))
+    test_list()

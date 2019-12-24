@@ -29,7 +29,7 @@ config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指�
 patient_test = config['patient_test']
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=4000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=100000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
@@ -97,7 +97,7 @@ class Data_info():
             dir_names = os.listdir(path)
             for n in dir_names:
                 full_path = os.path.join(path, n)
-                if name == "pre_zeizure":
+                if name == "pre_seizure":
                     preseizure.append((full_path, index))
                 else:
                     sleep_normal.append((full_path, index))
@@ -302,7 +302,7 @@ def maml_framwork():
 
     # flag_vae = True  # 设置梯度反向传播的标志位，vae
     # flag_maml = not flag_vae  # 设置梯度反向传播的薄志伟，maml
-    for epoch in range(2):  # 设置迭代次数
+    for epoch in range(1):  # 设置迭代次数
         # fetch meta_batchsz num of episode each time
         db = DataLoader(mini, args.task_num, shuffle=True, num_workers=1, pin_memory=True)
 

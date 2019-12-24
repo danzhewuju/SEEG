@@ -60,5 +60,8 @@ if __name__ == '__main__':
     # path = "./log/BDP/preseizure/BDP-random_sample.npy"
     # # test_fft(path)
     # feature_analysis(feature_data_path=path)
-    path = "./log/BDP/preseizure/BDP-feature.npy"
-    test_data_shape(path)
+    # path = "./log/BDP/preseizure/BDP-feature.npy"
+#     # test_data_shape(path)
+    path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/visualization_feature/raw_data_time_sequentially/preseizure/BDP/filter/pre_1/e076f2d4-2552-11ea-9699-e0d55e6ff654-0.npy"
+    data = np.load(path)
+    print(data.shape)

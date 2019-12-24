@@ -64,7 +64,7 @@ class Data_info():
             dir_names = os.listdir(path)
             for n in dir_names:
                 full_path = os.path.join(path, n)
-                if name == "pre_zeizure":
+                if name == "pre_seizure":
                     preseizure.append((full_path, index))
                 else:
                     sleep_normal.append((full_path, index))
@@ -75,7 +75,7 @@ class Data_info():
             dir_names = os.listdir(path)
             for n in dir_names:
                 full_path = os.path.join(path, n)
-                if name == "pre_zeizure":
+                if name == "pre_seizure":
                     preseizure.append((full_path, index))
                 else:
                     sleep_normal.append((full_path, index))

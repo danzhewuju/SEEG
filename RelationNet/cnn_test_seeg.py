@@ -29,8 +29,8 @@ print("patient_test is {}".format(patient_test))
 parser = argparse.ArgumentParser(description="CNN parameter setting!")
 parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
 parser.add_argument('-s', '--sample', default=100)  # 对其进行重采样
-parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/{}/train'.format(patient_test))
-parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/test'.format(patient_test))
+parser.add_argument('-train_p', '--train_path', default='../data/seeg/mixed_data/{}/train'.format(patient_test))
+parser.add_argument('-test_p', '--test_path', default='../data/seeg/mixed_data/{}/test'.format(patient_test))
 parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
 parser.add_argument('-m_p', '--model_path', default='./models/cnn_model/model-cnn_{}.ckpt')
 parser.add_argument('-g', '--GPU', type=int, default=0)
@@ -127,7 +127,7 @@ class Data_info():
             dir_names = os.listdir(path)
             for n in dir_names:
                 full_path = os.path.join(path, n)
-                data_val.append((full_path, index))
+                data_val.append((full_path, index, n))
 
         self.val = data_val
         self.val_length = len(data_val)
@@ -138,13 +138,13 @@ class MyDataset(Dataset):
         self.datas = datas
 
     def __getitem__(self, item):
-        d_p, label = self.datas[item]
+        d_p, label, name_id = self.datas[item]
         data = np.load(d_p)
         result = matrix_normalization(data, (130, 200))
         result = result.astype('float32')
         result = result[np.newaxis, :]
         # result = trans_data(vae_model, result)
-        return result, label
+        return result, label, name_id
 
     def __len__(self):
         return len(self.datas)
@@ -154,11 +154,11 @@ def run():
     start_time = time.time()  # 开始时间
     data_info = Data_info(VAL_PATH)
     val_data = MyDataset(data_info.val)  # 标准数据集的构造
-    val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True)
+    val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=False)
 
     model = CNN().cuda(GPU)  # 保持和之前的神经网络相同的结构特征?
     model.load_state_dict(torch.load(MODLE_PATH))
-    print("Loading {} model!".format(MODLE_PATH))
+    print("Loading model! {}".format(MODLE_PATH))
 
     total = data_info.val_length
     correct = 0
@@ -172,30 +172,25 @@ def run():
     total_f1_score = []
     total_auc = []
     for i in range(10):
-        correct = 0
-        accuracies = []
-        precisions = []
-        recalls = []
-        f1scores = []
-        aucs = []
+
+        pre_label = []
+        ground_label = []
         with torch.no_grad():
-            for (data, labels) in val_loader:
+            for (data, labels, name_id) in val_loader:
                 data = data.cuda(GPU)
                 labels = labels.cuda(GPU)
 
                 outputs = model(data)  # 直接获得模型的结果
                 _, predicted = torch.max(outputs.data, 1)
-                cal.set_values(predicted, labels)
-                accuracies.append(cal.get_accuracy())
-                precisions.append(cal.get_precision())
-                recalls.append(cal.get_recall())
-                f1scores.append(cal.get_f1score())
-                aucs.append(cal.get_auc())
-        acc_avg = np.array(accuracies).mean()
-        precisions_avg = np.array(precisions).mean()
-        recall_avg = np.array(recalls).mean()
-        f1score_avg = np.array(f1scores).mean()
-        auc_avg = np.array(aucs).mean()
+                pre_label += predicted.tolist()
+                ground_label += labels.detach().cpu().numpy().tolist()
+
+        cal.set_values(pre_label, ground_label)
+        acc_avg = cal.get_accuracy()
+        precisions_avg = cal.get_precision()
+        recall_avg = cal.get_recall()
+        f1score_avg = cal.get_f1score()
+        auc_avg = cal.get_auc()
 
         total_accuracy.append(acc_avg)
         total_precision.append(precisions_avg)
@@ -215,8 +210,9 @@ def run():
                                                                        average_recall, h_r,
                                                                        average_f1score, h_f, average_auc, h_au))
 
-    result = "average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n average f1score "\
-             ":{}, h:{}\n average AUC :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p, average_recall, h_r, average_f1score, h_f, average_auc, h_au)
+    result = "average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n average f1score " \
+             ":{}, h:{}\n average AUC :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p, average_recall,
+                                                          h_r, average_f1score, h_f, average_auc, h_au)
     log = "{}-{}:\n{} ".format(os.path.basename(__file__), patient_test, result)
     LogRecord.write_log(log)
     end_time = time.time()
@@ -224,5 +220,79 @@ def run():
     print("Running Time {:.4f}".format(run_time))
 
 
+def run_test_1():
+    true_label = 0
+    CNN_batch_size = 16
+
+    class Data_info():
+        def __init__(self, path_val, label):
+            # pre-seizure: 0  non-seizure:1
+            names = os.listdir(path_val)
+            full_path = [(os.path.join(path_val, x), label, x) for x in names]
+            self.full_path = full_path
+            self.data_length = len(full_path)
+            self.names = names
+
+    class MyDataset(Dataset):  # 重写dateset的相关类
+        def __init__(self, imgs):
+            self.imgs = imgs
+            # self.transform = transform
+            # self.target_transform = target_transform
+
+        def __getitem__(self, index):
+            fn, label, name_id = self.imgs[index]
+            data = np.load(fn)
+            result = matrix_normalization(data, (130, 200))
+            result = result.astype('float32')
+            result = result[np.newaxis, :]
+            return result, label, name_id
+
+        def __len__(self):
+            return len(self.imgs)
+
+    data_path = "../data/seeg/zero_data/BDP/val/sleep_normal"
+    print("path:{}".format(data_path))
+    data_info = Data_info(data_path, true_label)
+    my_dataset = MyDataset(data_info.full_path)
+    dataloader = DataLoader(my_dataset, batch_size=CNN_batch_size, shuffle=False)
+
+    cnn_model = CNN().cuda(0)
+    # model.load_state_dict(torch.load(MODLE_PATH))
+    model_path = MODLE_PATH
+    if os.path.exists(model_path):
+        cnn_model.load_state_dict(torch.load(model_path))
+        print("CNN model loaded success! {}".format(model_path))
+    else:
+        print("modle is not exist!")
+        exit(0)
+    pre_result = {}
+    with torch.no_grad():
+        for data, label, name_id in dataloader:
+            data = data.cuda(0)
+
+            outputs = cnn_model(data)
+            # print(outputs)
+            # c_result = outputs.cpu().detach().numpy()
+            # r = softmax(c_result, axis=1)
+            # pre_y = r.argmax(1)[0]
+            _, predicted = torch.max(outputs.data, 1)
+            pre_y = predicted
+
+            pre_result[name_id[0]] = pre_y
+
+    # save_name = save_file_util("precision", "{}-{}.pkl".format(patient_test, "pre-seizure-precision-0"))
+    # # save_name = save_file_util("precision", "{}-{}.pkl".format(patient_test, "sleep-precision-1"))
+    # with open(save_name, 'wb') as f:
+    #     pickle.dump(pre_result, f)
+    #     print("save success!")
+    sum_length = len(pre_result)
+    count = 0
+    for name_id, pre in pre_result.items():
+        if pre == true_label:
+            count += 1
+    print("Accuracy: {}".format(count / sum_length))
+
+
 if __name__ == '__main__':
     run()
+    # run_test_1()

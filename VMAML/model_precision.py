@@ -26,6 +26,7 @@ from MAML.Mamlnet import Seegnet
 from VMAML.vmeta import *
 from util.util_file import Pyemail, LogRecord
 import json
+from functools import partial
 
 config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
 patient_test = config['patient_test']
@@ -56,7 +57,11 @@ TEST_PATH = args.test_path
 TRAIN_PATH = args.train_path
 VAL_PATH = args.val_path
 VAE_LR = args.vae_lr
+CNN_batch_size = 16
 device = torch.device("cuda" if args.cuda else "cpu")
+
+# 模型的选择 1.CNN 2.MAML
+model_selection = "CNN"
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 
@@ -81,6 +86,55 @@ config = [
     ('linear', [args.n_way, 7040])]
 
 resize = (130, 200)
+
+x_ = 8
+y_ = 12
+NUM_CLASS = 2
+
+
+class CNN(nn.Module):
+    def __init__(self):
+        super(CNN, self).__init__()
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2))
+
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(16, 32, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+
+        self.layer3 = nn.Sequential(
+            nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+
+        self.layer4 = nn.Sequential(
+            nn.Conv2d(64, 32, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+        self.fc1 = nn.Linear(x_ * y_ * 32, 32)  # x_ y_ 和你输入的矩阵有关系
+        self.fc2 = nn.Linear(32, 8)
+        self.fc3 = nn.Linear(8, NUM_CLASS)  # 取决于最后的个数种类
+
+    def forward(self, x):
+        out = self.layer1(x)
+        out = self.layer2(out)
+        out = self.layer3(out)
+        out = self.layer4(out)
+        out = out.reshape(out.size(0), -1)  # 这里面的-1代表的是自适应的意思。
+        out = self.fc1(out)
+        out = self.fc2(out)
+        out = self.fc3(out)
+        return out
 
 
 class Data_info():
@@ -121,11 +175,11 @@ def save_file_util(dir, name):
     return save_name
 
 
-def precision():
-    true_label = 0
-    state_dic = {0: "preseizure", 1: "sleep"}
+def precision_vmaml():
     # 模型世界的状态
-    path = "../visualization_feature/raw_data_time_sequentially/{}/{}/filter/pre_2".format(state_dic[true_label], patient_test)
+
+    path = "../visualization_feature/raw_data_time_sequentially/{}/{}/filter/".format(state_dic[true_label],
+                                                                                      patient_test)
     print("path:{}".format(path))
     data_info = Data_info(path, true_label)
     # print(data_info.full_path)
@@ -166,6 +220,56 @@ def precision():
     print("Accuracy: {}".format(count / sum_length))
 
 
+def precision_cnn():
+    # data_path = "../visualization_feature/raw_data_time_sequentially/{}/{}/filter".format(state_dic[true_label],
+    #                                                                                             patient_test)
+    data_path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/BDP/val/sleep_normal"
+    print("path:{}".format(data_path))
+    data_info = Data_info(data_path, true_label)
+    my_dataset = MyDataset(data_info.full_path)
+    dataloader = DataLoader(my_dataset, batch_size=CNN_batch_size, shuffle=False)
+    cnn_model = CNN().cuda(0)
+    model_path = "../RelationNet/models/cnn_model/model-cnn_{}.ckpt".format(patient_test)
+    if os.path.exists(model_path):
+        cnn_model.load_state_dict(torch.load(model_path))
+        print("CNN model loaded success! {}".format(model_path))
+    else:
+        print("modle is not exist!")
+        exit(0)
+    pre_result = {}
+    with torch.no_grad():
+        for data, label, name_id in dataloader:
+            data = data.cuda(device)
+
+            outputs = cnn_model(data)
+            # print(outputs)
+            # c_result = outputs.cpu().detach().numpy()
+            # r = softmax(c_result, axis=1)
+            # pre_y = r.argmax(1)[0]
+            _, predicted = torch.max(outputs.data, 1)
+            pre_y = predicted
+
+            pre_result[name_id[0]] = pre_y
+
+    save_name = save_file_util("precision", "{}-{}.pkl".format(patient_test, "pre-seizure-precision-0"))
+    # save_name = save_file_util("precision", "{}-{}.pkl".format(patient_test, "sleep-precision-1"))
+    with open(save_name, 'wb') as f:
+        pickle.dump(pre_result, f)
+        print("save success!")
+    sum_length = len(pre_result)
+    count = 0
+    for name_id, pre in pre_result.items():
+        if pre == true_label:
+            count += 1
+    print("Accuracy: {}".format(count / sum_length))
+
+
 if __name__ == '__main__':
-    # precision()
-    precision()
+    true_label = 0
+    state_dic = {0: "sleep", 1: "preseizure"}
+    # run_dict = {"VMAML": partial(precision_vmaml), "CNN": partial(precision_cnn)}
+    # run_dict[model_selection]
+    if model_selection == "CNN":
+        precision_cnn()
+    else:
+        precision_vmaml()
