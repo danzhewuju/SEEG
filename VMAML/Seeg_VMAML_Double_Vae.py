@@ -45,7 +45,7 @@ argparser.add_argument('--dataset_dir', type=str, help="training data set",
                        default="../data/seeg/zero_data/{}".format(patient_test))
 argparser.add_argument('--no-cuda', action='store_true', default=False, help='enables CUDA training')
 argparser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/{}/train'.format(patient_test))
-argparser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
+argparser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/test'.format(patient_test))
 argparser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
 
 args = argparser.parse_args()
