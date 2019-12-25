@@ -233,9 +233,9 @@ def precision_vmaml():
 def precision_cnn():
     # data_path = "../visualization_feature/raw_data_time_sequentially/{}/{}/filter".format(state_dic[true_label],
     #                                                                                             patient_test)
-    data_path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/BDP/val/sleep_normal"
+    data_path = "../visualization_feature/valpatient_data"
     print("path:{}".format(data_path))
-    data_info = Data_info(data_path, true_label)
+    data_info = Data_info(data_path)
     my_dataset = MyDataset(data_info.full_path)
     dataloader = DataLoader(my_dataset, batch_size=CNN_batch_size, shuffle=False)
     cnn_model = CNN().cuda(0)
@@ -247,6 +247,8 @@ def precision_cnn():
         print("modle is not exist!")
         exit(0)
     pre_result = {}
+    pre_list = []
+    true_list = []
     with torch.no_grad():
         for data, label, name_id in dataloader:
             data = data.cuda(device)
@@ -256,22 +258,23 @@ def precision_cnn():
             # c_result = outputs.cpu().detach().numpy()
             # r = softmax(c_result, axis=1)
             # pre_y = r.argmax(1)[0]
-            _, predicted = torch.max(outputs.data, 1)
-            pre_y = predicted
+            c_result = outputs.cpu().detach().numpy()
 
-            pre_result[name_id[0]] = pre_y
+            r = softmax(c_result)
+            pre_y = r.argmax(1)
+            pre_result[name_id] = pre_y
+            pre_list.append(pre_y[0])
+            true_list.append(label[0])
 
     save_name = save_file_util("precision", "{}-{}.pkl".format(patient_test, "pre-seizure-precision-0"))
     # save_name = save_file_util("precision", "{}-{}.pkl".format(patient_test, "sleep-precision-1"))
     with open(save_name, 'wb') as f:
         pickle.dump(pre_result, f)
         print("save success!")
-    sum_length = len(pre_result)
-    count = 0
-    for name_id, pre in pre_result.items():
-        if pre == true_label:
-            count += 1
-    print("Accuracy: {}".format(count / sum_length))
+    cal = IndicatorCalculation()
+    cal.set_values(pre_list, true_list)
+    print("Accuracy:{}, Precision:{}, Recall:{}, f1_score:{}".format(cal.get_accuracy(), cal.get_precision(),
+                                                                     cal.get_recall(), cal.get_f1score()))
 
 
 if __name__ == '__main__':

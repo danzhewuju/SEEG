@@ -29,7 +29,7 @@ config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指�
 patient_test = config['patient_test']
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=4000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
@@ -353,8 +353,16 @@ def maml_framwork():
                     avg_loss = np.mean(np.array(loss_all_test))
                     plt_test_loss.append(avg_loss)
 
+
+                    model_path = "./models/{}/maml{}way_{}shot_{}_epoch_{}.pkl".format(patient_test, args.n_way,
+                                                                                       args.k_spt,
+                                                                                       patient_test, step)
+                    torch.save(maml.state_dict(), model_path)
+                    print("epoch {} model has been saved!".format(step))
+
                 test_accuracy = np.array(accs_all_test).mean()
                 print('Test acc:', test_accuracy)
+
                 if test_accuracy > last_accuracy:
                     # save networks
                     torch.save(maml.state_dict(), str(
