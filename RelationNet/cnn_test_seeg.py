@@ -31,7 +31,7 @@ parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
 parser.add_argument('-s', '--sample', default=100)  # 对其进行重采样
 parser.add_argument('-train_p', '--train_path', default='../data/seeg/mixed_data/{}/train'.format(patient_test))
 parser.add_argument('-test_p', '--test_path', default='../data/seeg/mixed_data/{}/test'.format(patient_test))
-parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
+parser.add_argument('-val_p', '--val_path', default='../visualization_feature/train_data'.format(patient_test))
 parser.add_argument('-m_p', '--model_path', default='./models/cnn_model/model-cnn_{}.ckpt')
 parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
@@ -154,7 +154,7 @@ def run():
     start_time = time.time()  # 开始时间
     data_info = Data_info(VAL_PATH)
     val_data = MyDataset(data_info.val)  # 标准数据集的构造
-    val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=False)
+    val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True)
 
     model = CNN().cuda(GPU)  # 保持和之前的神经网络相同的结构特征?
     model.load_state_dict(torch.load(MODLE_PATH))
@@ -222,7 +222,7 @@ def run():
 
 def run_test_1():
     true_label = 0
-    CNN_batch_size = 16
+    CNN_batch_size = 1
 
     class Data_info():
         def __init__(self, path_val, label):
@@ -256,11 +256,11 @@ def run_test_1():
     my_dataset = MyDataset(data_info.full_path)
     dataloader = DataLoader(my_dataset, batch_size=CNN_batch_size, shuffle=False)
 
-    cnn_model = CNN().cuda(0)
+    model = CNN().cuda(0)
     # model.load_state_dict(torch.load(MODLE_PATH))
     model_path = MODLE_PATH
     if os.path.exists(model_path):
-        cnn_model.load_state_dict(torch.load(model_path))
+        model.load_state_dict(torch.load(model_path))
         print("CNN model loaded success! {}".format(model_path))
     else:
         print("modle is not exist!")
@@ -270,7 +270,7 @@ def run_test_1():
         for data, label, name_id in dataloader:
             data = data.cuda(0)
 
-            outputs = cnn_model(data)
+            outputs = model(data)
             # print(outputs)
             # c_result = outputs.cpu().detach().numpy()
             # r = softmax(c_result, axis=1)
@@ -295,4 +295,4 @@ def run_test_1():
 
 if __name__ == '__main__':
     run()
-    # run_test_1()
+    run_test_1()

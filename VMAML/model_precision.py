@@ -61,7 +61,7 @@ CNN_batch_size = 16
 device = torch.device("cuda" if args.cuda else "cpu")
 
 # 模型的选择 1.CNN 2.MAML
-model_selection = "CNN"
+model_selection = "VMAML"
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 
@@ -138,20 +138,22 @@ class CNN(nn.Module):
 
 
 class Data_info():
-    def __init__(self, path_val, label):
-        # pre-seizure: 0  non-seizure:1
-        names = os.listdir(path_val)
-        full_path = [(os.path.join(path_val, x), label, x) for x in names]
-        self.full_path = full_path
-        self.data_length = len(full_path)
-        self.names = names
+    def __init__(self, path_val):
+        # sleep_normal:0    pre-seizure: 1
+        dirs = os.listdir(path_val)
+        data_val = []
+        for (index, d) in enumerate(dirs):
+            path_l = os.path.join(path_val, d)
+            names = os.listdir(path_l)
+            data_val += [(os.path.join(path_l, x), index, x) for x in names]
+
+        self.full_path = data_val
+        self.data_length = len(data_val)
 
 
 class MyDataset(Dataset):  # 重写dateset的相关类
-    def __init__(self, imgs, transform=None, target_transform=None):
+    def __init__(self, imgs):
         self.imgs = imgs
-        self.transform = transform
-        self.target_transform = target_transform
 
     def __getitem__(self, index):
         fn, label, name_id = self.imgs[index]
@@ -178,13 +180,15 @@ def save_file_util(dir, name):
 def precision_vmaml():
     # 模型世界的状态
 
-    path = "../visualization_feature/raw_data_time_sequentially/{}/{}/filter/".format(state_dic[true_label],
-                                                                                      patient_test)
+    # path = "../visualization_feature/raw_data_time_sequentially/{}/{}/filter/".format(state_dic[true_label],
+    #                                                                                   patient_test)
+    path = "../visualization_feature/valpatient_data"
     print("path:{}".format(path))
-    data_info = Data_info(path, true_label)
+    data_info = Data_info(path)
     # print(data_info.full_path)
     # print(sorted(data_info.full_path))
     my_dataset = MyDataset(data_info.full_path)
+    data_loader = DataLoader(my_dataset, batch_size=1, shuffle=True)
     maml = Meta(args, config).to(device)
     model_path = str(
         "./models/{}/maml".format(patient_test) + str(args.n_way) + "way_" + str(args.k_spt) + "shot_{}.pkl".format(
@@ -195,10 +199,10 @@ def precision_vmaml():
         print("model is not exist!")
     maml_net = maml.net
     pre_result = {}
+    pre_list = []
+    true_list = []
 
-    for data, label, name_id in my_dataset:
-        data = data[np.newaxis, :]
-        data = torch.from_numpy(data)
+    for data, label, name_id in data_loader:
         data = data.to(device)
         with torch.no_grad():
             result = maml_net(data)
@@ -206,18 +210,24 @@ def precision_vmaml():
             r = softmax(c_result)
             pre_y = r.argmax(1)
             pre_result[name_id] = pre_y
+            pre_list.append(pre_y[0])
+            true_list.append(label[0])
+    cal = IndicatorCalculation()
+    cal.set_values(pre_list, true_list)
+    print("Accuracy:{}, Precision:{}, Recall:{}, f1_score:{}".format(cal.get_accuracy(), cal.get_precision(),
+                                                                     cal.get_recall(), cal.get_f1score()))
 
-    save_name = save_file_util("precision", "{}-{}.pkl".format(patient_test, "pre-seizure-precision-0"))
-    # save_name = save_file_util("precision", "{}-{}.pkl".format(patient_test, "sleep-precision-1"))
-    with open(save_name, 'wb') as f:
-        pickle.dump(pre_result, f)
-        print("save success!")
-    sum_length = len(pre_result)
-    count = 0
-    for name_id, pre in pre_result.items():
-        if pre == true_label:
-            count += 1
-    print("Accuracy: {}".format(count / sum_length))
+    # save_name = save_file_util("precision", "{}-{}.pkl".format(patient_test, "pre-seizure-precision-0"))
+    # # save_name = save_file_util("precision", "{}-{}.pkl".format(patient_test, "sleep-precision-1"))
+    # with open(save_name, 'wb') as f:
+    #     pickle.dump(pre_result, f)
+    #     print("save success!")
+    # sum_length = len(pre_result)
+    # count = 0
+    # for name_id, pre in pre_result.items():
+    #     if pre == true_label:
+    #         count += 1
+    # print("Accuracy: {}".format(count / sum_length))
 
 
 def precision_cnn():

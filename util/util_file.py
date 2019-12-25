@@ -304,17 +304,12 @@ class IndicatorCalculation():  # 包含二分类中各种指标
             return (2 * self.__tp()) / (2 * self.__tp() + self.__fn() + self.__fp())
 
     def get_auc(self):
-        if type(self.prediction) is not np.ndarray:
-            self.prediction = np.asarray(self.prediction)
-            self.ground_truth = np.asarray(self.ground_truth)
-        # if False:
-        #     y_predict = self.prediction.cpu()
-        #     y_real = self.ground_truth.cpu()
-        # else:
-        #     y_predict = self.prediction
-        #     y_real = self.ground_truth
-        y_predict = self.prediction
-        y_real = self.ground_truth
+        # if type(self.prediction) is not np.ndarray:
+        #     self.prediction = np.asarray(self.prediction)
+        #     self.ground_truth = np.asarray(self.ground_truth)
+
+        y_predict = self.prediction.cpu()
+        y_real = self.ground_truth.cpu()
 
         auc_score = metrics.roc_auc_score(y_real, y_predict)
         return auc_score
