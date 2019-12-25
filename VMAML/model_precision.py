@@ -61,7 +61,7 @@ CNN_batch_size = 1
 device = torch.device("cuda" if args.cuda else "cpu")
 
 # 模型的选择 1.CNN 2.MAML
-model_selection = "CNN"
+model_selection = "MAML"
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 
@@ -177,7 +177,7 @@ def save_file_util(dir, name):
     return save_name
 
 
-def precision_vmaml(epoch=None):
+def precision_vmaml(epoch=300):
     # 模型世界的状态
 
     # path = "../visualization_feature/raw_data_time_sequentially/{}/{}/filter/".format(state_dic[true_label],
@@ -237,6 +237,8 @@ def precision_cnn():
     # data_path = "../visualization_feature/raw_data_time_sequentially/{}/{}/filter".format(state_dic[true_label],
     #                                                                                             patient_test)
     data_path = "../visualization_feature/valpatient_data"
+    # data_path = '../data/seeg/zero_data/{}/val'.format(patient_test)
+
     print("path:{}".format(data_path))
     data_info = Data_info(data_path)
     my_dataset = MyDataset(data_info.full_path)
