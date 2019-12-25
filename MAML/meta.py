@@ -217,7 +217,7 @@ class Meta(nn.Module):
                 f1scores[k + 1] = cal.get_f1score()
                 auc[k+1] = cal.get_auc()
 
-        # del net
+        del net
         loss_all /= self.update_step_test - 1
 
         # accs = np.array(corrects) / querysz

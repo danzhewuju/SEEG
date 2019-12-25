@@ -31,7 +31,7 @@ parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
 parser.add_argument('-s', '--sample', default=100)  # 对其进行重采样
 parser.add_argument('-train_p', '--train_path', default='../data/seeg/mixed_data/{}/train'.format(patient_test))
 parser.add_argument('-test_p', '--test_path', default='../data/seeg/mixed_data/{}/test'.format(patient_test))
-parser.add_argument('-val_p', '--val_path', default='../visualization_feature/train_data'.format(patient_test))
+parser.add_argument('-val_p', '--val_path', default='../visualization_feature/valpatient_data/')
 parser.add_argument('-m_p', '--model_path', default='./models/cnn_model/model-cnn_{}.ckpt')
 parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
@@ -190,29 +190,29 @@ def run():
         precisions_avg = cal.get_precision()
         recall_avg = cal.get_recall()
         f1score_avg = cal.get_f1score()
-        auc_avg = cal.get_auc()
+        # auc_avg = cal.get_auc()
 
         total_accuracy.append(acc_avg)
         total_precision.append(precisions_avg)
         total_recall.append(recall_avg)
         total_f1_score.append(f1score_avg)
-        total_auc.append(auc_avg)
+        # total_auc.append(auc_avg)
 
-        print('Test Accuracy:{:.5f}, Test Precision:{:.5f}, Test Recall:{:.5f}, Test F1 score:{:.5f}, Test AUC:{:.5f}'.
-              format(acc_avg, precisions_avg, recall_avg, f1score_avg, auc_avg))
+        print('Test Accuracy:{:.5f}, Test Precision:{:.5f}, Test Recall:{:.5f}, Test F1 score:{:.5f}'.
+              format(acc_avg, precisions_avg, recall_avg, f1score_avg))
     average_accuracy, h_a = mean_confidence_interval(total_accuracy)
     average_precision, h_p = mean_confidence_interval(np.array(total_precision))
     average_recall, h_r = mean_confidence_interval(np.array(total_recall))
     average_f1score, h_f = mean_confidence_interval(np.array(total_f1_score))
-    average_auc, h_au = mean_confidence_interval(total_auc)
+    # average_auc, h_au = mean_confidence_interval(total_auc)
     print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n "
-          "average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p,
-                                                                       average_recall, h_r,
-                                                                       average_f1score, h_f, average_auc, h_au))
+          "average f1score :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p,
+                                               average_recall, h_r,
+                                               average_f1score, h_f))
 
     result = "average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n average f1score " \
-             ":{}, h:{}\n average AUC :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p, average_recall,
-                                                          h_r, average_f1score, h_f, average_auc, h_au)
+             ":{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p, average_recall,
+                                  h_r, average_f1score, h_f)
     log = "{}-{}:\n{} ".format(os.path.basename(__file__), patient_test, result)
     LogRecord.write_log(log)
     end_time = time.time()

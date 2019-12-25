@@ -57,11 +57,11 @@ TEST_PATH = args.test_path
 TRAIN_PATH = args.train_path
 VAL_PATH = args.val_path
 VAE_LR = args.vae_lr
-CNN_batch_size = 16
+CNN_batch_size = 1
 device = torch.device("cuda" if args.cuda else "cpu")
 
 # 模型的选择 1.CNN 2.MAML
-model_selection = "VMAML"
+model_selection = "CNN"
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 
@@ -177,12 +177,13 @@ def save_file_util(dir, name):
     return save_name
 
 
-def precision_vmaml():
+def precision_vmaml(epoch=None):
     # 模型世界的状态
 
     # path = "../visualization_feature/raw_data_time_sequentially/{}/{}/filter/".format(state_dic[true_label],
     #                                                                                   patient_test)
     path = "../visualization_feature/valpatient_data"
+    # path = '../data/seeg/zero_data/{}/val'.format(patient_test)
     print("path:{}".format(path))
     data_info = Data_info(path)
     # print(data_info.full_path)
@@ -191,8 +192,10 @@ def precision_vmaml():
     data_loader = DataLoader(my_dataset, batch_size=1, shuffle=True)
     maml = Meta(args, config).to(device)
     model_path = str(
-        "./models/{}/maml".format(patient_test) + str(args.n_way) + "way_" + str(args.k_spt) + "shot_{}.pkl".format(
-            patient_test))
+        "./models/{}/maml".format(patient_test) + str(args.n_way) + "way_" + str(
+            args.k_spt) + "shot_{}_epoch_{}.pkl".format(
+            patient_test, epoch))
+    # model_path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/MAML/models/BDP/maml2way_5shot_BDP.pkl"
     if os.path.exists(model_path):
         maml.load_state_dict(torch.load(model_path))
     else:
@@ -238,6 +241,7 @@ def precision_cnn():
     data_info = Data_info(data_path)
     my_dataset = MyDataset(data_info.full_path)
     dataloader = DataLoader(my_dataset, batch_size=CNN_batch_size, shuffle=False)
+
     cnn_model = CNN().cuda(0)
     model_path = "../RelationNet/models/cnn_model/model-cnn_{}.ckpt".format(patient_test)
     if os.path.exists(model_path):
@@ -277,6 +281,12 @@ def precision_cnn():
                                                                      cal.get_recall(), cal.get_f1score()))
 
 
+def test_vmaml_performance():
+    epoch_list = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200]
+    for e in epoch_list:
+        precision_vmaml(e)
+
+
 if __name__ == '__main__':
     true_label = 0
     state_dic = {0: "sleep", 1: "preseizure"}
@@ -286,3 +296,5 @@ if __name__ == '__main__':
         precision_cnn()
     else:
         precision_vmaml()
+
+    # test_vmaml_performance()
