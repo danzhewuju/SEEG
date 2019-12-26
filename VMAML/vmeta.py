@@ -315,8 +315,8 @@ class Meta(nn.Module):
                 f1scores[k + 1] = cal.get_f1score()
                 auc[k + 1] = cal.get_auc()
 
-        # del net
-        index = len(corrects)-1
+        del net
+        index = len(corrects) - 1
         # index = corrects.index(max(corrects))  # 选取准确率最高的那个结果
 
         loss_all /= self.update_step_test - 1

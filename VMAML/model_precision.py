@@ -61,7 +61,7 @@ CNN_batch_size = 1
 device = torch.device("cuda" if args.cuda else "cpu")
 
 # 模型的选择 1.CNN 2.MAML
-model_selection = "MAML"
+model_selection = "CNN"
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 
@@ -290,13 +290,15 @@ def test_vmaml_performance():
 
 
 if __name__ == '__main__':
-    true_label = 0
-    state_dic = {0: "sleep", 1: "preseizure"}
-    # run_dict = {"VMAML": partial(precision_vmaml), "CNN": partial(precision_cnn)}
-    # run_dict[model_selection]
-    if model_selection == "CNN":
-        precision_cnn()
-    else:
-        precision_vmaml()
+    # true_label = 0
+    # state_dic = {0: "sleep", 1: "preseizure"}
+    # # run_dict = {"VMAML": partial(precision_vmaml), "CNN": partial(precision_cnn)}
+    # # run_dict[model_selection]
+    # if model_selection == "CNN":
+    #     print("CNN")
+    #     precision_cnn()
+    # else:
+    #     print("MAML")
+    #     precision_vmaml()
 
-    # test_vmaml_performance()
+    test_vmaml_performance()

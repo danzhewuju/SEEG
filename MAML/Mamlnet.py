@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 import sys
+import json
 
 sys.path.append('../')
 
@@ -12,6 +13,8 @@ from util.util_file import get_label_data
 
 resize_x = 130
 resize_y = 200
+config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
 
 
 def matrix_normalization(data, resize_shape=(130, 200)):
@@ -214,7 +217,8 @@ if __name__ == '__main__':
     plt.ion()
 
     tb = SummaryWriter('runs', 'miniimagenet')
-    mini = Seegnet('./seegnet/', mode='train', n_way=5, k_shot=1, k_query=1, batchsz=1000)
+    mini = Seegnet('../data/seeg/zero_data/{}/'.format(patient_test), mode='train', n_way=5, k_shot=1, k_query=1,
+                   batchsz=10)
 
     for i, set_ in enumerate(mini):
         # support_x: [k_shot*n_way, 3, 84, 84]

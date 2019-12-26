@@ -29,14 +29,14 @@ config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指�
 patient_test = config['patient_test']
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=4000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
-argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
+argparser.add_argument('--imgsz', type=int, help='imgsz', default=500)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=8)
-argparser.add_argument('--vae_lr', type=float, help='meta-level outer learning rate', default=0.001)
+argparser.add_argument('--vae_lr', type=float, help='meta-level outer learning rate', default=0.01)
 argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.001)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
@@ -108,7 +108,7 @@ class Data_info():
             dir_names = os.listdir(path)
             for n in dir_names:
                 full_path = os.path.join(path, n)
-                if name == "pre_zeizure":
+                if name == "pre_seizure":
                     preseizure.append((full_path, index))
                 else:
                     sleep_normal.append((full_path, index))
@@ -292,7 +292,7 @@ def maml_framwork():
                    batchsz=args.epoch)
     mini_test = Seegnet(args.dataset_dir, mode='test', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
-                        batchsz=100)
+                        batchsz=500)
     last_accuracy = 0.0
     plt_train_loss = []
     plt_train_acc = []
@@ -353,12 +353,12 @@ def maml_framwork():
                     avg_loss = np.mean(np.array(loss_all_test))
                     plt_test_loss.append(avg_loss)
 
-
-                    model_path = "./models/{}/maml{}way_{}shot_{}_epoch_{}.pkl".format(patient_test, args.n_way,
-                                                                                       args.k_spt,
-                                                                                       patient_test, step)
-                    torch.save(maml.state_dict(), model_path)
-                    print("epoch {} model has been saved!".format(step))
+                    # 保存对于长序列的每一步的结果
+                    # model_path = "./models/{}/maml{}way_{}shot_{}_epoch_{}.pkl".format(patient_test, args.n_way,
+                    #                                                                    args.k_spt,
+                    #                                                                    patient_test, step)
+                    # torch.save(maml.state_dict(), model_path)
+                    # print("epoch {} model has been saved!".format(step))
 
                 test_accuracy = np.array(accs_all_test).mean()
                 print('Test acc:', test_accuracy)

@@ -31,7 +31,8 @@ parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
 parser.add_argument('-s', '--sample', default=100)  # 对其进行重采样
 parser.add_argument('-train_p', '--train_path', default='../data/seeg/mixed_data/{}/train'.format(patient_test))
 parser.add_argument('-test_p', '--test_path', default='../data/seeg/mixed_data/{}/test'.format(patient_test))
-parser.add_argument('-val_p', '--val_path', default='../visualization_feature/valpatient_data/')
+#parser.add_argument('-val_p', '--val_path', default='../visualization_feature/valpatient_data/')
+parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
 parser.add_argument('-m_p', '--model_path', default='./models/cnn_model/model-cnn_{}.ckpt')
 parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)

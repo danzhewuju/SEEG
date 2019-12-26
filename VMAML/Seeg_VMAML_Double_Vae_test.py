@@ -176,7 +176,7 @@ def main():
     #                     batchsz=1000)
     mini_test = Seegnet(args.dataset_dir, mode='val', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
-                        batchsz=100)
+                        batchsz=500)
     test_accuracy = []
     test_precision = []
     test_recall = []
@@ -184,7 +184,7 @@ def main():
     test_auc = []
     for epoch in range(5):
         # fetch meta_batchsz num of episode each time
-        db_test = DataLoader(mini_test, 5, shuffle=True, num_workers=1, pin_memory=True)
+        db_test = DataLoader(mini_test, 1, shuffle=True, num_workers=1, pin_memory=True)
         accs = []
         precisions = []
         recalls = []
