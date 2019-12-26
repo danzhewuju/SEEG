@@ -61,7 +61,7 @@ CNN_batch_size = 1
 device = torch.device("cuda" if args.cuda else "cpu")
 
 # 模型的选择 1.CNN 2.MAML
-model_selection = "CNN"
+model_selection = "MAML"
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 
@@ -182,8 +182,8 @@ def precision_vmaml(epoch=300):
 
     # path = "../visualization_feature/raw_data_time_sequentially/{}/{}/filter/".format(state_dic[true_label],
     #                                                                                   patient_test)
-    path = "../visualization_feature/valpatient_data"
-    # path = '../data/seeg/zero_data/{}/val'.format(patient_test)
+    # path = "../visualization_feature/valpatient_data"
+    path = '../data/seeg/zero_data/{}/val'.format(patient_test)
     print("path:{}".format(path))
     data_info = Data_info(path)
     # print(data_info.full_path)
@@ -193,8 +193,8 @@ def precision_vmaml(epoch=300):
     maml = Meta(args, config).to(device)
     model_path = str(
         "./models/{}/maml".format(patient_test) + str(args.n_way) + "way_" + str(
-            args.k_spt) + "shot_{}_epoch_{}.pkl".format(
-            patient_test, epoch))
+            args.k_spt) + "shot_{}.pkl".format(
+            patient_test))
     # model_path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/MAML/models/BDP/maml2way_5shot_BDP.pkl"
     if os.path.exists(model_path):
         maml.load_state_dict(torch.load(model_path))
@@ -210,7 +210,7 @@ def precision_vmaml(epoch=300):
         with torch.no_grad():
             result = maml_net(data)
             c_result = result.cpu().detach().numpy()
-            r = softmax(c_result)
+            r = softmax(c_result, axis=1)
             pre_y = r.argmax(1)
             pre_result[name_id] = pre_y
             pre_list.append(pre_y[0])
@@ -290,15 +290,15 @@ def test_vmaml_performance():
 
 
 if __name__ == '__main__':
-    # true_label = 0
-    # state_dic = {0: "sleep", 1: "preseizure"}
-    # # run_dict = {"VMAML": partial(precision_vmaml), "CNN": partial(precision_cnn)}
-    # # run_dict[model_selection]
-    # if model_selection == "CNN":
-    #     print("CNN")
-    #     precision_cnn()
-    # else:
-    #     print("MAML")
-    #     precision_vmaml()
+    true_label = 0
+    state_dic = {0: "sleep", 1: "preseizure"}
+    # run_dict = {"VMAML": partial(precision_vmaml), "CNN": partial(precision_cnn)}
+    # run_dict[model_selection]
+    if model_selection == "CNN":
+        print("CNN")
+        precision_cnn()
+    else:
+        print("MAML")
+        precision_vmaml()
 
-    test_vmaml_performance()
+    # test_vmaml_performance()

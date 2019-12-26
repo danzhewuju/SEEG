@@ -8,7 +8,7 @@ from RelationNet.Seegdata import *
 from util.util_file import *
 import re
 from functools import reduce
-from util.util_file import IndicatorCalculation, similarity_dtw, LogRecord
+from util.util_file import IndicatorCalculation, similarity_dtw, LogRecord, get_label_data
 import logging
 from tqdm import tqdm
 import pandas as pd
@@ -425,6 +425,13 @@ def test_log_record():
     LogRecord.write_log(result)
 
 
+def test_get_label():
+    path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/BDP/train"
+    data = get_label_data(path)
+    print(data)
+
+
 if __name__ == '__main__':
-    print(__file__)
-    test_log_record()
+    test_get_label()
+# print(__file__)
+# test_log_record()

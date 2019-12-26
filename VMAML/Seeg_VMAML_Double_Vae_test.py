@@ -36,10 +36,10 @@ argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=8)
 argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=1e-3)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
-argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
-argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=5)
+argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=2)
+argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=2)
 argparser.add_argument('--dataset_dir', type=str, help="training data set",
-                       default="../data/seeg/zero_data/{}".format(patient_test))
+                       default="../visualization_feature".format(patient_test))
 
 args = argparser.parse_args()
 
@@ -174,7 +174,7 @@ def main():
     # mini = Seegnet(args.dataset_dir, mode='train_vae', n_way=args.n_way, k_shot=args.k_spt,
     #                     k_query=args.k_qry,
     #                     batchsz=1000)
-    mini_test = Seegnet(args.dataset_dir, mode='val', n_way=args.n_way, k_shot=args.k_spt,
+    mini_test = Seegnet(args.dataset_dir, mode='valpatient_data', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
                         batchsz=500)
     test_accuracy = []
@@ -195,6 +195,7 @@ def main():
             # 1.未引入VAE模块
             x_spt, y_spt, x_qry, y_qry = x_spt.squeeze(0).to(device), y_spt.squeeze(0).to(device), \
                                          x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
+            # print(x_spt.shape,y_spt.shape, x_qry.shape, y_qry.shape)
             result, loss_t = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
 
             # # 2.需要引入VAE编码
