@@ -13,20 +13,12 @@ from scipy.special import softmax
 import pickle
 import time
 
-import numpy as np
-import scipy.stats
-import torch
 from torch.utils.data import DataLoader, Dataset
-from Seeg_VMAML import VAE
 from util.util_file import matrix_normalization
 
 sys.path.append('../')
-import random
-from MAML.Mamlnet import Seegnet
 from VMAML.vmeta import *
-from util.util_file import Pyemail, LogRecord
 import json
-from functools import partial
 
 config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
 patient_test = config['patient_test']
@@ -61,7 +53,7 @@ CNN_batch_size = 1
 device = torch.device("cuda" if args.cuda else "cpu")
 
 # 模型的选择 1.CNN 2.MAML
-model_selection = "MAML"
+model_selection = "CNN"
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 
@@ -236,8 +228,8 @@ def precision_vmaml(epoch=300):
 def precision_cnn():
     # data_path = "../visualization_feature/raw_data_time_sequentially/{}/{}/filter".format(state_dic[true_label],
     #                                                                                             patient_test)
-    data_path = "../visualization_feature/valpatient_data"
-    # data_path = '../data/seeg/zero_data/{}/val'.format(patient_test)
+    # data_path = "../visualization_feature/valpatient_data"
+    data_path = '../data/seeg/zero_data/{}/val'.format(patient_test)
 
     print("path:{}".format(data_path))
     data_info = Data_info(data_path)

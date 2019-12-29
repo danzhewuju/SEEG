@@ -8,6 +8,11 @@ from torch.nn import functional as F
 
 from VMAML.vlearner import Learner
 from util.util_file import IndicatorCalculation
+import json
+import pickle
+
+config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
+patient_test = config['patient_test']
 
 
 class Meta(nn.Module):
@@ -229,7 +234,7 @@ class Meta(nn.Module):
 
         return accs, loss_all
 
-    def finetunning(self, x_spt, y_spt, x_qry, y_qry):
+    def finetunning(self, x_spt, y_spt, x_qry, y_qry, query_y_id_list):
         """
 
         :param x_spt:   [setsz, c_, h, w]
@@ -307,6 +312,8 @@ class Meta(nn.Module):
 
             with torch.no_grad():
                 pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
+                if k == self.update_step_test - 1:
+                    prediction_query = pred_q.detach().cpu().numpy().tolist()
                 # correct = torch.eq(pred_q, y_qry).sum().item()  # convert to numpy
                 cal.set_values(pred_q, y_qry)
                 corrects[k + 1] = cal.get_accuracy()
@@ -316,9 +323,18 @@ class Meta(nn.Module):
                 auc[k + 1] = cal.get_auc()
 
         del net
-        index = len(corrects) - 1
         # index = corrects.index(max(corrects))  # 选取准确率最高的那个结果
 
+        # 将预测的结果进行统计
+        r_path = "./precision/{}_val_precision.pkl".format(patient_test)
+        record = np.load(r_path, allow_pickle=True)
+        for index, id in enumerate(query_y_id_list):
+            label = prediction_query[index]
+            record[id]["prediction"] = label
+        with open(r_path, 'wb') as f:
+            pickle.dump(record, f)
+
+        index = len(corrects) - 1
         loss_all /= self.update_step_test - 1
         result = {"accuracy": corrects[index],
                   "precision": precisions[index],

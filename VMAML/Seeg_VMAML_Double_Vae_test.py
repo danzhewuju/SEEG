@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader
 from Seeg_VMAML import VAE
 
 sys.path.append('../')
-from MAML.Mamlnet import Seegnet
+from VMAML.Mamlnet import Seegnet
 from VMAML.vmeta import *
 from util.util_file import Pyemail, LogRecord
 import json
@@ -68,6 +68,7 @@ resize = (130, 200)
 device = torch.device('cuda')
 Vae = VAE().to(device)
 maml = Meta(args, config).to(device)
+
 
 # 构建两个编码器
 # vae_p = VAE().to(device)
@@ -176,7 +177,8 @@ def main():
     #                     batchsz=1000)
     mini_test = Seegnet(args.dataset_dir, mode='valpatient_data', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
-                        batchsz=500)
+                        batchsz=5000
+                        )
     test_accuracy = []
     test_precision = []
     test_recall = []
@@ -184,19 +186,20 @@ def main():
     test_auc = []
     for epoch in range(5):
         # fetch meta_batchsz num of episode each time
-        db_test = DataLoader(mini_test, 1, shuffle=True, num_workers=1, pin_memory=True)
+        db_test = DataLoader(mini_test, 1, shuffle=True, pin_memory=True)
         accs = []
         precisions = []
         recalls = []
         f1scores = []
         aucs = []
 
-        for x_spt, y_spt, x_qry, y_qry in db_test:
+        for x_spt, y_spt, x_qry, y_qry, query_y_id_list in db_test:
+            query_y_id_list = [x[0] for x in query_y_id_list]
             # 1.未引入VAE模块
             x_spt, y_spt, x_qry, y_qry = x_spt.squeeze(0).to(device), y_spt.squeeze(0).to(device), \
                                          x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
             # print(x_spt.shape,y_spt.shape, x_qry.shape, y_qry.shape)
-            result, loss_t = maml.finetunning(x_spt, y_spt, x_qry, y_qry)
+            result, loss_t = maml.finetunning(x_spt, y_spt, x_qry, y_qry, query_y_id_list)
 
             # # 2.需要引入VAE编码
             # x_spt_p, x_spt_n = trans_data_vae(x_spt.numpy(), y_spt)
@@ -252,8 +255,9 @@ def main():
     result = "average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(
         acc_mean, h, pre_mean, h_p, recall_mean, h_r,
         f1_mean, h_f1, auc_mean, h_au)
-    os.system("~/login")
-    Pyemail("{}的实验结果".format(patient_test), result)
+    # 将结果以邮件的形式告知
+    # os.system("~/login")
+    # Pyemail("{}的实验结果".format(patient_test), result)
 
     print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}"
           "\n average f1score :{}, h:{}\n average AUC :{}, h:{}\n".format(acc_mean, h, pre_mean, h_p, recall_mean, h_r,

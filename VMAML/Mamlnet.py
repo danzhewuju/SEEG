@@ -6,6 +6,7 @@ import torch
 from torch.utils.data import Dataset
 import sys
 import json
+import pickle
 
 sys.path.append('../')
 
@@ -66,7 +67,7 @@ class Seegnet(Dataset):  # 任务集的构造
     def __init__(self, root, mode, batchsz, n_way, k_shot, k_query, startidx=0):
         """
 
-        :param root: root path of mini-imagenet
+        :param root: root path of seeg data
         :param mode: train, val or test
         :param batchsz: batch size of sets, not batch of imgs
         :param n_way:
@@ -191,9 +192,21 @@ class Seegnet(Dataset):  # 任务集的构造
             result = torch.from_numpy(result)
             support_x[i] = result
 
+        query_y_id_list = []
+        record_tmp = {}
         for i, path in enumerate(flatten_query_x):
-        # query
+            # 记录query_y的结果
+            file_name = os.path.basename(path)
+            query_y_id_list.append(file_name)
+            ground_truth = self.filename_label[path]
+
+            record_line = {"ground truth": ground_truth, "prediction": ""}
+            record_tmp[file_name] = record_line
+
+            # print(record)
+
             data = np.load(path)
+
             result = matrix_normalization(data, (130, 200))
             result = result.astype('float32')
             result = result[np.newaxis, :]
@@ -201,8 +214,19 @@ class Seegnet(Dataset):  # 任务集的构造
             query_x[i] = result
         # print(support_set_y)
         # return support_x, torch.LongTensor(support_y), query_x, torch.LongTensor(query_y)
+        # 需要将文件进行写会
+        file_path = "./precision/{}_val_precision.pkl".format(patient_test)
+        if os.path.exists(file_path):
+            record = np.load(file_path, allow_pickle=True)
+        else:
+            record = {}
+        for k, v in record_tmp.items():
+            record[k] = v
+        with open(file_path, 'wb') as f:
+            pickle.dump(record, f)
 
-        return support_x, torch.LongTensor(support_y_relative), query_x, torch.LongTensor(query_y_relative)
+        return support_x, torch.LongTensor(support_y_relative), query_x, torch.LongTensor(
+            query_y_relative), query_y_id_list
 
     def __len__(self):
         # as we have built up to batchsz of sets, you can sample some small batch size of sets.
@@ -219,7 +243,7 @@ if __name__ == '__main__':
 
     tb = SummaryWriter('runs', 'miniimagenet')
     mini = Seegnet('../data/seeg/zero_data/{}/'.format(patient_test), mode='train', n_way=5, k_shot=1, k_query=1,
-                   batchsz=10)
+                   batchsz=20)
 
     for i, set_ in enumerate(mini):
         # support_x: [k_shot*n_way, 3, 84, 84]
