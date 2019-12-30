@@ -97,7 +97,7 @@ def data_save(path_read, name, flag, common_channels, flag_duration=0, isfilter=
     if isfilter:
         raw = filter_hz(raw, high_pass, low_pass)
     raw.resample(resample, npad="auto")  # resample 100hz
-    raw = select_channel_data_mne(raw, common_channels)
+    raw = select_channel_data_mne(raw, common_channels) # 根据特定的信道顺序来选择信道
     raw.reorder_channels(common_channels)  # 更改信道的顺序
     save_split_data_test(raw, name, flag, time, flag_duration=flag_duration)
 

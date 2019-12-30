@@ -5,13 +5,13 @@
   "grad_cam.get_feature_map__model_path_maml": "../VMAML/models/{0}/maml2way_5shot_{0}.pkl",
   "grad_cam.get_feature_map__model_path_cnn": "./models/model-cnn.ckpt",
   "handel.sequentially__path_channel_list_BDP": "../data/data_slice/channels_info/BDP_seq.csv",
-  "handel.sequentially__path_preseizure_BDP": "./log/{}/{}/BDP_SZ2_pre_seizure_raw.txt",
+  "handel.sequentially__path_preseizure_BDP": "./log/{}/{}/BDP_SZ1_pre_seizure_raw.txt",
   "handel.sequentially__path_sleep_BDP": "./log/{}/{}/BDP_Sleep_raw.txt",
-  "handel.sequentially__start_time_preseizure_BDP": "23:01:52",
+  "handel.sequentially__start_time_preseizure_BDP": "3:01:52",
   "handel.sequentially__start_time_sleep_BDP": "23:01:52",
   "handel.dynamic_detection__path_channel_list_BDP": "../data/data_slice/channels_info/BDP_seq.csv",
 
-  "person_raw_data_preseizure_BDP": "../data/raw_data/BDP/BDP_Pre_seizure/BDP_SZ2_pre_seizure_raw.fif",
+  "person_raw_data_preseizure_BDP": "../data/raw_data/BDP/BDP_Pre_seizure/BDP_SZ1_pre_seizure_raw.fif",
 
   "person_raw_data_sleep_BDP": "../data/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif",
 
@@ -47,5 +47,7 @@
   "handel.sequentially__path_channel_list_SYF": "../data/data_slice/channels_info/SYF_seq.csv",
   "handel.sequentially__start_time_preseizure_SYF": "23:22:14",
   "handel.sequentially__start_time_sleep_SYF": "0:53:32",
-  "handel.dynamic_detection__path_channel_list_SYF": "../data/data_slice/channels_info/SYF_seq.csv"
+  "handel.dynamic_detection__path_channel_list_SYF": "../data/data_slice/channels_info/SYF_seq.csv",
+
+  "handel.dynamic_processing__dir": "./raw_data_time_sequentially/{}/{}/filter/{})"
 }

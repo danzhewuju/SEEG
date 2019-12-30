@@ -356,6 +356,7 @@ def get_feature_map(path_data, location_name):
     :param location_name: raw data original file name ex: LK_SZ1_pre_seizure_raw.txt
     :return:
     '''
+    state_map = {"sleep": 0, "preseizure": 1}
     args = get_args()
     config = json.load(open('./json_path/config.json'))
     classification = config["classification"]
@@ -395,8 +396,7 @@ def get_feature_map(path_data, location_name):
 
     # If None, returns the map for the highest scoring category.
     # Otherwise, targets the requested index.
-    target_index = 0 if classification == "preseizure" else 1  # 目标函数  0: preseizure 1: positive
-    target_index = 0 if classification == "preseizure" else 1  # 目标函数  0: preseizure 1: positive
+    target_index = state_map[classification]  # 目标函数  0: preseizure 1: positive
 
     mask = grad_cam(input, target_index)
     location = get_matrix_max_location(mask, 5)  # 获得最大梯度的位置，包含时间位置和物理位置
@@ -416,7 +416,7 @@ def get_feature_map(path_data, location_name):
             if flag_op_channel == -1:
                 recorder_old_channel_index.append(p + count)  # 原来的随机过程进行了删除，现在需要复原
             if flag_op_channel == 1:
-                recorder_old_channel_index.append(p - count)  # 原来的随机过程进行了采样
+                recorder_old_channel_index.append(p - count)  # 原来的随机过程进行了采样， 现在需要复原
     else:
         recorder_old_channel_index = channel_number  # 如果尺寸保持一致就不在变化
 
@@ -446,6 +446,7 @@ def get_feature_map(path_data, location_name):
     save_path_npy = os.path.join(path_tmp, name_npy)
     save_path = os.path.join("./log/{}/{}/heatmap".format(patient_test, classification), name)
     show_cam_on_image(img, mask, save_path, save_path_npy=save_path_npy)  # 将热力图写回到原来的图片
+
 
 
 def get_feature_map_dynamic(data, name, key_flag=True):

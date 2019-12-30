@@ -22,6 +22,7 @@ from util.util_file import dir_create_check
 import pandas as pd
 from functools import partial
 from Util import cal_acc_visualization
+from memory_profiler import profile
 
 
 def get_hotmap_dic(path_hotmap, path_b_raw_data):
@@ -107,8 +108,10 @@ def create_raw_data_signal_by_similarity(image_dir="./heatmap"):
 # 将原始的数据和信道相结合
 def create_raw_data_signal_by_time(image_dir="./log/{}/{}/heatmap".format(patient_test, classification)):
     # patient_test = "ZK"
+    path_data_dir = json
 
-    raw_path_list = get_first_dir_path("./raw_data_time_sequentially/{}/".format(classification) + patient_test, "npy")
+    raw_path_list = get_first_dir_path(
+        "./raw_data_time_sequentially/{}/{}/filter".format(classification, patient_test), "npy")
     raw_data_name = [re.findall("/.+/(.+)", p)[0] for p in raw_path_list]
     dict_name_path = dict(zip(raw_data_name, raw_path_list))
 
@@ -179,16 +182,17 @@ def image_connection(data_signal_dir, raw_data_dir,
         plt.close(0)
 
 
+@profile(precision=10)
 def time_heat_map():
     '''
 
     :return:
     构造时间序列的热力图
     '''
-    max_lenth = 2083
     clean_dir("./log/{}/{}".format(patient_test, classification))
     # patient_test = "ZK"
-    path = "./raw_data_time_sequentially/{}/".format(classification) + patient_test
+
+    path = "./raw_data_time_sequentially/{}/{}/filter".format(classification, patient_test)
     file_name = "{0}/{1}/{0}_SZ1_pre_seizure_raw".format(patient_test,
                                                          classification) if classification == "preseizure" else "{0}/{1}/{0}_Sleep_raw".format(
         patient_test, classification)
@@ -197,27 +201,29 @@ def time_heat_map():
     heat_map_dir = "./log/{}/{}/heatmap".format(patient_test, classification)
     path_data = get_first_dir_path(path, 'npy')
     path_data.sort()  # 根据uuid 按照时间序列进行排序
-    count = min(len(path_data), max_lenth)  # 拼接的时间
+    count = len(path_data)  # 拼接的时间
     selected_path = path_data[:count]
     dir_create_check(heat_map_dir)
     # clean_dir(heat_map_dir)  # 清除文件夹里面所有文件
     for index, p in enumerate(selected_path):
         get_feature_map(p, file_name)
+
+    # 不用生成长时间的热力图
     heat_map_path = get_first_dir_path(heat_map_dir)
     heat_map_path.sort()
-    test_1 = Image.open(heat_map_path[0])
-    size = test_1.size
-    plt.figure(figsize=(2 * count, 3))
-    result = Image.new(test_1.mode, (size[0] * count, size[1]))
-    prediction = pd.read_csv("./log/{}/{}/heatmap.csv".format(patient_test, classification), sep=',')
-    for i in range(count):
-        if prediction.loc[i]['ground truth'] != prediction.loc[i]['prediction']:
-            img = Image.new('RGBA', (int(200), int(130)), color=(100, 100, 100, 255))
-        else:
-            img = Image.open(heat_map_path[i])
-        result.paste(img, box=(i * size[0], 0))
-    result.save("./log/{}/{}/heatmap{}.png".format(patient_test, classification, count * 2))
-    # plt.imshow(result)
+    # test_1 = Image.open(heat_map_path[0])
+    # size = test_1.size
+    # plt.figure(figsize=(2 * count, 3))
+    # result = Image.new(test_1.mode, (size[0] * count, size[1]))
+    # prediction = pd.read_csv("./log/{}/{}/heatmap.csv".format(patient_test, classification), sep=',')
+    # for i in range(count):
+    #     if prediction.loc[i]['ground truth'] != prediction.loc[i]['prediction']:
+    #         img = Image.new('RGBA', (int(200), int(130)), color=(100, 100, 100, 255))
+    #     else:
+    #         img = Image.open(heat_map_path[i])
+    #     result.paste(img, box=(i * size[0], 0))
+    # result.save("./log/{}/{}/heatmap{}.png".format(patient_test, classification, count * 2))
+    # # plt.imshow(result)
     # plt.show()
 
 
@@ -261,7 +267,7 @@ def raw_data_slice():
     print("processing data from {}".format(path_dir))
     path_raw = path_dir
     name = patient_test
-    generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
+    generate_data(path_raw, flag, name, path_commom_channel, isfilter=False)
 
     print("癫痫发作前的睡眠处理完成！！！") if flag == 0 else print("正常睡眠数据处理完成！！！")
 
@@ -372,7 +378,7 @@ def save_feature_data():
     :return: 用于生成特征数据
     '''
     path_dir = "./log/{}/{}".format(patient_test, classification)  # 所要读取特征的文件夹
-    data_dir = "./raw_data_time_sequentially/{}/{}".format(classification, patient_test)
+    data_dir = "./raw_data_time_sequentially/{}/{}/filter/{}".format(classification, patient_test, "pre_2")
     raw_data_sequence = get_first_dir_path(data_dir, suffix='npy')  # 原始数据的序列
     raw_data_sequence.sort()  # 按照时间序列来获得数据  # 数据
     # 找到文件列表中记录了features
@@ -501,10 +507,10 @@ def menu():
     print("patient_test is : {}, classification is : {}".format(patient_test, classification))
     path_dir = "./log/{}/{}".format(patient_test, classification)
     dir_create_check(path_dir)
-    handle_menu = {1: partial(raw_data_slice), 2: partial(time_heat_map), 3: partial(sequentially_signal),
-                   4: partial(image_contact_process_by_time), 0: partial(exit), 5: partial(save_feature_data),
-                   6: partial(cal_acc_visualization), 7: partial(feature_analysis), 8: partial(random_sample),
-                   9: partial(switch_patient)}
+    handle_menu = {0: partial(exit), 1: partial(raw_data_slice), 2: partial(time_heat_map),
+                   3: partial(sequentially_signal), 4: partial(image_contact_process_by_time),
+                   5: partial(save_feature_data), 6: partial(cal_acc_visualization), 7: partial(feature_analysis),
+                   8: partial(random_sample), 9: partial(switch_patient)}
 
     while True:
         print("现在的测试病人是：{}, 测试状态是：{}".format(patient_test, classification))
