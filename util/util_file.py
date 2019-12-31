@@ -231,6 +231,7 @@ def time_add(h, m, s, seconds_add):
     m = m % 60
 
     h += m_h
+    h %= 24
 
     return int(h), int(m), s
 

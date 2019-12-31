@@ -431,7 +431,15 @@ def test_get_label():
     print(data)
 
 
+def test_npy():
+    path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/NoteBookJupyter/data/pre_1/heatmap_data_storage/e076f2d4-2552-11ea-9699-e0d55e6ff654-0-loc-137-140-141-136-135.npy"
+    data = np.load(path)
+    print(data)
+
+
 if __name__ == '__main__':
-    test_get_label()
+    test_npy()
+    # test_get_label()
+
 # print(__file__)
 # test_log_record()

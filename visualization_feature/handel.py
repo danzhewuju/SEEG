@@ -189,7 +189,7 @@ def time_heat_map():
     :return:
     构造时间序列的热力图
     '''
-    clean_dir("./log/{}/{}".format(patient_test, classification))
+    # clean_dir("./log/{}/{}".format(patient_test, classification))
     # patient_test = "ZK"
 
     path = "./raw_data_time_sequentially/{}/{}/filter".format(classification, patient_test)
@@ -205,6 +205,9 @@ def time_heat_map():
     selected_path = path_data[:count]
     dir_create_check(heat_map_dir)
     # clean_dir(heat_map_dir)  # 清除文件夹里面所有文件
+    # for index, p in enumerate(selected_path[:len(selected_path)//2]):
+    #   get_feature_map(p, file_name)
+
     for index, p in enumerate(selected_path):
         get_feature_map(p, file_name)
 
@@ -378,7 +381,7 @@ def save_feature_data():
     :return: 用于生成特征数据
     '''
     path_dir = "./log/{}/{}".format(patient_test, classification)  # 所要读取特征的文件夹
-    data_dir = "./raw_data_time_sequentially/{}/{}/filter/{}".format(classification, patient_test, "pre_2")
+    data_dir = "./raw_data_time_sequentially/{}/{}/filter".format(classification, patient_test)
     raw_data_sequence = get_first_dir_path(data_dir, suffix='npy')  # 原始数据的序列
     raw_data_sequence.sort()  # 按照时间序列来获得数据  # 数据
     # 找到文件列表中记录了features
