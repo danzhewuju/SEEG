@@ -292,7 +292,7 @@ def maml_framwork():
                    batchsz=args.epoch)
     mini_test = Seegnet(args.dataset_dir, mode='test', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
-                        batchsz=500)
+                        batchsz=100)
     last_accuracy = 0.0
     plt_train_loss = []
     plt_train_acc = []
