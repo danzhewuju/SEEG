@@ -29,15 +29,15 @@ print("patient_test is {}".format(patient_test))
 argparser = argparse.ArgumentParser()
 argparser.add_argument('--epoch', type=int, help='epoch number', default=4000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
-argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
-argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
+argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=1)
+argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=10)
 argparser.add_argument('--imgsz', type=int, help='imgsz', default=100)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=8)
 argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=1e-3)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=2)
-argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=2)
+argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=5)
 argparser.add_argument('--dataset_dir', type=str, help="training data set",
                        default="../visualization_feature".format(patient_test))
 
@@ -177,7 +177,7 @@ def main():
     #                     batchsz=1000)
     mini_test = Seegnet(args.dataset_dir, mode='valpatient_data', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
-                        batchsz=5000
+                        batchsz=1000
                         )
     test_accuracy = []
     test_precision = []
@@ -186,16 +186,23 @@ def main():
     test_auc = []
     for epoch in range(5):
         # fetch meta_batchsz num of episode each time
-        db_test = DataLoader(mini_test, 1, shuffle=True, pin_memory=True)
+        db_test = DataLoader(mini_test, 1, shuffle=False, pin_memory=True)
         accs = []
         precisions = []
         recalls = []
         f1scores = []
         aucs = []
+        flag_one = True
 
         for x_spt, y_spt, x_qry, y_qry, query_y_id_list in db_test:
             query_y_id_list = [x[0] for x in query_y_id_list]
+            if flag_one:
+                x_spt_one = x_spt
+                y_spt_one = y_qry
+                # flag_one = False
             # 1.未引入VAE模块
+            x_spt = x_spt_one
+            y_spt_one = y_spt_one
             x_spt, y_spt, x_qry, y_qry = x_spt.squeeze(0).to(device), y_spt.squeeze(0).to(device), \
                                          x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
             # print(x_spt.shape,y_spt.shape, x_qry.shape, y_qry.shape)

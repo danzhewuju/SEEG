@@ -234,7 +234,7 @@ class Meta(nn.Module):
 
         return accs, loss_all
 
-    def finetunning(self, x_spt, y_spt, x_qry, y_qry, query_y_id_list):
+    def finetunning(self, x_spt, y_spt, x_qry, y_qry, query_y_id_list=None):
         """
 
         :param x_spt:   [setsz, c_, h, w]
@@ -312,7 +312,7 @@ class Meta(nn.Module):
 
             with torch.no_grad():
                 pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-                if k == self.update_step_test - 1:
+                if query_y_id_list is not None:
                     prediction_query = pred_q.detach().cpu().numpy().tolist()
                 # correct = torch.eq(pred_q, y_qry).sum().item()  # convert to numpy
                 cal.set_values(pred_q, y_qry)
@@ -326,13 +326,14 @@ class Meta(nn.Module):
         # index = corrects.index(max(corrects))  # 选取准确率最高的那个结果
 
         # 将预测的结果进行统计
-        r_path = "./precision/{}_val_precision.pkl".format(patient_test)
-        record = np.load(r_path, allow_pickle=True)
-        for index, id in enumerate(query_y_id_list):
-            label = prediction_query[index]
-            record[id]["prediction"] = label
-        with open(r_path, 'wb') as f:
-            pickle.dump(record, f)
+        if query_y_id_list is not None:
+            r_path = "./precision/{}_val_prediction.pkl".format(patient_test)
+            record = np.load(r_path, allow_pickle=True)
+            for index, id in enumerate(query_y_id_list):
+                label = prediction_query[index]
+                record[id]["prediction"] = label
+            with open(r_path, 'wb') as f:
+                pickle.dump(record, f)
 
         index = len(corrects) - 1
         loss_all /= self.update_step_test - 1

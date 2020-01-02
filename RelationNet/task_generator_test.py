@@ -17,6 +17,7 @@ sys.path.append('../')
 from util.util_file import *
 
 import json
+
 config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
 patient_test = config['patient_test']
 print("patient_test is {}".format(patient_test))

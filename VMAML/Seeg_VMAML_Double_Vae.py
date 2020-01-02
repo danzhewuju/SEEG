@@ -29,10 +29,10 @@ config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指�
 patient_test = config['patient_test']
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=10000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=100000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
-argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
-argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
+argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=1)
+argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=10)
 argparser.add_argument('--imgsz', type=int, help='imgsz', default=500)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=8)
@@ -45,7 +45,7 @@ argparser.add_argument('--dataset_dir', type=str, help="training data set",
                        default="../data/seeg/zero_data/{}".format(patient_test))
 argparser.add_argument('--no-cuda', action='store_true', default=False, help='enables CUDA training')
 argparser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/{}/train'.format(patient_test))
-argparser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
+argparser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/test'.format(patient_test))
 argparser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
 
 args = argparser.parse_args()
@@ -304,9 +304,9 @@ def maml_framwork():
     # flag_maml = not flag_vae  # 设置梯度反向传播的标志位，maml
     for epoch in range(1):  # 设置迭代次数
         # fetch meta_batchsz num of episode each time
-        db = DataLoader(mini, args.task_num, shuffle=True, num_workers=1, pin_memory=True)
+        db = DataLoader(mini, args.task_num, shuffle=True, pin_memory=True)
 
-        for step, (x_spt, y_spt, x_qry, y_qry) in tqdm(enumerate(db)):
+        for step, (x_spt, y_spt, x_qry, y_qry, _) in tqdm(enumerate(db)):
 
             x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt)
             x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry)
@@ -333,7 +333,7 @@ def maml_framwork():
                     accs_all_test = []
                     loss_all_test = []
 
-                    for x_spt, y_spt, x_qry, y_qry in db_test:
+                    for x_spt, y_spt, x_qry, y_qry, _ in db_test:
                         x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt)
                         x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry)
                         x_spt_vae = torch.from_numpy(x_spt_vae)
@@ -354,11 +354,11 @@ def maml_framwork():
                     plt_test_loss.append(avg_loss)
 
                     # 保存每100 epoch 的模型参数
-                    model_path = "./models/{}/maml{}way_{}shot_{}_epoch_{}.pkl".format(patient_test, args.n_way,
-                                                                                       args.k_spt,
-                                                                                       patient_test, step)
-                    torch.save(maml.state_dict(), model_path)
-                    print("epoch {} model has been saved!".format(step))
+                    # model_path = "./models/{}/maml{}way_{}shot_{}_epoch_{}.pkl".format(patient_test, args.n_way,
+                    #                                                                    args.k_spt,
+                    #                                                                    patient_test, step)
+                    # torch.save(maml.state_dict(), model_path)
+                    # print("epoch {} model has been saved!".format(step))
 
                 test_accuracy = np.array(accs_all_test).mean()
                 print('Test acc:', test_accuracy)

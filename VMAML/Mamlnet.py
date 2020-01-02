@@ -215,13 +215,14 @@ class Seegnet(Dataset):  # 任务集的构造
         # print(support_set_y)
         # return support_x, torch.LongTensor(support_y), query_x, torch.LongTensor(query_y)
         # 需要将文件进行写会
-        file_path = "./precision/{}_val_precision.pkl".format(patient_test)
+        file_path = "./precision/{}_val_prediction.pkl".format(patient_test)
         if os.path.exists(file_path):
             record = np.load(file_path, allow_pickle=True)
         else:
             record = {}
         for k, v in record_tmp.items():
-            record[k] = v
+            if k not in record.keys():
+                record[k] = v
         with open(file_path, 'wb') as f:
             pickle.dump(record, f)
 
