@@ -29,10 +29,10 @@ config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指�
 patient_test = config['patient_test']
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=100000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=3000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
-argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=1)
-argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=10)
+argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=10)
+argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
 argparser.add_argument('--imgsz', type=int, help='imgsz', default=500)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=8)
