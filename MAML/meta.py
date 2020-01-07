@@ -167,6 +167,8 @@ class Meta(nn.Module):
             logits_q = net(x_qry, net.parameters(), bn_training=True)
             # [setsz]
             pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
+            possible = F.softmax(logits_q, dim=1)
+            scores = possible[:, 1]
             # scalar
             cal.set_values(pred_q, y_qry)
 
@@ -175,7 +177,7 @@ class Meta(nn.Module):
             precisions[0] += cal.get_precision()
             recalls[0] += cal.get_recall()
             f1scores[0] += cal.get_f1score()
-            auc[0] = cal.get_auc()
+            auc[0] = cal.get_auc(scores, y_qry)
 
         # this is the loss and accuracy after the first update
         with torch.no_grad():
@@ -185,18 +187,21 @@ class Meta(nn.Module):
             pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
             # scalar
             cal.set_values(pred_q, y_qry)
+            possible = F.softmax(logits_q, dim=1)
+            scores = possible[:, 1]
 
             # correct = torch.eq(pred_q, y_qry).sum().item()
             corrects[1] = cal.get_accuracy()  # 指标构建
             precisions[1] = cal.get_precision()
             recalls[1] = cal.get_recall()
             f1scores[1] = cal.get_f1score()
-            auc[1] = cal.get_auc()
+            auc[1] = cal.get_auc(scores, y_qry)
         loss_all = 0
         for k in range(1, self.update_step_test):
             # 1. run the i-th task and compute loss for k=1~K-1
             logits = net(x_spt, fast_weights, bn_training=True)
             loss = F.cross_entropy(logits, y_spt)
+
             # 2. compute grad on theta_pi
             grad = torch.autograd.grad(loss, fast_weights)
             # 3. theta_pi = theta_pi - train_lr * grad
@@ -209,13 +214,15 @@ class Meta(nn.Module):
 
             with torch.no_grad():
                 pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
+                possible = F.softmax(logits_q, dim=1)
+                scores = possible[:, 1]
                 # correct = torch.eq(pred_q, y_qry).sum().item()  # convert to numpy
                 cal.set_values(pred_q, y_qry)
                 corrects[k + 1] = cal.get_accuracy()
                 precisions[k + 1] = cal.get_precision()
                 recalls[k + 1] = cal.get_recall()
                 f1scores[k + 1] = cal.get_f1score()
-                auc[k+1] = cal.get_auc()
+                auc[k+1] = cal.get_auc(scores, y_qry)
 
         del net
         loss_all /= self.update_step_test - 1
