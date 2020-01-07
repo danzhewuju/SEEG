@@ -227,6 +227,9 @@ def main():
                 relation_pairs = torch.cat((sample_features_ext, test_features_ext), 2).view(-1, FEATURE_DIM * 2, x_,
                                                                                              y_)
                 relations = relation_network(relation_pairs).view(-1, CLASS_NUM)
+                possible = F.softmax(relations, dim=1)
+                score = possible[:, 1]
+                score = score.detach()
 
                 _, predict_labels = torch.max(relations.data, 1)
 
@@ -242,7 +245,7 @@ def main():
                 precision = cal.get_precision()
                 recall = cal.get_recall()
                 f1_score = cal.get_f1score()
-                auc = cal.get_auc()
+                auc = cal.get_auc(score, test_labels)
                 accuracies.append(acc)
                 precisions.append(precision)
                 recalls.append(recall)

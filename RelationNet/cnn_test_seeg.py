@@ -11,6 +11,7 @@ import time
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 import sys
 
@@ -31,7 +32,7 @@ parser.add_argument('-t', '--time', default=2)  # 每一帧的长度
 parser.add_argument('-s', '--sample', default=100)  # 对其进行重采样
 parser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/{}/train'.format(patient_test))
 parser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/test'.format(patient_test))
-#parser.add_argument('-val_p', '--val_path', default='../visualization_feature/valpatient_data/')
+# parser.add_argument('-val_p', '--val_path', default='../visualization_feature/valpatient_data/')
 parser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
 parser.add_argument('-m_p', '--model_path', default='./models/cnn_model/model-cnn_{}.ckpt')
 parser.add_argument('-g', '--GPU', type=int, default=0)
@@ -176,12 +177,16 @@ def run():
 
         pre_label = []
         ground_label = []
+        scores = np.zeros(0)
         with torch.no_grad():
             for (data, labels, name_id) in val_loader:
                 data = data.cuda(GPU)
                 labels = labels.cuda(GPU)
 
                 outputs = model(data)  # 直接获得模型的结果
+                possible = F.softmax(outputs, dim=1)
+                score = possible[:, 1]
+                scores = np.append(scores, score.detach().cpu())
                 _, predicted = torch.max(outputs.data, 1)
                 pre_label += predicted.tolist()
                 ground_label += labels.detach().cpu().numpy().tolist()
@@ -191,13 +196,15 @@ def run():
         precisions_avg = cal.get_precision()
         recall_avg = cal.get_recall()
         f1score_avg = cal.get_f1score()
-        # auc_avg = cal.get_auc()
+        scores = torch.from_numpy(scores)
+        ground_label = torch.Tensor(ground_label)
+        auc_avg = cal.get_auc(scores, ground_label)
 
         total_accuracy.append(acc_avg)
         total_precision.append(precisions_avg)
         total_recall.append(recall_avg)
         total_f1_score.append(f1score_avg)
-        # total_auc.append(auc_avg)
+        total_auc.append(auc_avg)
 
         print('Test Accuracy:{:.5f}, Test Precision:{:.5f}, Test Recall:{:.5f}, Test F1 score:{:.5f}'.
               format(acc_avg, precisions_avg, recall_avg, f1score_avg))
@@ -205,15 +212,15 @@ def run():
     average_precision, h_p = mean_confidence_interval(np.array(total_precision))
     average_recall, h_r = mean_confidence_interval(np.array(total_recall))
     average_f1score, h_f = mean_confidence_interval(np.array(total_f1_score))
-    # average_auc, h_au = mean_confidence_interval(total_auc)
+    average_auc, h_au = mean_confidence_interval(total_auc)
     print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n "
           "average f1score :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p,
                                                average_recall, h_r,
                                                average_f1score, h_f))
 
     result = "average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n average f1score " \
-             ":{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p, average_recall,
-                                  h_r, average_f1score, h_f)
+             ":{}, h:{}\n, average AUC:{}, h:{}".format(average_accuracy, h_a, average_precision, h_p, average_recall,
+                                  h_r, average_f1score, h_f, average_auc, h_au)
     log = "{}-{}:\n{} ".format(os.path.basename(__file__), patient_test, result)
     LogRecord.write_log(log)
     end_time = time.time()
