@@ -271,6 +271,9 @@ class Meta(nn.Module):
             logits_q = net(x_qry, net.parameters(), bn_training=True)
             # [setsz]
             pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
+            possible = F.softmax(logits_q, dim=1)
+            scores = possible[:, 1]
+            # scalar
             # scalar
             # correct = torch.eq(pred_q, y_qry).sum().item()
             cal.set_values(pred_q, y_qry)
@@ -278,7 +281,7 @@ class Meta(nn.Module):
             precisions[0] = cal.get_precision()
             recalls[0] = cal.get_recall()
             f1scores[0] = cal.get_f1score()
-            auc[0] = cal.get_auc()
+            auc[0] = cal.get_auc(scores, y_qry)
 
         # this is the loss and accuracy after the first update
         with torch.no_grad():
@@ -286,6 +289,8 @@ class Meta(nn.Module):
             logits_q = net(x_qry, fast_weights, bn_training=True)
             # [setsz]
             pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
+            possible = F.softmax(logits_q, dim=1)
+            scores = possible[:, 1]
             # scalar
             # correct = torch.eq(pred_q, y_qry).sum().item()
             cal.set_values(pred_q, y_qry)
@@ -293,7 +298,7 @@ class Meta(nn.Module):
             precisions[1] = cal.get_precision()
             recalls[1] = cal.get_recall()
             f1scores[1] = cal.get_f1score()
-            auc[1] = cal.get_auc()
+            auc[1] = cal.get_auc(scores, y_qry)
 
         loss_all = 0
         for k in range(1, self.update_step_test):
@@ -315,27 +320,29 @@ class Meta(nn.Module):
                 if query_y_id_list is not None:
                     prediction_query = pred_q.detach().cpu().numpy().tolist()
                 # correct = torch.eq(pred_q, y_qry).sum().item()  # convert to numpy
+                possible = F.softmax(logits_q, dim=1)
+                scores = possible[:, 1]
                 cal.set_values(pred_q, y_qry)
                 corrects[k + 1] = cal.get_accuracy()
                 precisions[k + 1] = cal.get_precision()
                 recalls[k + 1] = cal.get_recall()
                 f1scores[k + 1] = cal.get_f1score()
-                auc[k + 1] = cal.get_auc()
+                auc[k + 1] = cal.get_auc(scores, y_qry)
 
         del net
-        # index = corrects.index(max(corrects))  # 选取准确率最高的那个结果
+        index = corrects.index(max(corrects))  # 选取准确率最高的那个结果
 
         # 将预测的结果进行统计
-        if query_y_id_list is not None:
-            r_path = "./precision/{}_val_prediction.pkl".format(patient_test)
-            record = np.load(r_path, allow_pickle=True)
-            for index, id in enumerate(query_y_id_list):
-                label = prediction_query[index]
-                record[id]["prediction"] = label
-            with open(r_path, 'wb') as f:
-                pickle.dump(record, f)
+        # if query_y_id_list is not None:
+        #     r_path = "./precision/{}_val_prediction.pkl".format(patient_test)
+        #     record = np.load(r_path, allow_pickle=True)
+        #     for index, id in enumerate(query_y_id_list):
+        #         label = prediction_query[index]
+        #         record[id]["prediction"] = label
+        #     with open(r_path, 'wb') as f:
+        #         pickle.dump(record, f)
 
-        index = len(corrects) - 1
+        # index = len(corrects) - 1
         loss_all /= self.update_step_test - 1
         result = {"accuracy": corrects[index],
                   "precision": precisions[index],
