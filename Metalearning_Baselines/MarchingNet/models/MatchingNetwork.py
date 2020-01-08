@@ -17,7 +17,10 @@ from .Classifier import Classifier
 from .DistanceNetwork import DistanceNetwork
 from .AttentionalClassify import AttentionalClassify
 import torch.nn.functional as F
-from config import IndicatorCalculation, mean_confidence_interval
+import sys
+
+sys.path.append("../../")
+from util.util_file import IndicatorCalculation
 
 
 class MatchingNetwork(nn.Module):
@@ -71,6 +74,7 @@ class MatchingNetwork(nn.Module):
         # produce embeddings for target images
         ground_truth = []
         pre = []
+        scores = np.zeros(0)
         for i in np.arange(target_image.size(1)):
             gen_encode = self.g(target_image[:, i, :, :, :])
             encoded_images.append(gen_encode)
@@ -87,6 +91,9 @@ class MatchingNetwork(nn.Module):
             preds = self.classify(similarities, support_set_y=support_set_labels_one_hot)
 
             # calculate accuracy and crossentropy loss
+            possible = F.softmax(preds, dim=1)
+            score = possible[:, 1].detach().cpu()
+            scores = np.append(scores, score)
             values, indices = preds.max(1)
             pre += indices.flatten().tolist()
 
@@ -106,7 +113,12 @@ class MatchingNetwork(nn.Module):
         data_json["precision"] = cal.get_precision()
         data_json["recall"] = cal.get_recall()
         data_json["f1"] = cal.get_f1score()
-        data_json["auc"] = cal.get_auc()
+        scores = torch.from_numpy(scores)
+        ground_truth = torch.Tensor(ground_truth)
+        try:
+            data_json["auc"] = cal.get_auc(scores, ground_truth)
+        except BaseException:
+            data_json["auc"] = 0.5
         return accuracy / target_image.size(1), crossentropy_loss / target_image.size(1), data_json
 
 

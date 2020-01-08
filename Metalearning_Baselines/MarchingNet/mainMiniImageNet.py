@@ -14,10 +14,13 @@ from experiments.OneShotMiniImageNetBuilder import miniImageNetBuilder
 import tqdm
 from config import mean_confidence_interval, logger, Pyemail
 import os
+import sys
+sys.path.append("../../")
+from util.util_file import IndicatorCalculation
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--gpu", type=str, default="1")
+parser.add_argument("--gpu", type=str, default="0")
 args = parser.parse_args()
 # from logger import Logger
 
@@ -37,16 +40,16 @@ samples_per_class = 10
 channels = 1
 # Training setup
 total_epochs = 20
-total_train_batches = 1000
+total_train_batches = 500
 total_val_batches = 10
-total_test_batches = 1000
+total_test_batches = 500
 # Parse other options
 args = Options().parse()
 
-patient_test = "BDP"
+patient_test = "LK"
 print("patient's name is :{}".format(patient_test))
-TRAIN_PATH = "/home/cbd109-2/yh.link/python/dataset/zero_data/{}/train".format(patient_test)
-TEST_PATH = "/home/cbd109-2/yh.link/python/dataset/zero_data/{}/test".format(patient_test)
+TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/{}/train".format(patient_test)
+TEST_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/{}/test".format(patient_test)
 
 # datas = Data_info(path_train=TRAIN_PATH, path_test=TEST_PATH)
 # train_data = MyDataset(datas.data_train)  # 作为训练集
@@ -69,20 +72,20 @@ LOG_DIR = args.log_dir + '/miniImageNetOneShot_run-batchSize_{}-fce_{}-classes_p
 # logger = Logger(LOG_DIR)
 
 # args.dataroot = '/home/aberenguel/Dataset/miniImagenet'
-os.environ['CUDA_VISIBLE_DEVICES'] = "1"
-dataTrain = miniImagenetOneShot.miniImagenetOneShotDataset(dataroot=args.dataroot,
+os.environ['CUDA_VISIBLE_DEVICES'] = "0"
+dataTrain = miniImagenetOneShot.miniImagenetOneShotDataset(dataroot=args.dataroot.format(patient_test),
                                                            type='train',
                                                            nEpisodes=total_train_batches * batch_size,
                                                            classes_per_set=classes_per_set,
                                                            samples_per_class=samples_per_class)
 
-dataVal = miniImagenetOneShot.miniImagenetOneShotDataset(dataroot=args.dataroot,
+dataVal = miniImagenetOneShot.miniImagenetOneShotDataset(dataroot=args.dataroot.format(patient_test),
                                                          type='val',
                                                          nEpisodes=total_val_batches * batch_size,
                                                          classes_per_set=classes_per_set,
                                                          samples_per_class=samples_per_class)
 
-dataTest = miniImagenetOneShot.miniImagenetOneShotDataset(dataroot=args.dataroot,
+dataTest = miniImagenetOneShot.miniImagenetOneShotDataset(dataroot=args.dataroot.format(patient_test),
                                                           type='test',
                                                           nEpisodes=total_test_batches * batch_size,
                                                           classes_per_set=classes_per_set,
@@ -136,7 +139,7 @@ with tqdm.tqdm(total=total_epochs + 10) as pbar_e:
     result = "\naccuracy:{}, h:{}\nprecision:{}, h:{}\nrecall:{}, h:{}\nf1:{}, h:{}\n auc:{}, h:{}".format(
         avg_accuracy, h_acc, avg_precision, h_p, avg_recall, h_r, avg_f1, h_f, avg_auc, h_a)
     logger(result)
-    os.system("~/login")  # login in network
-    Pyemail("experiments ending !", result)
+    # os.system("~/login")  # login in network
+    # Pyemail("experiments ending !", result)
 
     # logger.step()

@@ -15,7 +15,7 @@ class Options():
     def __init__(self):
         # Training settings
         parser = argparse.ArgumentParser(description='Matching Network')
-        parser.add_argument('--dataroot', type=str, default='/home/cbd109-2/Users/data/yh/python/dataset/zero_data/BDP',
+        parser.add_argument('--dataroot', type=str, default='/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/{}',
                             help='path to dataset')
         parser.add_argument('--log-dir', default='./logs',
                             help='folder to output model checkpoints')

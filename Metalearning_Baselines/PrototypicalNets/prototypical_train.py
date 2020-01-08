@@ -10,7 +10,7 @@ from utils import pprint, set_gpu, ensure_path, Averager, Timer, count_acc, eucl
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--max-epoch', type=int, default=200)
+    parser.add_argument('--max-epoch', type=int, default=100)
     parser.add_argument('--save-epoch', type=int, default=20)
     parser.add_argument('--shot', type=int, default=5)
     parser.add_argument('--query', type=int, default=5)
@@ -18,16 +18,16 @@ if __name__ == '__main__':
     parser.add_argument('--test-way', type=int, default=2)
     parser.add_argument('--step-size', type=int, default=20)
     parser.add_argument('--save-path', default='./save/proto-1')
-    parser.add_argument('--gpu', default='1')
+    parser.add_argument('--gpu', default='0')
     args = parser.parse_args()
     pprint(vars(args))
 
     set_gpu(args.gpu)
     ensure_path(args.save_path)
-    patient_test = "BDP"
+    patient_test = "SYF"
     print("patient's name is :{}".format(patient_test))
-    TRAIN_PATH = "/home/cbd109-2/yh.link/python/dataset/zero_data/{}/train".format(patient_test)
-    TEST_PATH = "/home/cbd109-2/yh.link/python/dataset/zero_data/{}/test".format(patient_test)
+    TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/{}/train".format(patient_test)
+    TEST_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/{}/test".format(patient_test)
 
     # trainset = MiniImageNet('train')
     datas = Data_info(path_train=TRAIN_PATH, path_test=TEST_PATH)
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     val_loader = DataLoader(dataset=test_data, batch_sampler=val_sampler,
                             num_workers=8, pin_memory=True)
 
-    model = Convnet().cuda()
+    model = Convnet().cuda(0)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.5)

@@ -9,6 +9,12 @@ import logging
 from convnet import Convnet
 
 from utils import *
+import torch
+import os
+import numpy as np
+import torch.nn.functional as F
+# from prototypical_train import patient_test
+# print("patient test :{}".format(patient_test))
 
 
 class Data_info():
@@ -47,18 +53,18 @@ class MyDataset(Dataset):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--gpu', default='1')
+    parser.add_argument('--gpu', default='0')
     parser.add_argument('--load', default='./save/proto-1/max-acc.pth')
-    parser.add_argument('--batch', type=int, default=2000)
+    parser.add_argument('--batch', type=int, default=50)
     parser.add_argument('--way', type=int, default=2)
-    parser.add_argument('--shot', type=int, default=5)
-    parser.add_argument('--query', type=int, default=30)
+    parser.add_argument('--shot', type=int, default=10)
+    parser.add_argument('--query', type=int, default=10)
     args = parser.parse_args()
     pprint(vars(args))
 
     set_gpu(args.gpu)
-    patient_test = "BDP"
-    VAL_PATH = "/home/cbd109-2/yh.link/python/dataset/zero_data/{}/val".format(patient_test)
+    patient_test = "SYF"
+    VAL_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/{}/val".format(patient_test)
 
     # dataset = MiniImageNet('test')
     data_info = Data_info(VAL_PATH)
@@ -93,6 +99,10 @@ if __name__ == '__main__':
 
         logits = euclidean_metric(model(data_query), p)
 
+        possible = F.softmax(logits, dim=1)
+        # print(possible)
+        score = possible[:, 1]
+
         label = torch.arange(args.way).repeat(args.query)
         label = label.type(torch.cuda.LongTensor)
 
@@ -104,7 +114,8 @@ if __name__ == '__main__':
         ave_precision.append(cal.get_precision())
         ave_recall.append(cal.get_recall())
         ave_f1.append(cal.get_f1score())
-        ave_auc.append(cal.get_auc())
+        score = score.detach()
+        ave_auc.append(cal.get_auc(score, label))
         # ave_acc.append(acc)
         print('batch {}: Accuracy:{:.2f}, Precision:{:.2f},Recall:{:.2f},F1:{:.2f},AUC:{:.2f}'.format(i, ave_acc[-1],
                                                                                                      ave_precision[-1],

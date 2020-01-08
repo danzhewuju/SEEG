@@ -206,21 +206,18 @@ def run():
         total_f1_score.append(f1score_avg)
         total_auc.append(auc_avg)
 
-        print('Test Accuracy:{:.5f}, Test Precision:{:.5f}, Test Recall:{:.5f}, Test F1 score:{:.5f}'.
-              format(acc_avg, precisions_avg, recall_avg, f1score_avg))
+        print('Test Accuracy:{:.5f}, Test Precision:{:.5f}, Test Recall:{:.5f}, Test F1 score:{:.5f}, Test AUC:{:.5f}'.
+              format(acc_avg, precisions_avg, recall_avg, f1score_avg, auc_avg))
     average_accuracy, h_a = mean_confidence_interval(total_accuracy)
     average_precision, h_p = mean_confidence_interval(np.array(total_precision))
     average_recall, h_r = mean_confidence_interval(np.array(total_recall))
     average_f1score, h_f = mean_confidence_interval(np.array(total_f1_score))
     average_auc, h_au = mean_confidence_interval(total_auc)
-    print("average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n "
-          "average f1score :{}, h:{}\n".format(average_accuracy, h_a, average_precision, h_p,
-                                               average_recall, h_r,
-                                               average_f1score, h_f))
 
     result = "average accuracy :{}, h:{}\n average precision :{}, h:{}\n average recall :{}, h:{}\n average f1score " \
-             ":{}, h:{}\n, average AUC:{}, h:{}".format(average_accuracy, h_a, average_precision, h_p, average_recall,
+             ":{}, h:{}\n average AUC:{}, h:{}".format(average_accuracy, h_a, average_precision, h_p, average_recall,
                                   h_r, average_f1score, h_f, average_auc, h_au)
+    print(result)
     log = "{}-{}:\n{} ".format(os.path.basename(__file__), patient_test, result)
     LogRecord.write_log(log)
     end_time = time.time()
