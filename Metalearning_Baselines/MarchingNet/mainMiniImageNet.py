@@ -36,17 +36,17 @@ args = parser.parse_args()
 batch_size = 10
 fce = True
 classes_per_set = 2
-samples_per_class = 10
+samples_per_class = 5
 channels = 1
 # Training setup
 total_epochs = 20
-total_train_batches = 500
+total_train_batches = 100
 total_val_batches = 10
-total_test_batches = 500
+total_test_batches = 100
 # Parse other options
 args = Options().parse()
 
-patient_test = "LK"
+patient_test = "ZK"
 print("patient's name is :{}".format(patient_test))
 TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/{}/train".format(patient_test)
 TEST_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/{}/test".format(patient_test)

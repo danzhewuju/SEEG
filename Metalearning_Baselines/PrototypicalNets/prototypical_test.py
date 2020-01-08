@@ -57,13 +57,14 @@ if __name__ == '__main__':
     parser.add_argument('--load', default='./save/proto-1/max-acc.pth')
     parser.add_argument('--batch', type=int, default=50)
     parser.add_argument('--way', type=int, default=2)
-    parser.add_argument('--shot', type=int, default=10)
-    parser.add_argument('--query', type=int, default=10)
+    parser.add_argument('--shot', type=int, default=5)
+    parser.add_argument('--query', type=int, default=5)
     args = parser.parse_args()
     pprint(vars(args))
 
     set_gpu(args.gpu)
-    patient_test = "SYF"
+    patient_test = "ZK"
+    print("patient test:{}".format(patient_test))
     VAL_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/{}/val".format(patient_test)
 
     # dataset = MiniImageNet('test')

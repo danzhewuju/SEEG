@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     set_gpu(args.gpu)
     ensure_path(args.save_path)
-    patient_test = "SYF"
+    patient_test = "ZK"
     print("patient's name is :{}".format(patient_test))
     TRAIN_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/{}/train".format(patient_test)
     TEST_PATH = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/seeg/zero_data/{}/test".format(patient_test)
