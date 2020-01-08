@@ -14,7 +14,7 @@ import numpy as np
 import scipy.stats
 import torch
 from torch.utils.data import DataLoader
-from Seeg_VMAML import VAE
+from Seeg_VMAML_Double_Vae import VAE
 
 sys.path.append('../')
 from VMAML.Mamlnet import Seegnet
@@ -66,21 +66,20 @@ config = [
 
 resize = (130, 200)
 device = torch.device('cuda')
-Vae = VAE().to(device)
 maml = Meta(args, config).to(device)
-
 
 # 构建两个编码器
 # vae_p = VAE().to(device)
 # vae_n = VAE().to(device)
-# model_vae_p_path = "./models/Vae_negative_{}.pkl".format(patient_test)
-# model_vae_n_path = "./model/Vae_positive_{}.pkl".format(patient_test)
+# model_vae_p_path = "./models/{0}/Vae_negative_{0}.pkl".format(patient_test)
+# model_vae_n_path = "./models/{0}/Vae_positive_{0}.pkl".format(patient_test)
 # if os.path.exists(model_vae_n_path) and os.path.exists(model_vae_p_path):
 #     vae_p.load_state_dict(torch.load(model_vae_p_path))
 #     vae_n.load_state_dict(torch.load(model_vae_n_path))
 #     print("loading VAE model successfully!")
 # else:
 #     print("VAE model doesn't exist!")
+#     exit(0)
 
 
 def mean_confidence_interval(accs, confidence=0.95):
@@ -108,18 +107,11 @@ def mean_confidence_interval(accs, confidence=0.95):
 #         recon_batch_p, mu_p, logvar_p = vae_p(data_tmp)
 #         recon_batch_n, mu_n, logvar_n = vae_n(data_tmp)
 #
-#         # if label_list[i] == 1:  # positive
-#         #     optimizer_vae_p.zero_grad()
-#         #     recon_batch, mu, logvar = vae_p(data_tmp)
-#         #     loss = loss_function(recon_batch, data_tmp, mu, logvar)
-#         #     loss.backward()
-#         #     optimizer_vae_p.step()
-#         # else:
-#         #     optimizer_vae_n.zero_grad()
-#         #     recon_batch, mu, logvar = vae_n(data_tmp)
-#         #     loss = loss_function(recon_batch, data_tmp, mu, logvar)
-#         #     loss.backward()
-#         #     optimizer_vae_n.step()
+#         if label_list[i] == 1:  # positive
+#             recon_batch, mu, logvar = vae_p(data_tmp)
+#
+#         else:
+#             recon_batch, mu, logvar = vae_n(data_tmp)
 #         result_tmp_n = recon_batch_n.detach().cpu().numpy()
 #         result_tmp_p = recon_batch_p.detach().cpu().numpy()
 #         # result_tmp = (result_tmp_p+result_tmp_n)/2
@@ -188,17 +180,11 @@ def main():
         recalls = []
         f1scores = []
         aucs = []
-        flag_one = True
 
         for x_spt, y_spt, x_qry, y_qry, query_y_id_list in db_test:
             query_y_id_list = [x[0] for x in query_y_id_list]
-            if flag_one:
-                x_spt_one = x_spt
-                y_spt_one = y_qry
-                # flag_one = False
-            # 1.未引入VAE模块
-            x_spt = x_spt_one
-            y_spt_one = y_spt_one
+            # x_spt_vae, _ = trans_data_vae(x_spt.numpy(), y_spt)
+            # x_spt_vae = torch.from_numpy(x_spt_vae)
             x_spt, y_spt, x_qry, y_qry = x_spt.squeeze(0).to(device), y_spt.squeeze(0).to(device), \
                                          x_qry.squeeze(0).to(device), y_qry.squeeze(0).to(device)
             # print(x_spt.shape,y_spt.shape, x_qry.shape, y_qry.shape)
