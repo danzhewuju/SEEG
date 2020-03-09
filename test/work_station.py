@@ -8,4 +8,7 @@
 
 from util.seeg_utils import *
 from util.util_file import *
+import numpy as np
+a = np.random.randn(100, 100)
+print(a)
 

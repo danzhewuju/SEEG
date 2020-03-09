@@ -6,6 +6,9 @@ import time
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms
+from PIL import Image
+from util.util_file import trans_numpy_cv2
 
 sys.path.append('../')
 sys.path.append('../VAE')
@@ -41,7 +44,7 @@ parser.add_argument('-g', '--GPU', type=int, default=0)
 parser.add_argument('-n', '--class_number', type=int, default=2)
 parser.add_argument('-b', '--batch_size', type=int, default=32)
 parser.add_argument('-l', '--learning_rate', type=float, default=0.001)
-parser.add_argument('-e', '--epoch', type=int, default=2)
+parser.add_argument('-e', '--epoch', type=int, default=5)
 args = parser.parse_args()
 
 # hyper parameter setting
@@ -184,6 +187,7 @@ class MyDataset(Dataset):  # 重写dateset的相关类
     def __getitem__(self, index):
         fn, label = self.imgs[index]
         data = np.load(fn)
+        data = self.transform(data)
         result = matrix_normalization(data, (130, 200))
         result = result.astype('float32')
         result = result[np.newaxis, :]
@@ -194,11 +198,29 @@ class MyDataset(Dataset):  # 重写dateset的相关类
         return len(self.imgs)
 
 
+def train_transform(x):
+    trans_data = transforms.Compose([
+        transforms.RandomHorizontalFlip(),
+        # transforms.RandomCrop(96),
+        transforms.ColorJitter(brightness=0.5, contrast=0.5, hue=0.5),
+        transforms.ToTensor(),
+        transforms.Normalize([0.5], [0.5])
+    ])
+    x = trans_numpy_cv2(x)
+    x = Image.fromarray(x)
+    x = trans_data(x)
+    result = np.array(x)
+    result = result.reshape((result.shape[1:]))
+    noise = np.random.rand(result.shape[0], result.shape[1])
+    result += noise
+    return result
+
+
 def run():
     start_time = time.time()
     datas = Data_info(path_train=TRAIN_PATH, path_test=TEST_PATH)
-    train_data = MyDataset(datas.data_train)  # 作为训练集
-    test_data = MyDataset(datas.data_test)  # 作为测试集
+    train_data = MyDataset(datas.data_train, transform=train_transform)  # 作为训练集
+    test_data = MyDataset(datas.data_test, transform=train_transform)  # 作为测试集
     train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(test_data, batch_size=BATCH_SIZE, shuffle=True)
 

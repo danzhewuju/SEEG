@@ -22,6 +22,7 @@ import scipy.stats
 from VAE.vae import trans_data, VAE
 from util.util_file import IndicatorCalculation, LogRecord
 import json
+from cnn_train_seeg import train_transform
 
 config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
 patient_test = config['patient_test']
@@ -136,12 +137,15 @@ class Data_info():
 
 
 class MyDataset(Dataset):
-    def __init__(self, datas):
+    def __init__(self, datas, transform):
         self.datas = datas
+        self.transform = transform
 
     def __getitem__(self, item):
         d_p, label, name_id = self.datas[item]
         data = np.load(d_p)
+        if self.transform is not None:
+            data = self.transform(data)
         result = matrix_normalization(data, (130, 200))
         result = result.astype('float32')
         result = result[np.newaxis, :]
@@ -155,7 +159,7 @@ class MyDataset(Dataset):
 def run():
     start_time = time.time()  # 开始时间
     data_info = Data_info(VAL_PATH)
-    val_data = MyDataset(data_info.val)  # 标准数据集的构造
+    val_data = MyDataset(data_info.val, transform=train_transform)  # 标准数据集的构造
     val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True)
 
     model = CNN().cuda(GPU)  # 保持和之前的神经网络相同的结构特征?
