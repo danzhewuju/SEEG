@@ -11,7 +11,8 @@ from __future__ import print_function
 
 import argparse
 import sys
-
+from torchvision import transforms
+from PIL import Image
 import torch.utils.data
 from torch.utils.data import DataLoader
 
@@ -24,12 +25,13 @@ import matplotlib.pyplot as plt
 import time
 from tqdm import tqdm
 import json
+from util.util_file import trans_numpy_cv2
 
 config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指定训练所使用的数据
 patient_test = config['patient_test']
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=3000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=6000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
@@ -39,13 +41,13 @@ argparser.add_argument('--task_num', type=int, help='meta batch size, namely tas
 argparser.add_argument('--vae_lr', type=float, help='meta-level outer learning rate', default=0.01)
 argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.001)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
-argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=2)
-argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=2)
+argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
+argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=5)
 argparser.add_argument('--dataset_dir', type=str, help="training data set",
                        default="../data/seeg/zero_data/{}".format(patient_test))
 argparser.add_argument('--no-cuda', action='store_true', default=False, help='enables CUDA training')
 argparser.add_argument('-train_p', '--train_path', default='../data/seeg/zero_data/{}/train'.format(patient_test))
-argparser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
+argparser.add_argument('-test_p', '--test_path', default='../data/seeg/zero_data/{}/test'.format(patient_test))
 argparser.add_argument('-val_p', '--val_path', default='../data/seeg/zero_data/{}/val'.format(patient_test))
 
 args = argparser.parse_args()
@@ -129,6 +131,24 @@ class Data_info():
         self.sleep_normal = sleep_normal
 
 
+def train_transform(x):
+    trans_data = transforms.Compose([
+        transforms.RandomHorizontalFlip(),
+        # transforms.RandomCrop(96),
+        transforms.ColorJitter(brightness=0.5, contrast=0.5, hue=0.5),
+        transforms.ToTensor(),
+        transforms.Normalize([0.5], [0.5])
+    ])
+    x = trans_numpy_cv2(x)
+    x = Image.fromarray(x)
+    x = trans_data(x)
+    result = np.array(x)
+    result = result.reshape((result.shape[1:]))
+    noise = np.random.rand(result.shape[0], result.shape[1])
+    result += noise
+    return result
+
+
 class MyDataset(Dataset):  # 重写dateset的相关类
     def __init__(self, imgs, transform=None, target_transform=None):
         self.imgs = imgs
@@ -138,6 +158,7 @@ class MyDataset(Dataset):  # 重写dateset的相关类
     def __getitem__(self, index):
         fn, label = self.imgs[index]
         data = np.load(fn)
+        data = self.transform(data)
         result = matrix_normalization(data, (130, 200))
         result = result.astype('float32')
         result = result[np.newaxis, :]
@@ -151,8 +172,8 @@ print(TRAIN_PATH)
 print(TEST_PATH)
 datas = Data_info(path_train=TRAIN_PATH, path_test=TEST_PATH)
 all_data = datas.data_train + datas.data_test  # 所有的训练集
-positive_loader = MyDataset(datas.preseizure)  # 作为训练集
-negative_loader = MyDataset(datas.sleep_normal)  # 作为测试集
+positive_loader = MyDataset(datas.preseizure, transform=train_transform)  # 作为训练集
+negative_loader = MyDataset(datas.sleep_normal, transform=train_transform)  # 作为测试集
 
 all_loader = MyDataset(all_data)
 
