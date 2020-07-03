@@ -165,7 +165,7 @@ def main():
 
     mini_test = Seegnet(args.dataset_dir, mode='val', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
-                        batchsz=200
+                        batchsz=2000
                         )
     test_accuracy = []
     test_precision = []

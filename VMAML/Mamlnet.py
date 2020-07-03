@@ -215,17 +215,17 @@ class Seegnet(Dataset):  # 任务集的构造
         # print(support_set_y)
         # return support_x, torch.LongTensor(support_y), query_x, torch.LongTensor(query_y)
         # 需要将文件进行写会
-        # file_path = "./precision/{}_val_prediction.pkl".format(patient_test)
-        # if os.path.exists(file_path):
-        #     record = np.load(file_path, allow_pickle=True)
-        #     print("暂时不进行保存验证！")
-        # else:
-        #     record = {}
-        # for k, v in record_tmp.items():
-        #     if k not in record.keys():
-        #         record[k] = v
-        # with open(file_path, 'wb') as f:
-        #     pickle.dump(record, f)
+        file_path = "./precision/{}_val_prediction.pkl".format(patient_test)
+        if os.path.exists(file_path):
+            record = np.load(file_path, allow_pickle=True)
+            # print("暂时不进行保存验证！")
+        else:
+            record = {}
+        for k, v in record_tmp.items():
+            if k not in record.keys():
+                record[k] = v
+        with open(file_path, 'wb') as f:
+            pickle.dump(record, f)
 
         return support_x, torch.LongTensor(support_y_relative), query_x, torch.LongTensor(
             query_y_relative), query_y_id_list

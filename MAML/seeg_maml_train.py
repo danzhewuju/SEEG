@@ -142,7 +142,7 @@ def main():
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('--epoch', type=int, help='epoch number', default=4000)
+    argparser.add_argument('--epoch', type=int, help='epoch number', default=2000)
     argparser.add_argument('--n_way', type=int, help='n way', default=2)
     argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
     argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
@@ -152,7 +152,7 @@ if __name__ == '__main__':
     argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=1e-3)
     argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
     argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
-    argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=10)
+    argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=5)
     argparser.add_argument('--dataset_dir', type=str, help="training data set",
                            default="../data/seeg/zero_data/{}".format(patient_test))
 

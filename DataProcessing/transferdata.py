@@ -126,11 +126,11 @@ def sleep_normal_handle():
     '''
     clean_dir("../data/data_slice/split/sleep/")
     path_commom_channel = "../data/data_slice/channels_info/LK_seq.csv"
-    path_raw_normal_sleep = ["../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-0.fif",
-                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-1.fif',
-                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-2-0.fif',
-                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-4-0.fif',
-                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_Aug_4th_2am_seeg_raw-6-0.fif'
+    path_raw_normal_sleep = ["../data/raw_data/LK/LK_SLEEP/LK_Sleep_raw-0.fif",
+                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_raw-1.fif',
+                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_raw-2-0.fif',
+                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_raw-4-0.fif',
+                             '../data/raw_data/LK/LK_SLEEP/LK_Sleep_raw-6-0.fif'
 
                              ]  # 数据太多，因此只是选取部分的数据进行处理
     name = "LK"

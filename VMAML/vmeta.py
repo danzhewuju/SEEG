@@ -5,6 +5,7 @@ import torch
 from torch import nn
 from torch import optim
 from torch.nn import functional as F
+import os
 
 from VMAML.vlearner import Learner
 from util.util_file import IndicatorCalculation
@@ -317,7 +318,7 @@ class Meta(nn.Module):
 
             with torch.no_grad():
                 pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-                if query_y_id_list is not None:
+                if query_y_id_list is not None and k == self.update_step_test - 1:  # 需要记录最后的预测结果
                     prediction_query = pred_q.detach().cpu().numpy().tolist()
                 # correct = torch.eq(pred_q, y_qry).sum().item()  # convert to numpy
                 possible = F.softmax(logits_q, dim=1)
@@ -330,19 +331,22 @@ class Meta(nn.Module):
                 auc[k + 1] = cal.get_auc(scores, y_qry)
 
         del net
-        index = corrects.index(max(corrects))  # 选取准确率最高的那个结果
+
 
         # 将预测的结果进行统计
-        # if query_y_id_list is not None:
-        #     r_path = "./precision/{}_val_prediction.pkl".format(patient_test)
-        #     record = np.load(r_path, allow_pickle=True)
-        #     for index, id in enumerate(query_y_id_list):
-        #         label = prediction_query[index]
-        #         record[id]["prediction"] = label
-        #     with open(r_path, 'wb') as f:
-        #         pickle.dump(record, f)
+        if query_y_id_list is not None:
+            r_path = "./precision/{}_val_prediction.pkl".format(patient_test)
+            # 文件存在需要被创建
+            # record = {} if not os.path.exists(r_path) else np.load(r_path, allow_pickle=True)
+            record = np.load(r_path, allow_pickle=True)
+            for index, id in enumerate(query_y_id_list):
+                label = prediction_query[index]
+                record[id]["prediction"] = label
+            with open(r_path, 'wb') as f:
+                pickle.dump(record, f)
 
-        # index = len(corrects) - 1
+        # index = len(corrects) - 1 # 选取最优的那个结果
+        index = corrects.index(max(corrects))  # 选取准确率最高的那个结果
         loss_all /= self.update_step_test - 1
         result = {"accuracy": corrects[index],
                   "precision": precisions[index],

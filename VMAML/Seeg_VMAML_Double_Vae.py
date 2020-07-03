@@ -31,7 +31,7 @@ config = json.load(open("../DataProcessing/config/fig.json", 'r'))  # 需要指�
 patient_test = config['patient_test']
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=8000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=5000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
