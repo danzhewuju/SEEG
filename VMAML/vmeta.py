@@ -265,6 +265,7 @@ class Meta(nn.Module):
         loss = F.cross_entropy(logits, y_spt)
         grad = torch.autograd.grad(loss, net.parameters())
         fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, net.parameters())))
+        prediction_query = []
 
         # this is the loss and accuracy before first update
         with torch.no_grad():
@@ -283,6 +284,7 @@ class Meta(nn.Module):
             recalls[0] = cal.get_recall()
             f1scores[0] = cal.get_f1score()
             auc[0] = cal.get_auc(scores, y_qry)
+            prediction_query.append(pred_q.tolist())
 
         # this is the loss and accuracy after the first update
         with torch.no_grad():
@@ -300,6 +302,7 @@ class Meta(nn.Module):
             recalls[1] = cal.get_recall()
             f1scores[1] = cal.get_f1score()
             auc[1] = cal.get_auc(scores, y_qry)
+            prediction_query.append(pred_q.tolist())
 
         loss_all = 0
         for k in range(1, self.update_step_test):
@@ -318,8 +321,9 @@ class Meta(nn.Module):
 
             with torch.no_grad():
                 pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-                if query_y_id_list is not None and k == self.update_step_test - 1:  # 需要记录最后的预测结果
-                    prediction_query = pred_q.detach().cpu().numpy().tolist()
+                if query_y_id_list is not None:  # 需要记录最后的预测结果
+                    tmp_query = pred_q.detach().cpu().numpy().tolist()
+                    prediction_query.append(tmp_query)
                 # correct = torch.eq(pred_q, y_qry).sum().item()  # convert to numpy
                 possible = F.softmax(logits_q, dim=1)
                 scores = possible[:, 1]
@@ -332,7 +336,19 @@ class Meta(nn.Module):
 
         del net
 
+        # index = len(corrects) - 1 # 选取最优的那个结果
+        index = corrects.index(max(corrects))  # 选取准确率最高的那个结果
+        loss_all /= self.update_step_test - 1
+        result = {"accuracy": corrects[index],
+                  "precision": precisions[index],
+                  "recall": recalls[index],
+                  "f1score": f1scores[index],
+                  "auc": auc[index],
+                  }
+        # accs = np.array(corrects) / querysz
+
         # 将预测的结果进行统计
+        prediction_query = prediction_query[index]
         if query_y_id_list is not None:
             r_path = "./precision/{}_val_prediction.pkl".format(patient_test)
             # 文件存在需要被创建
@@ -347,17 +363,6 @@ class Meta(nn.Module):
 
             with open(r_path, 'wb') as f:
                 pickle.dump(record, f)
-
-        # index = len(corrects) - 1 # 选取最优的那个结果
-        index = corrects.index(max(corrects))  # 选取准确率最高的那个结果
-        loss_all /= self.update_step_test - 1
-        result = {"accuracy": corrects[index],
-                  "precision": precisions[index],
-                  "recall": recalls[index],
-                  "f1score": f1scores[index],
-                  "auc": auc[index],
-                  }
-        # accs = np.array(corrects) / querysz
 
         return result, loss_all
 
