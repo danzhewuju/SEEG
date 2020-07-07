@@ -27,7 +27,7 @@ patient_test = config['patient_test']
 print("patient_test is {}".format(patient_test))
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('--epoch', type=int, help='epoch number', default=1000)
+argparser.add_argument('--epoch', type=int, help='epoch number', default=2000)
 argparser.add_argument('--n_way', type=int, help='n way', default=2)
 argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=5)
 argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=5)
@@ -37,7 +37,7 @@ argparser.add_argument('--task_num', type=int, help='meta batch size, namely tas
 argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=1e-3)
 argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
-argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=5)
+argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=8)
 argparser.add_argument('--dataset_dir', type=str, help="training data set",
                        default="../data/seeg/zero_data/{}/".format(patient_test))
 
@@ -165,7 +165,7 @@ def main():
 
     mini_test = Seegnet(args.dataset_dir, mode='val', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
-                        batchsz=1000
+                        batchsz=2000
                         )
     test_accuracy = []
     test_precision = []

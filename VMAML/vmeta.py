@@ -340,9 +340,10 @@ class Meta(nn.Module):
             # record = np.load(r_path, allow_pickle=True)
             ground_truth = y_qry.cpu().tolist()
             for index, id in enumerate(query_y_id_list):
-                label = prediction_query[index]
-                res = {'ground truth': ground_truth[index], 'prediction': label}
-                record[id] = res
+                if id not in record.keys():
+                    label = prediction_query[index]
+                    res = {'ground truth': ground_truth[index], 'prediction': label}
+                    record[id] = res
 
             with open(r_path, 'wb') as f:
                 pickle.dump(record, f)
