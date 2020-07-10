@@ -39,10 +39,10 @@ argparser.add_argument('--imgsz', type=int, help='imgsz', default=500)
 argparser.add_argument('--imgc', type=int, help='imgc', default=5)
 argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=8)
 argparser.add_argument('--vae_lr', type=float, help='meta-level outer learning rate', default=0.01)
-argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.0001)
-argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.001)
+argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.001)
+argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
-argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=5)
+argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=8)
 argparser.add_argument('--dataset_dir', type=str, help="training data set",
                        default="../data/seeg/zero_data/{}".format(patient_test))
 argparser.add_argument('--no-cuda', action='store_true', default=False, help='enables CUDA training')
@@ -323,11 +323,11 @@ def maml_framwork():
 
     # flag_vae = True  # 设置梯度反向传播的标志位，vae
     # flag_maml = not flag_vae  # 设置梯度反向传播的标志位，maml
-    for epoch in range(1):  # 设置迭代次数
+    for epoch in tqdm(range(3 )):  # 设置迭代次数
         # fetch meta_batchsz num of episode each time
         db = DataLoader(mini, args.task_num, shuffle=True, pin_memory=True)
 
-        for step, (x_spt, y_spt, x_qry, y_qry, _) in tqdm(enumerate(db)):
+        for step, (x_spt, y_spt, x_qry, y_qry, _) in enumerate(tqdm(db)):
 
             x_spt_vae, loss_spt = trans_data_vae(x_spt.numpy(), y_spt)
             x_qry_vae, loss_qry = trans_data_vae(x_qry.numpy(), y_qry)
