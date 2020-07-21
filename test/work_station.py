@@ -9,6 +9,9 @@
 from util.seeg_utils import *
 from util.util_file import *
 import numpy as np
-a = np.random.randn(100, 100)
-print(a)
+if __name__ == '__main__':
+    path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/BDP/BDP_Pre_seizure/BDP_SZ2_pre_seizure_raw.fif"
+    data = read_raw(path)
+    time_length = get_recorder_time(data) / 2
+    print(time_length)
 

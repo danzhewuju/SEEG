@@ -1,14 +1,9 @@
 #!/usr/bin/python
-
-
-
 import sys
-
 sys.path.append('../')
 from RelationNet.Seegdata import *
 from util.util_file import *
 import re
-from functools import reduce
 from util.util_file import IndicatorCalculation, similarity_dtw, LogRecord, get_label_data
 import logging
 from tqdm import tqdm
