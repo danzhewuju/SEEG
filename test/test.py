@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
-# import librosa
-# import librosa.display
-# import torch
 
+
+import sys
+
+sys.path.append('../')
 from RelationNet.Seegdata import *
 from util.util_file import *
 import re
@@ -12,15 +13,7 @@ from util.util_file import IndicatorCalculation, similarity_dtw, LogRecord, get_
 import logging
 from tqdm import tqdm
 import pandas as pd
-from collections import Counter
-
-from functools import partial
-import mne
-from dtw import dtw
-
 import torch
-from torch.nn import functional as F
-import json
 
 
 # from torch.nn import functional as F
@@ -67,74 +60,6 @@ def test_4(path="../data/data_path.txt"):
     print("SGH files: {}, count: {}".format(SGH_path, len(SGH_path)))
     file_map = {"LK": LK_path, "GHB": SGH_path}
     return file_map
-
-
-def test_6():
-    path_lk0 = '/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/data_slice/split/cases/06f4fad8-65db-11e9-bae7-e0d55ee63f3d-1.npy'
-    raw = np.load(path_lk0)
-    plt.figure()
-    librosa.display.waveplot(raw)
-    plt.show()
-    librosa.display.waveplot(raw[0])
-    plt.show()
-    # plt.plot(list(range(100 * 5)), raw[0])
-    # for index in range(118):
-    #     librosa.display.waveplot(raw[index])  # 波形数据的展示，将数据转化为类似于声波的一种
-    #     plt.show()
-
-    # # 模板 def test_n():
-    # path_normal = "/home/cbd109-2/Users/yh/Program/Python/tmp/SEEG/data/data_slice/split/cases"
-    # f = list(os.walk(path_normal))
-    # print(len(f[0][2]))
-
-
-def test_8():  # 关于数据过零率的相关统计信息
-    path_cases = '../data/data_slice/split/cases'
-    path_normal = '../data/data_slice/split/normal'
-    map_cases = get_all_file_path(path_cases, 'npy')
-    map_normal = get_all_file_path(path_normal, 'npy')
-    # print(map_cases)
-    # print(map_normal)
-    data_map_cases = {}
-    for d_map in map_cases.items():
-        data = [np.load(x) for x in d_map[1]]
-        data_map_cases[d_map[0]] = data
-    data_lk = data_map_cases["LK"]
-    data_sgh = data_map_cases["SGH"]
-    channel_num = len(data_lk[0])
-    avg_counts_lk = []
-    for dd in data_lk:
-        counts = []
-        for d in dd:
-            c = librosa.zero_crossings(d)
-            counts.append(len([x for x in c if x == True]))
-        avg_count = sum(counts) / channel_num
-        avg_counts_lk.append(avg_count)
-    # plt.visualization_feature()
-    # plt.title("zero_crossing LK")
-    # plt.plot(range(len(avg_counts_cases)), avg_counts_cases)
-    print(np.mean(np.array(avg_counts_lk)))
-    # plt.show()
-
-    avg_counts_sgh = []
-    for dd in data_sgh:
-        counts = []
-        for d in dd:
-            c = librosa.zero_crossings(d)
-            counts.append(len([x for x in c if x == True]))
-        avg_count = sum(counts) / channel_num
-        avg_counts_sgh.append(avg_count)
-    plt.figure()
-    plt.title("zero_crossing")
-    plt.xlabel("t")
-    plt.ylabel('count')
-    p_lk = plt.plot(range(len(avg_counts_lk)), avg_counts_lk, label='LK')
-    end = len(avg_counts_lk)
-
-    p_sgh = plt.plot(avg_counts_sgh[:end], label='sgh')
-    plt.legend()
-    print(sum(avg_counts_sgh) / len(avg_counts_sgh))
-    plt.show()
 
 
 def test_9():  # 其他功能的探索
@@ -438,8 +363,10 @@ def test_npy():
 
 
 if __name__ == '__main__':
-    test_npy()
-    # test_get_label()
+    path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/data/raw_data/BDP/BDP_Pre_seizure/BDP_SZ2_pre_seizure_raw.fif"
+    data = read_raw(path)
+    time_length = get_recorder_time(data) / 2
+    print(time_length)
 
 # print(__file__)
 # test_log_record()

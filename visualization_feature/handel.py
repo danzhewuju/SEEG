@@ -270,7 +270,7 @@ def raw_data_slice():
     print("processing data from {}".format(path_dir))
     path_raw = path_dir
     name = patient_test
-    generate_data(path_raw, flag, name, path_commom_channel, isfilter=False)
+    generate_data(path_raw, flag, name, path_commom_channel, isfilter=True)
 
     print("癫痫发作前的睡眠处理完成！！！") if flag == 0 else print("正常睡眠数据处理完成！！！")
 

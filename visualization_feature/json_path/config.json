@@ -10,9 +10,7 @@
   "handel.sequentially__start_time_preseizure_BDP": "3:01:52",
   "handel.sequentially__start_time_sleep_BDP": "23:01:52",
   "handel.dynamic_detection__path_channel_list_BDP": "../data/data_slice/channels_info/BDP_seq.csv",
-
   "person_raw_data_preseizure_BDP": "../data/raw_data/BDP/BDP_Pre_seizure/BDP_SZ1_pre_seizure_raw.fif",
-
   "person_raw_data_sleep_BDP": "../data/raw_data/BDP/BDP_SLEEP/BDP_Sleep_raw.fif",
 
   "person_raw_data_preseizure_ZK": "../data/raw_data/ZK/ZK_Pre_seizure/ZK_SZ1_pre_seizure_raw.fif",
