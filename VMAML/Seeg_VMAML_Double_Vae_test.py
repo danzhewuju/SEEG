@@ -14,7 +14,6 @@ import numpy as np
 import scipy.stats
 import torch
 from torch.utils.data import DataLoader
-from Seeg_VMAML_Double_Vae import VAE
 
 sys.path.append('../')
 from VMAML.Mamlnet import Seegnet
@@ -39,7 +38,7 @@ argparser.add_argument('--update_lr', type=float, help='task-level inner update 
 argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=5)
 argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=8)
 argparser.add_argument('--dataset_dir', type=str, help="training data set",
-                       default="../data/seeg/zero_data/{}/".format(patient_test))
+                       default="../visualization_feature/valpatient_data/{}/".format(patient_test))
 
 args = argparser.parse_args()
 
@@ -67,6 +66,7 @@ config = [
 resize = (130, 200)
 device = torch.device('cuda')
 maml = Meta(args, config).to(device)
+
 
 # 构建两个编码器
 # vae_p = VAE().to(device)
@@ -163,16 +163,16 @@ def main():
     print(maml)
     print('Total trainable tensors:', num)
 
-    mini_test = Seegnet(args.dataset_dir, mode='val', n_way=args.n_way, k_shot=args.k_spt,
+    mini_test = Seegnet(args.dataset_dir, mode='', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
-                        batchsz=2000
+                        batchsz=4000
                         )
     test_accuracy = []
     test_precision = []
     test_recall = []
     test_f1score = []
     test_auc = []
-    for epoch in range(5):
+    for epoch in range(2):
         # fetch meta_batchsz num of episode each time
         db_test = DataLoader(mini_test, 1, shuffle=False, pin_memory=True)
         accs = []

@@ -88,8 +88,11 @@ class Seegnet(Dataset):  # 任务集的构造
             mode, batchsz, n_way, k_shot, k_query))
 
         # reconstruct input
+        if mode != '':
+            csvdata, filename_label = self.loadCSV(os.path.join(root, mode))  # csv path
+        else:
+            csvdata, filename_label = self.loadCSV(root)  # csv path
 
-        csvdata, filename_label = self.loadCSV(os.path.join(root, mode))  # csv path
         self.filename_label = filename_label
         self.data = []
         self.img2label = {}
