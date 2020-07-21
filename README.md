@@ -32,6 +32,8 @@ Python : pip install python
 
 **Metalearning_Baselines** other meta learning models
 
+pre_seizure: 1, normal_sleep:0
+
 
 
 

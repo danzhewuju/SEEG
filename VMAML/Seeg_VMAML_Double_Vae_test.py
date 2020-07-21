@@ -162,6 +162,7 @@ def main():
     num = sum(map(lambda x: np.prod(x.shape), tmp))
     print(maml)
     print('Total trainable tensors:', num)
+    print(args.dataset_dir)
 
     mini_test = Seegnet(args.dataset_dir, mode='', n_way=args.n_way, k_shot=args.k_spt,
                         k_query=args.k_qry,
