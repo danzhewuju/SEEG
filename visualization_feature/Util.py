@@ -61,5 +61,5 @@ if __name__ == '__main__':
     label = "non_seizure"
     dict_label = {"pre_seizure": 'pre_seizure', "non_seizure": 'sleep_normal'}
     path_dir = "./valpatient_data/{}/{}".format(patient_test, dict_label[label])
-    save_file = "./log/{}/Time_index.csv".format(patient_test)
+    save_file = "./log/{0}/{0}_time_index.csv".format(patient_test)
     cal_time_info(path_dir, label, save_file)  # 用于计算切片的时间信息， 每一个切片会对应一个起始时间

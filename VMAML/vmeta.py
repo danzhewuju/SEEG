@@ -350,7 +350,7 @@ class Meta(nn.Module):
         # 将预测的结果进行统计
         prediction_query = prediction_query[index]
         if query_y_id_list is not None:
-            r_path = "./precision/{}_val_prediction.pkl".format(patient_test)
+            r_path = "./precision/{}_single_prediction.pkl".format(patient_test)
             # 文件存在需要被创建
             record = {} if not os.path.exists(r_path) else np.load(r_path, allow_pickle=True)
             # record = np.load(r_path, allow_pickle=True)
