@@ -136,12 +136,12 @@ class VAE(nn.Module):
         super(VAE, self).__init__()
 
         # self.fc1 = nn.Linear(resize[0] * resize[1], 400)
-        self.fc1 = nn.Linear(resize[0] * resize[1], 2000)
+        self.fc1 = nn.Linear(130 * 200, 2000)
         self.fc12 = nn.Linear(2000, 200)
         self.fc21 = nn.Linear(200, 20)
         self.fc22 = nn.Linear(200, 20)
         self.fc3 = nn.Linear(20, 200)
-        self.fc4 = nn.Linear(200, resize[0] * resize[1])
+        self.fc4 = nn.Linear(200, 130 * 200)
 
     def encode(self, x):
         h1 = F.relu(self.fc1(x))
@@ -168,7 +168,9 @@ class VAE(nn.Module):
         return self.decode(z), mu, logvar
 
 
+model_path = "./models/model-vae-positive_preseizure.ckpt"
 model = VAE().to(device)
+model.load_state_dict(torch.load(model_path))
 optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
 
@@ -263,7 +265,7 @@ def train_all_data(epoch):
 def trans_data(vae_model, data, shape=(130, 200)):
     data_tmp = torch.from_numpy(data)
     data_input = data_tmp.cuda(0)
-    recon_batch, _, _ = vae_model(data_input)
+    recon_batch, _, _ = vae_model(data_input.float())
     recon_batch = recon_batch.cpu()
     result = recon_batch.detach().numpy()
     result = result.reshape(shape)
@@ -275,11 +277,28 @@ def show_eeg(data):
     plt.show()
 
 
+def save_data():
+    '''
+    # 用于查看编码后的结果，并且将数据进行保存
+    :param data:
+    :return:
+    '''
+    path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/visualization_feature/raw_data_time_sequentially/preseizure/BDP/filter/pre_1/e076f2ea-2552-11ea-9699-e0d55e6ff654-0.npy"
+    data = np.load(path)
+    data = matrix_normalization(data)
+    # data = torch.from_numpy(data).cuda(0)
+    result = trans_data(model, data, shape=(130, 200))
+    save_path = './save_vae_data/e076f2ea-2552-11ea-9699-e0d55e6ff654-vae-0.npy'
+    # result = result.cpu().numpy()
+    np.save(save_path, result)
+
+
 if __name__ == "__main__":
-    for epoch in tqdm(range(1, args.epochs + 1)):
-        # 1.训练正态编码器
-        train_positive(epoch)
-        # 2. 训练负态编码器
-        train_negative(epoch)
-        # 3.用全部数据训练编码器， 暂未使用
-        # train_all_data(epoch)
+    # for epoch in tqdm(range(1, args.epochs + 1)):
+    #     # 1.训练正态编码器
+    #     train_positive(epoch)
+    #     # 2. 训练负态编码器
+    #     train_negative(epoch)
+    #     # 3.用全部数据训练编码器， 暂未使用
+    #     # train_all_data(epoch)
+    save_data()

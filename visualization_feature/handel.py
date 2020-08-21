@@ -182,7 +182,7 @@ def image_connection(data_signal_dir, raw_data_dir,
         plt.close(0)
 
 
-@profile(precision=10)
+# @profile(precision=10)
 def time_heat_map():
     '''
 

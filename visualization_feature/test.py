@@ -4,6 +4,7 @@ from scipy import fftpack
 import numpy as np
 from handel import feature_analysis
 import matplotlib.pyplot as plt
+from util.util_file import matrix_normalization
 
 sys.path.append("../")
 import json
@@ -55,6 +56,34 @@ def test_data_shape(path):
     data = np.load(path)
     print(data.shape)
 
+def draw_seeg_picture(data, sampling=500, x_axis='Time [sec]', y_axis='Channel'):
+    '''
+
+    :param data: SEEG读取的信号， 进行可视化的读取
+    :return:
+    '''
+    width = data.shape[1]
+    height = data.shape[0]
+    dpi = 100
+    plt.figure(figsize=(4, 3), dpi=200)
+    # my_x_ticks = np.arange(0, width // sampling, 1.0 / sampling)  # 原始数据有width个数据，故此处为设置从0开始，间隔为1/sampling
+    # plt.xticks(my_x_ticks)
+    plt.xlabel(x_axis)
+    # plt.ylabel(y_axis)
+    # plt.axis('off')
+    plt.imshow(data, aspect='auto')
+    plt.show()
+    plt.close()
+
+
+def draw():
+    path = '/home/cbd109-3/Users/data/yh/Program/Python/SEEG/visualization_feature/raw_data_time_sequentially/preseizure/BDP/filter/pre_1/e076f2ea-2552-11ea-9699-e0d55e6ff654-0.npy'
+    data = np.load(path, allow_pickle=True)
+    data = matrix_normalization(data)
+    draw_seeg_picture(data, sampling=100)
+
+
+
 
 if __name__ == '__main__':
     # path = "./log/BDP/preseizure/BDP-random_sample.npy"
@@ -62,6 +91,7 @@ if __name__ == '__main__':
     # feature_analysis(feature_data_path=path)
     # path = "./log/BDP/preseizure/BDP-feature.npy"
 #     # test_data_shape(path)
-    path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/visualization_feature/raw_data_time_sequentially/preseizure/BDP/filter/pre_1/e076f2d4-2552-11ea-9699-e0d55e6ff654-0.npy"
-    data = np.load(path)
-    print(data.shape)
+#     path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/visualization_feature/raw_data_time_sequentially/preseizure/BDP/filter/pre_1/e076f2d4-2552-11ea-9699-e0d55e6ff654-0.npy"
+#     data = np.load(path)
+#     print(data.shape)
+    draw()

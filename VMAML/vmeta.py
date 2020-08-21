@@ -348,21 +348,21 @@ class Meta(nn.Module):
         # accs = np.array(corrects) / querysz
 
         # 将预测的结果进行统计
-        prediction_query = prediction_query[index]
-        if query_y_id_list is not None:
-            r_path = "./precision/{}_single_prediction.pkl".format(patient_test)
-            # 文件存在需要被创建
-            record = {} if not os.path.exists(r_path) else np.load(r_path, allow_pickle=True)
-            # record = np.load(r_path, allow_pickle=True)
-            ground_truth = y_qry.cpu().tolist()
-            for index, id in enumerate(query_y_id_list):
-                if id not in record.keys():
-                    label = prediction_query[index]
-                    res = {'ground truth': ground_truth[index], 'prediction': label}
-                    record[id] = res
-
-            with open(r_path, 'wb') as f:
-                pickle.dump(record, f)
+        # prediction_query = prediction_query[index]
+        # if query_y_id_list is not None:
+        #     r_path = "./precision/{}_single_prediction.pkl".format(patient_test)
+        #     # 文件存在需要被创建
+        #     record = {} if not os.path.exists(r_path) else np.load(r_path, allow_pickle=True)
+        #     # record = np.load(r_path, allow_pickle=True)
+        #     ground_truth = y_qry.cpu().tolist()
+        #     for index, id in enumerate(query_y_id_list):
+        #         if id not in record.keys():
+        #             label = prediction_query[index]
+        #             res = {'ground truth': ground_truth[index], 'prediction': label}
+        #             record[id] = res
+        #
+        #     with open(r_path, 'wb') as f:
+        #         pickle.dump(record, f)
 
         return result, loss_all
 
