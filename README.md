@@ -22,7 +22,7 @@ Python : pip install python
 
 **MAML** including MAML model.
 
-**VMAML** A new model that combines vae and maml.
+**VAML** A new model that combines vae and maml.
 
 **VAE** variational auto encode, coding seeg matrix.
 
