@@ -1,13 +1,20 @@
 # SEEG Project
-## introduction 
+## Introduction 
 
 The focus point of this project is to research the difference between sleep of pre seizure and normal sleep.
+
+
+## Data preprocessing 
+
+You need read DataProcessing 
 
 ## How to run this project
 
 MNE: pip install -U https://api.github.com/repos/mne-tools/mne-python/zipball/master
 
 Python : pip install python 
+
+You need run ./Seeg_VMAML_Double_Vae.py
 
 
 ## Content
