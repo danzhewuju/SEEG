@@ -10,11 +10,11 @@ import matplotlib.gridspec as grd
 import numpy as np
 from util.util_file import matrix_normalization
 
-data_1 = np.load('./e076f2ea-2552-11ea-9699-e0d55e6ff654-0.npy')
+data_1 = np.load('./54f69ee6-2ac8-11ea-a4b0-e0d55e6ff654-0-raw-v1.npy')
 data_1 = matrix_normalization(data_1)
-data_2 = np.load('./e076f2ea-2552-11ea-9699-e0d55e6ff654-vae-0.npy')
-htmp1 = np.load('./3037c2d1-1ccf-11ea-9699-e0d55e6ff654-0-loc-34-34-33-33-34.npy')
-cord = np.load('./3037c2d1-1ccf-11ea-9699-e0d55e6ff654-0.npy')
+data_2 = np.load('./54f69ee6-2ac8-11ea-a4b0-e0d55e6ff654-0-vae-v1.npy')
+htmp1 = np.load('./3037c18b-1ccf-11ea-9699-e0d55e6ff654-0-loc-138-134-140-135-136-v1.npy')
+cord = np.load('./3037c18b-1ccf-11ea-9699-e0d55e6ff654-0-v1.npy')
 # plt.imshow(data_1)
 # plt.show()
 htmp2 = []

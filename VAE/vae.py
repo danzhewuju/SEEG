@@ -283,12 +283,12 @@ def save_data():
     :param data:
     :return:
     '''
-    path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/visualization_feature/raw_data_time_sequentially/preseizure/BDP/filter/pre_1/e076f2ea-2552-11ea-9699-e0d55e6ff654-0.npy"
+    path = "/home/cbd109-3/Users/data/yh/Program/Python/SEEG/visualization_feature/raw_data_time_sequentially/preseizure/BDP/no_filter/pre_1/54f69ee6-2ac8-11ea-a4b0-e0d55e6ff654-0.npy"
     data = np.load(path)
     data = matrix_normalization(data)
     # data = torch.from_numpy(data).cuda(0)
     result = trans_data(model, data, shape=(130, 200))
-    save_path = './save_vae_data/e076f2ea-2552-11ea-9699-e0d55e6ff654-vae-0.npy'
+    save_path = './save_vae_data/54f69ee6-2ac8-11ea-a4b0-e0d55e6ff654-0-vae-v1.npy'
     # result = result.cpu().numpy()
     np.save(save_path, result)
 
