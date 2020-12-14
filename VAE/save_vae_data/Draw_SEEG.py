@@ -35,11 +35,13 @@ ax.set_yticks([])
 # x_major_locator=MultipleLocator(2/200)
 # ax.xaxis.set_major_locator(x_major_locator)
 p = ax.imshow(data_1, interpolation='nearest')  # htmp2是热力图变量
+ax.text(90, 165,'(a)')
 xlabel = ['$0.0$', '$0.5$', '$1.0$', '$1.5$', '$2.0$']
 plt.xticks(np.arange(0, 201, 50), xlabel)
 plt.ylabel("Channel", labelpad=10)
 
 ax1 = plt.subplot(gs[2])
+ax1.text(90, 165, '(b)')
 ax1.set_yticks([])
 p = ax1.imshow(htmp2, interpolation='nearest')  # htmp2是热力图变量
 xlabel = ['$0.0$', '$0.5$', '$1.0$', '$1.5$', '$2.0$']
@@ -47,6 +49,7 @@ plt.xticks(np.arange(0, 201, 50), xlabel)
 plt.ylabel("Channel", labelpad=10)
 
 ax2 = plt.subplot(gs[3])  # 设置左下网格画波形
+ax2.text(90, 180, '(c)')
 ax2.set_yticks([])
 ax2 = ax2.imshow(data_2, interpolation='nearest')  # 设置左下网格画波形
 xlabel = ['$0.0$', '$0.5$', '$1.0$', '$1.5$', '$2.0$']
@@ -58,13 +61,15 @@ plt.xlabel("Time [sec]")
 # cb = plt.colorbar(p, cax = colorAx)
 # cb.set_label('RWU')
 ax4 = plt.subplot(gs[5])  # 设置左下网格画波形
+
 # plt.figure(figsize=(2, 2))
 # ax4.set_yticks([])
-ax4.plot(np.linspace(0, 2, 200), cord * 1000000, 'k', lw=0.5)  # 波形数据
+ax4.plot(np.linspace(0, 2, 200), cord *1000000, 'k', lw=0.5)  # 波形数据
 # xlabel = ['$0.0$', '$0.5$', '$1.0$', '$1.5$', '$2.0$']
 # plt.xticks(np.arange(0, 201, 50), xlabel)
 plt.ylabel("Voltage [uV]")
 plt.xlabel("Time [sec]")
+ax4.text(90,180, '(d)')
 
 plt.savefig('heatmap.pdf')
 plt.show()

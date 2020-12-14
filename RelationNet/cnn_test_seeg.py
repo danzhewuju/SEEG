@@ -222,7 +222,7 @@ def run():
              ":{}, h:{}\n average AUC:{}, h:{}".format(average_accuracy, h_a, average_precision, h_p, average_recall,
                                   h_r, average_f1score, h_f, average_auc, h_au)
     print(result)
-    log = "{}-{}:\n{} ".format(os.path.basename(__file__), patient_test, result)
+    log = "{}-{} {} ".format(os.path.basename(__file__), patient_test, result)
     LogRecord.write_log(log)
     end_time = time.time()
     run_time = end_time - start_time
